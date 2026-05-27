@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hacker House Collection — A residency for builders</title>
+  <meta name="description" content="A curated residency for builders, hackers, and founders. Live in the house. Ship from the house." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ambient backdrop, lives behind everything -->
+  <div class="backdrop" aria-hidden="true">
+    <div class="backdrop__photo"></div>
+    <div class="backdrop__veil"></div>
+    <div class="backdrop__leak backdrop__leak--a"></div>
+    <div class="backdrop__leak backdrop__leak--b"></div>
+    <div class="backdrop__leak backdrop__leak--c"></div>
+  </div>
+
+  <!-- glass pill nav -->
+  <header class="nav">
+    <a class="nav__brand" href="#top" aria-label="Hacker House Collection">
+      <span class="nav__mark" aria-hidden="true">✦</span>
+      <span class="nav__wordmark"><em>Hacker</em> House</span>
+    </a>
+    <nav class="nav__pills" aria-label="Primary">
+      <a class="nav__pill" href="#top">main</a>
+      <a class="nav__pill" href="#concept">about us</a>
+      <a class="nav__pill nav__pill--cta" href="#apply">
+        <span>apply now</span>
+        <span class="nav__pill-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="nav__pill" href="#houses">homes</a>
+      <a class="nav__pill" href="#cohort">inspire</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <!-- LEFT: the glass pane with title + apply button -->
+      <div class="hero__left">
+        <article class="hero__pane glass">
+          <div class="panel__rim"></div>
+          <div class="panel__shine"></div>
+
+          <header class="hero__pane-head">
+            <span class="tag">Cohort 07 · Open Call</span>
+            <span class="hero__pane-dot" aria-hidden="true"></span>
+          </header>
+
+          <h1 class="hero__title">
+            <span class="line">A house</span>
+            <span class="line"><em>for the people</em></span>
+            <span class="line">who can't <em>stop</em></span>
+            <span class="line">building.</span>
+          </h1>
+
+          <p class="hero__sub">
+            Eight weeks. One roof. The friends who'll ship with you for
+            the next ten years. Hand-picked residencies for builders
+            across four cities — pick one, ship the work.
+          </p>
+
+          <div class="hero__actions">
+            <a href="#apply" class="btn btn--primary btn--lg glass glass--button">
+              <span class="btn__label">Apply for Cohort 07</span>
+              <span class="btn__caret" aria-hidden="true">→</span>
+            </a>
+            <a href="#concept" class="btn btn--ghost">
+              <span class="btn__dot" aria-hidden="true"></span>
+              Read the dossier
+            </a>
+          </div>
+
+          <footer class="hero__pane-foot">
+            <div>
+              <span class="hero__foot-num">4</span>
+              <span class="hero__foot-label">houses</span>
+            </div>
+            <div>
+              <span class="hero__foot-num">24</span>
+              <span class="hero__foot-label">residents</span>
+            </div>
+            <div>
+              <span class="hero__foot-num">8</span>
+              <span class="hero__foot-label">weeks</span>
+            </div>
+            <div>
+              <span class="hero__foot-num">06.28</span>
+              <span class="hero__foot-label">closes</span>
+            </div>
+          </footer>
+        </article>
+      </div>
+
+      <!-- RIGHT: the map, layer 1, with an animated trail moving across locations -->
+      <div class="hero__right" aria-hidden="true">
+        <div class="hero__map">
+          <svg
+            class="map"
+            viewBox="0 0 1200 700"
+            preserveAspectRatio="xMidYMid slice"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffc079" stop-opacity="0.9" />
+                <stop offset="60%" stop-color="#ff6a30" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="#ff6a30" stop-opacity="0" />
+              </radialGradient>
+              <radialGradient id="travelerGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fff5dc" stop-opacity="1" />
+                <stop offset="30%" stop-color="#ffc079" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#ffc079" stop-opacity="0" />
+              </radialGradient>
+              <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" />
+              </filter>
+
+              <!-- the trail itself — a smooth bezier that loops through the four houses
+                   SF → CDMX → Berlin → Tokyo → back to SF -->
+              <path
+                id="trail"
+                d="M 220 230 Q 250 290 320 320 Q 380 345 470 310 Q 540 280 640 200 Q 780 180 940 240 Q 1100 290 1140 340 Q 1080 400 940 420 Q 780 430 640 380 Q 520 340 380 380 Q 260 410 220 360 Z"
+              />
+            </defs>
+
+            <!-- graticule of dots, drawn as a regular grid for the map texture -->
+            <g class="map__grid">
+              <!-- vertical lat dots, generated as a 20x12 grid -->
+              <g fill="rgba(246, 236, 214, 0.10)">
+                <!-- row by row -->
+                <circle cx="40"   cy="60"  r="1.2"/><circle cx="120"  cy="60"  r="1.2"/><circle cx="200"  cy="60"  r="1.2"/><circle cx="280"  cy="60"  r="1.2"/><circle cx="360"  cy="60"  r="1.2"/><circle cx="440"  cy="60"  r="1.2"/><circle cx="520"  cy="60"  r="1.2"/><circle cx="600"  cy="60"  r="1.2"/><circle cx="680"  cy="60"  r="1.2"/><circle cx="760"  cy="60"  r="1.2"/><circle cx="840"  cy="60"  r="1.2"/><circle cx="920"  cy="60"  r="1.2"/><circle cx="1000" cy="60"  r="1.2"/><circle cx="1080" cy="60"  r="1.2"/><circle cx="1160" cy="60"  r="1.2"/>
+                <circle cx="40"   cy="120" r="1.2"/><circle cx="120"  cy="120" r="1.2"/><circle cx="200"  cy="120" r="1.2"/><circle cx="280"  cy="120" r="1.2"/><circle cx="360"  cy="120" r="1.2"/><circle cx="440"  cy="120" r="1.2"/><circle cx="520"  cy="120" r="1.2"/><circle cx="600"  cy="120" r="1.2"/><circle cx="680"  cy="120" r="1.2"/><circle cx="760"  cy="120" r="1.2"/><circle cx="840"  cy="120" r="1.2"/><circle cx="920"  cy="120" r="1.2"/><circle cx="1000" cy="120" r="1.2"/><circle cx="1080" cy="120" r="1.2"/><circle cx="1160" cy="120" r="1.2"/>
+                <circle cx="40"   cy="180" r="1.2"/><circle cx="120"  cy="180" r="1.2"/><circle cx="200"  cy="180" r="1.2"/><circle cx="280"  cy="180" r="1.2"/><circle cx="360"  cy="180" r="1.2"/><circle cx="440"  cy="180" r="1.2"/><circle cx="520"  cy="180" r="1.2"/><circle cx="600"  cy="180" r="1.2"/><circle cx="680"  cy="180" r="1.2"/><circle cx="760"  cy="180" r="1.2"/><circle cx="840"  cy="180" r="1.2"/><circle cx="920"  cy="180" r="1.2"/><circle cx="1000" cy="180" r="1.2"/><circle cx="1080" cy="180" r="1.2"/><circle cx="1160" cy="180" r="1.2"/>
+                <circle cx="40"   cy="240" r="1.2"/><circle cx="120"  cy="240" r="1.2"/><circle cx="200"  cy="240" r="1.2"/><circle cx="280"  cy="240" r="1.2"/><circle cx="360"  cy="240" r="1.2"/><circle cx="440"  cy="240" r="1.2"/><circle cx="520"  cy="240" r="1.2"/><circle cx="600"  cy="240" r="1.2"/><circle cx="680"  cy="240" r="1.2"/><circle cx="760"  cy="240" r="1.2"/><circle cx="840"  cy="240" r="1.2"/><circle cx="920"  cy="240" r="1.2"/><circle cx="1000" cy="240" r="1.2"/><circle cx="1080" cy="240" r="1.2"/><circle cx="1160" cy="240" r="1.2"/>
+                <circle cx="40"   cy="300" r="1.2"/><circle cx="120"  cy="300" r="1.2"/><circle cx="200"  cy="300" r="1.2"/><circle cx="280"  cy="300" r="1.2"/><circle cx="360"  cy="300" r="1.2"/><circle cx="440"  cy="300" r="1.2"/><circle cx="520"  cy="300" r="1.2"/><circle cx="600"  cy="300" r="1.2"/><circle cx="680"  cy="300" r="1.2"/><circle cx="760"  cy="300" r="1.2"/><circle cx="840"  cy="300" r="1.2"/><circle cx="920"  cy="300" r="1.2"/><circle cx="1000" cy="300" r="1.2"/><circle cx="1080" cy="300" r="1.2"/><circle cx="1160" cy="300" r="1.2"/>
+                <circle cx="40"   cy="360" r="1.2"/><circle cx="120"  cy="360" r="1.2"/><circle cx="200"  cy="360" r="1.2"/><circle cx="280"  cy="360" r="1.2"/><circle cx="360"  cy="360" r="1.2"/><circle cx="440"  cy="360" r="1.2"/><circle cx="520"  cy="360" r="1.2"/><circle cx="600"  cy="360" r="1.2"/><circle cx="680"  cy="360" r="1.2"/><circle cx="760"  cy="360" r="1.2"/><circle cx="840"  cy="360" r="1.2"/><circle cx="920"  cy="360" r="1.2"/><circle cx="1000" cy="360" r="1.2"/><circle cx="1080" cy="360" r="1.2"/><circle cx="1160" cy="360" r="1.2"/>
+                <circle cx="40"   cy="420" r="1.2"/><circle cx="120"  cy="420" r="1.2"/><circle cx="200"  cy="420" r="1.2"/><circle cx="280"  cy="420" r="1.2"/><circle cx="360"  cy="420" r="1.2"/><circle cx="440"  cy="420" r="1.2"/><circle cx="520"  cy="420" r="1.2"/><circle cx="600"  cy="420" r="1.2"/><circle cx="680"  cy="420" r="1.2"/><circle cx="760"  cy="420" r="1.2"/><circle cx="840"  cy="420" r="1.2"/><circle cx="920"  cy="420" r="1.2"/><circle cx="1000" cy="420" r="1.2"/><circle cx="1080" cy="420" r="1.2"/><circle cx="1160" cy="420" r="1.2"/>
+                <circle cx="40"   cy="480" r="1.2"/><circle cx="120"  cy="480" r="1.2"/><circle cx="200"  cy="480" r="1.2"/><circle cx="280"  cy="480" r="1.2"/><circle cx="360"  cy="480" r="1.2"/><circle cx="440"  cy="480" r="1.2"/><circle cx="520"  cy="480" r="1.2"/><circle cx="600"  cy="480" r="1.2"/><circle cx="680"  cy="480" r="1.2"/><circle cx="760"  cy="480" r="1.2"/><circle cx="840"  cy="480" r="1.2"/><circle cx="920"  cy="480" r="1.2"/><circle cx="1000" cy="480" r="1.2"/><circle cx="1080" cy="480" r="1.2"/><circle cx="1160" cy="480" r="1.2"/>
+                <circle cx="40"   cy="540" r="1.2"/><circle cx="120"  cy="540" r="1.2"/><circle cx="200"  cy="540" r="1.2"/><circle cx="280"  cy="540" r="1.2"/><circle cx="360"  cy="540" r="1.2"/><circle cx="440"  cy="540" r="1.2"/><circle cx="520"  cy="540" r="1.2"/><circle cx="600"  cy="540" r="1.2"/><circle cx="680"  cy="540" r="1.2"/><circle cx="760"  cy="540" r="1.2"/><circle cx="840"  cy="540" r="1.2"/><circle cx="920"  cy="540" r="1.2"/><circle cx="1000" cy="540" r="1.2"/><circle cx="1080" cy="540" r="1.2"/><circle cx="1160" cy="540" r="1.2"/>
+                <circle cx="40"   cy="600" r="1.2"/><circle cx="120"  cy="600" r="1.2"/><circle cx="200"  cy="600" r="1.2"/><circle cx="280"  cy="600" r="1.2"/><circle cx="360"  cy="600" r="1.2"/><circle cx="440"  cy="600" r="1.2"/><circle cx="520"  cy="600" r="1.2"/><circle cx="600"  cy="600" r="1.2"/><circle cx="680"  cy="600" r="1.2"/><circle cx="760"  cy="600" r="1.2"/><circle cx="840"  cy="600" r="1.2"/><circle cx="920"  cy="600" r="1.2"/><circle cx="1000" cy="600" r="1.2"/><circle cx="1080" cy="600" r="1.2"/><circle cx="1160" cy="600" r="1.2"/>
+                <circle cx="40"   cy="660" r="1.2"/><circle cx="120"  cy="660" r="1.2"/><circle cx="200"  cy="660" r="1.2"/><circle cx="280"  cy="660" r="1.2"/><circle cx="360"  cy="660" r="1.2"/><circle cx="440"  cy="660" r="1.2"/><circle cx="520"  cy="660" r="1.2"/><circle cx="600"  cy="660" r="1.2"/><circle cx="680"  cy="660" r="1.2"/><circle cx="760"  cy="660" r="1.2"/><circle cx="840"  cy="660" r="1.2"/><circle cx="920"  cy="660" r="1.2"/><circle cx="1000" cy="660" r="1.2"/><circle cx="1080" cy="660" r="1.2"/><circle cx="1160" cy="660" r="1.2"/>
+              </g>
+            </g>
+
+            <!-- simplified continent silhouettes — abstract, low contrast -->
+            <g class="map__land" fill="rgba(246, 236, 214, 0.045)" stroke="rgba(246, 236, 214, 0.10)" stroke-width="1">
+              <!-- north america -->
+              <path d="M 80 130 Q 130 100 200 110 Q 280 110 330 160 Q 360 220 320 260 Q 280 290 250 285 Q 220 320 180 310 Q 140 290 110 250 Q 80 200 80 130 Z" />
+              <!-- south america -->
+              <path d="M 280 320 Q 330 320 350 380 Q 360 460 320 530 Q 280 590 260 540 Q 250 470 260 410 Q 270 360 280 320 Z" />
+              <!-- europe -->
+              <path d="M 540 130 Q 600 110 660 130 Q 700 160 680 200 Q 640 220 600 210 Q 560 200 540 170 Z" />
+              <!-- africa -->
+              <path d="M 580 230 Q 660 230 700 280 Q 720 360 680 440 Q 640 490 600 470 Q 560 430 560 360 Q 560 290 580 230 Z" />
+              <!-- asia -->
+              <path d="M 700 130 Q 820 100 950 140 Q 1040 170 1060 220 Q 1040 260 980 250 Q 880 260 800 240 Q 740 220 700 180 Z" />
+              <!-- southeast asia / oceania -->
+              <path d="M 960 380 Q 1020 380 1060 420 Q 1080 460 1040 480 Q 990 480 960 460 Q 940 430 960 380 Z" />
+              <!-- australia -->
+              <path d="M 1000 500 Q 1060 490 1110 510 Q 1140 540 1110 570 Q 1060 580 1010 565 Q 980 540 1000 500 Z" />
+            </g>
+
+            <!-- the connecting trail (full loop, dashed faint) -->
+            <use href="#trail" class="map__trail-base" />
+            <!-- the bright drawing trail (animated stroke offset) -->
+            <use href="#trail" class="map__trail-bright" />
+
+            <!-- city pins -->
+            <g class="map__pins">
+              <!-- SF -->
+              <g class="map__pin" transform="translate(220 230)">
+                <circle class="map__pin-halo" r="34" fill="url(#pinGlow)" />
+                <circle class="map__pin-ring" r="14" />
+                <circle class="map__pin-dot" r="5" />
+                <g class="map__pin-label" transform="translate(20 -10)">
+                  <text class="map__pin-name">San Francisco</text>
+                  <text class="map__pin-meta" dy="14">37.77° N · H/01</text>
+                </g>
+              </g>
+              <!-- CDMX -->
+              <g class="map__pin" transform="translate(320 320)">
+                <circle class="map__pin-halo" r="32" fill="url(#pinGlow)" />
+                <circle class="map__pin-ring" r="14" />
+                <circle class="map__pin-dot" r="5" />
+                <g class="map__pin-label" transform="translate(20 -10)">
+                  <text class="map__pin-name">Mexico City</text>
+                  <text class="map__pin-meta" dy="14">19.43° N · H/04</text>
+                </g>
+              </g>
+              <!-- Berlin -->
+              <g class="map__pin" transform="translate(640 200)">
+                <circle class="map__pin-halo" r="32" fill="url(#pinGlow)" />
+                <circle class="map__pin-ring" r="14" />
+                <circle class="map__pin-dot" r="5" />
+                <g class="map__pin-label" transform="translate(20 -10)">
+                  <text class="map__pin-name">Berlin</text>
+                  <text class="map__pin-meta" dy="14">52.52° N · H/03</text>
+                </g>
+              </g>
+              <!-- Tokyo -->
+              <g class="map__pin" transform="translate(940 240)">
+                <circle class="map__pin-halo" r="32" fill="url(#pinGlow)" />
+                <circle class="map__pin-ring" r="14" />
+                <circle class="map__pin-dot" r="5" />
+                <g class="map__pin-label map__pin-label--left" transform="translate(-20 -10)">
+                  <text class="map__pin-name" text-anchor="end">Tokyo</text>
+                  <text class="map__pin-meta" text-anchor="end" dy="14">35.68° N · H/02</text>
+                </g>
+              </g>
+            </g>
+
+            <!-- the traveler — a glowing dot that walks the loop -->
+            <g class="map__traveler-group">
+              <circle r="22" fill="url(#travelerGlow)">
+                <animateMotion dur="18s" repeatCount="indefinite">
+                  <mpath href="#trail" />
+                </animateMotion>
+              </circle>
+              <circle r="3.5" fill="#fff5dc" class="map__traveler-core">
+                <animateMotion dur="18s" repeatCount="indefinite">
+                  <mpath href="#trail" />
+                </animateMotion>
+              </circle>
+            </g>
+          </svg>
+
+          <!-- gradient mask: the map fades into the background -->
+          <div class="hero__map-mask" aria-hidden="true"></div>
+
+          <!-- floating context chip over the map -->
+          <div class="map__chip glass">
+            <div class="panel__rim"></div>
+            <span class="map__chip-pill">live</span>
+            <span class="map__chip-line">Cohort 07 · 19 of 50 seats remaining</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- scroll hint -->
+      <div class="hero__scroll" aria-hidden="true">
+        <span>scroll</span>
+        <span class="hero__scroll-line"></span>
+      </div>
+    </section>
+
+    <!-- ============ DISPATCH / TICKER ============ -->
+    <section class="ticker" aria-label="Dispatches">
+      <div class="ticker__track">
+        <span>Cohort 07 — open call closes June 28</span>
+        <span aria-hidden="true">✦</span>
+        <span>House Tokyo — 6 seats remaining</span>
+        <span aria-hidden="true">✦</span>
+        <span>House Berlin — 4 seats remaining</span>
+        <span aria-hidden="true">✦</span>
+        <span>House SF — closed (waitlist open)</span>
+        <span aria-hidden="true">✦</span>
+        <span>House CDMX — 9 seats remaining</span>
+        <span aria-hidden="true">✦</span>
+        <span>Cohort 07 — open call closes June 28</span>
+        <span aria-hidden="true">✦</span>
+        <span>House Tokyo — 6 seats remaining</span>
+        <span aria-hidden="true">✦</span>
+        <span>House Berlin — 4 seats remaining</span>
+        <span aria-hidden="true">✦</span>
+      </div>
+    </section>
+
+    <!-- ============ ACT 2 — paper / calm ============ -->
+    <div class="paper">
+
+    <!-- ============ CONCEPT ============ -->
+    <section id="concept" class="concept">
+      <header class="section__head">
+        <span class="section__kicker">§ 01 — The concept</span>
+        <h2 class="section__title">
+          Three moods. <em>One house.</em>
+        </h2>
+        <p class="section__lede">
+          A day in the house moves through three states. Morning fog,
+          afternoon clarity, the long blur of a build night. We design the
+          weeks around them.
+        </p>
+      </header>
+
+      <div class="concept__grid">
+        <article class="concept__card glass concept__card--frosted">
+          <div class="panel__rim"></div>
+          <div class="panel__shine"></div>
+          <div class="concept__num">i.</div>
+          <h3 class="concept__name">Frosted</h3>
+          <p class="concept__time">07:30 — 11:00</p>
+          <p class="concept__body">
+            The morning is quiet. Pour-overs at the long table. Notebooks
+            before laptops. You read your own code from yesterday like a
+            stranger wrote it. The house breathes slowly.
+          </p>
+          <ul class="concept__list">
+            <li>silent hours</li>
+            <li>solo reading</li>
+            <li>longhand planning</li>
+          </ul>
+        </article>
+
+        <article class="concept__card glass concept__card--clear">
+          <div class="panel__rim"></div>
+          <div class="panel__shine"></div>
+          <div class="concept__num">ii.</div>
+          <h3 class="concept__name">Clear</h3>
+          <p class="concept__time">11:00 — 18:00</p>
+          <p class="concept__body">
+            The middle is sharp. Pair reviews on the couch. Honest feedback
+            without ceremony. The cohort has each other's terminals open in
+            tabs. Decisions get made in minutes.
+          </p>
+          <ul class="concept__list">
+            <li>weekly demos</li>
+            <li>open code reviews</li>
+            <li>founder office hours</li>
+          </ul>
+        </article>
+
+        <article class="concept__card glass concept__card--blur">
+          <div class="panel__rim"></div>
+          <div class="panel__shine"></div>
+          <div class="concept__num">iii.</div>
+          <h3 class="concept__name">Blur</h3>
+          <p class="concept__time">18:00 — late</p>
+          <p class="concept__body">
+            The night blurs. A record on, dinner cooked together, then
+            laptops back open. Most of what gets shipped, gets shipped here.
+            By 2 a.m. someone is reading a paper out loud.
+          </p>
+          <ul class="concept__list">
+            <li>shared dinners</li>
+            <li>long shipping nights</li>
+            <li>2 a.m. paper club</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ HOUSES ============ -->
+    <section id="houses" class="houses">
+      <header class="section__head section__head--split">
+        <div>
+          <span class="section__kicker">§ 02 — The houses</span>
+          <h2 class="section__title">Four houses. <em>One collection.</em></h2>
+        </div>
+        <p class="section__aside">
+          Each house is leased for a season, dressed by a different
+          architect, and run by a resident-in-residence. You apply to the
+          collection; we match you to the house.
+        </p>
+      </header>
+
+      <div class="houses__grid">
+        <article class="house glass" data-city="sf">
+          <div class="panel__rim"></div>
+          <div class="house__photo house__photo--sf" aria-hidden="true"></div>
+          <div class="house__body">
+            <header class="house__head">
+              <span class="house__index">H/01</span>
+              <span class="house__status house__status--closed">closed · waitlist</span>
+            </header>
+            <h3 class="house__name">House San Francisco</h3>
+            <p class="house__loc">Lower Haight · 6 bedrooms</p>
+            <p class="house__desc">
+              A pre-war Victorian with a sunken living room and far too
+              many whiteboards. Walkable to the dive bar where the last
+              cohort signed their first term sheet.
+            </p>
+            <footer class="house__foot">
+              <span class="house__seats">— · closed</span>
+              <span class="house__dates">Jul 14 — Sep 08</span>
+            </footer>
+          </div>
+        </article>
+
+        <article class="house glass" data-city="tyo">
+          <div class="panel__rim"></div>
+          <div class="house__photo house__photo--tyo" aria-hidden="true"></div>
+          <div class="house__body">
+            <header class="house__head">
+              <span class="house__index">H/02</span>
+              <span class="house__status">6 seats</span>
+            </header>
+            <h3 class="house__name">House Tokyo</h3>
+            <p class="house__loc">Shimokitazawa · 5 bedrooms</p>
+            <p class="house__desc">
+              A converted record store on a quiet side street. The genkan
+              still has the old shop bell. Best coffee in any of the
+              houses, decided by an embarrassingly long tournament.
+            </p>
+            <footer class="house__foot">
+              <span class="house__seats">6 of 12 open</span>
+              <span class="house__dates">Jul 14 — Sep 08</span>
+            </footer>
+          </div>
+        </article>
+
+        <article class="house glass" data-city="ber">
+          <div class="panel__rim"></div>
+          <div class="house__photo house__photo--ber" aria-hidden="true"></div>
+          <div class="house__body">
+            <header class="house__head">
+              <span class="house__index">H/03</span>
+              <span class="house__status">4 seats</span>
+            </header>
+            <h3 class="house__name">House Berlin</h3>
+            <p class="house__loc">Kreuzberg · 7 bedrooms</p>
+            <p class="house__desc">
+              A loft above an old printing press. Concrete floors, brass
+              fixtures, a Steinway nobody admits to playing until week
+              three. Demo night spills onto the canal.
+            </p>
+            <footer class="house__foot">
+              <span class="house__seats">4 of 14 open</span>
+              <span class="house__dates">Jul 14 — Sep 08</span>
+            </footer>
+          </div>
+        </article>
+
+        <article class="house glass" data-city="cdmx">
+          <div class="panel__rim"></div>
+          <div class="house__photo house__photo--cdmx" aria-hidden="true"></div>
+          <div class="house__body">
+            <header class="house__head">
+              <span class="house__index">H/04</span>
+              <span class="house__status">9 seats</span>
+            </header>
+            <h3 class="house__name">House Mexico City</h3>
+            <p class="house__loc">Roma Norte · 8 bedrooms</p>
+            <p class="house__desc">
+              A pink villa with a courtyard you can't quite believe you're
+              allowed to work in. Rooftop demos at sunset. The dog who
+              lives next door has been adopted by every cohort since 2022.
+            </p>
+            <footer class="house__foot">
+              <span class="house__seats">9 of 16 open</span>
+              <span class="house__dates">Jul 14 — Sep 08</span>
+            </footer>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ A DAY ============ -->
+    <section id="day" class="day">
+      <header class="section__head">
+        <span class="section__kicker">§ 03 — A day in the house</span>
+        <h2 class="section__title">
+          The shape of <em>a Tuesday.</em>
+        </h2>
+      </header>
+
+      <!-- ink-on-paper map drawn behind the glass tile -->
+      <div class="day__map" aria-hidden="true">
+        <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <!-- graticule of dots -->
+          <g class="day__map-grid">
+            <circle cx="80" cy="80" r="1.2"/><circle cx="200" cy="80" r="1.2"/><circle cx="320" cy="80" r="1.2"/><circle cx="440" cy="80" r="1.2"/><circle cx="560" cy="80" r="1.2"/><circle cx="680" cy="80" r="1.2"/><circle cx="800" cy="80" r="1.2"/><circle cx="920" cy="80" r="1.2"/><circle cx="1040" cy="80" r="1.2"/><circle cx="1160" cy="80" r="1.2"/>
+            <circle cx="80" cy="160" r="1.2"/><circle cx="200" cy="160" r="1.2"/><circle cx="320" cy="160" r="1.2"/><circle cx="440" cy="160" r="1.2"/><circle cx="560" cy="160" r="1.2"/><circle cx="680" cy="160" r="1.2"/><circle cx="800" cy="160" r="1.2"/><circle cx="920" cy="160" r="1.2"/><circle cx="1040" cy="160" r="1.2"/><circle cx="1160" cy="160" r="1.2"/>
+            <circle cx="80" cy="240" r="1.2"/><circle cx="200" cy="240" r="1.2"/><circle cx="320" cy="240" r="1.2"/><circle cx="440" cy="240" r="1.2"/><circle cx="560" cy="240" r="1.2"/><circle cx="680" cy="240" r="1.2"/><circle cx="800" cy="240" r="1.2"/><circle cx="920" cy="240" r="1.2"/><circle cx="1040" cy="240" r="1.2"/><circle cx="1160" cy="240" r="1.2"/>
+            <circle cx="80" cy="320" r="1.2"/><circle cx="200" cy="320" r="1.2"/><circle cx="320" cy="320" r="1.2"/><circle cx="440" cy="320" r="1.2"/><circle cx="560" cy="320" r="1.2"/><circle cx="680" cy="320" r="1.2"/><circle cx="800" cy="320" r="1.2"/><circle cx="920" cy="320" r="1.2"/><circle cx="1040" cy="320" r="1.2"/><circle cx="1160" cy="320" r="1.2"/>
+            <circle cx="80" cy="400" r="1.2"/><circle cx="200" cy="400" r="1.2"/><circle cx="320" cy="400" r="1.2"/><circle cx="440" cy="400" r="1.2"/><circle cx="560" cy="400" r="1.2"/><circle cx="680" cy="400" r="1.2"/><circle cx="800" cy="400" r="1.2"/><circle cx="920" cy="400" r="1.2"/><circle cx="1040" cy="400" r="1.2"/><circle cx="1160" cy="400" r="1.2"/>
+            <circle cx="80" cy="480" r="1.2"/><circle cx="200" cy="480" r="1.2"/><circle cx="320" cy="480" r="1.2"/><circle cx="440" cy="480" r="1.2"/><circle cx="560" cy="480" r="1.2"/><circle cx="680" cy="480" r="1.2"/><circle cx="800" cy="480" r="1.2"/><circle cx="920" cy="480" r="1.2"/><circle cx="1040" cy="480" r="1.2"/><circle cx="1160" cy="480" r="1.2"/>
+          </g>
+          <!-- simplified continents -->
+          <g class="day__map-land" stroke-width="1">
+            <path d="M 80 110 Q 130 90 200 100 Q 280 100 320 150 Q 350 200 310 240 Q 270 270 230 265 Q 195 290 165 280 Q 130 260 105 220 Q 80 180 80 110 Z" />
+            <path d="M 280 290 Q 330 290 350 350 Q 360 420 320 470 Q 285 510 265 470 Q 250 410 260 360 Q 270 320 280 290 Z" />
+            <path d="M 540 110 Q 600 95 660 110 Q 695 135 680 175 Q 640 195 600 185 Q 560 175 540 150 Z" />
+            <path d="M 580 200 Q 660 200 700 250 Q 720 320 680 390 Q 640 430 600 410 Q 560 380 560 320 Q 560 260 580 200 Z" />
+            <path d="M 700 110 Q 820 90 950 120 Q 1040 145 1060 195 Q 1040 230 980 220 Q 880 230 800 210 Q 740 195 700 160 Z" />
+            <path d="M 1000 440 Q 1060 430 1110 445 Q 1140 470 1110 495 Q 1060 505 1010 495 Q 980 475 1000 440 Z" />
+          </g>
+          <!-- a dashed route line that subtly connects the four pins -->
+          <path class="day__map-route"
+            d="M 200 200 Q 250 250 290 270 Q 450 280 620 180 Q 800 160 940 210" />
+          <!-- the four pins, small and unobtrusive -->
+          <g>
+            <circle class="day__map-pin" cx="200" cy="200" r="3.5" />
+            <circle class="day__map-pin" cx="290" cy="270" r="3.5" />
+            <circle class="day__map-pin" cx="620" cy="180" r="3.5" />
+            <circle class="day__map-pin" cx="940" cy="210" r="3.5" />
+          </g>
+        </svg>
+      </div>
+
+      <div class="day__card glass">
+        <div class="panel__rim"></div>
+        <div class="panel__shine"></div>
+
+        <ol class="day__schedule">
+          <li>
+            <span class="day__time">07:30</span>
+            <span class="day__dot" aria-hidden="true"></span>
+            <span class="day__title">Light comes up in the kitchen.</span>
+            <span class="day__note">First coffee. No phones at the table.</span>
+          </li>
+          <li>
+            <span class="day__time">09:00</span>
+            <span class="day__dot" aria-hidden="true"></span>
+            <span class="day__title">Silent block.</span>
+            <span class="day__note">Two hours, doors closed, no Slack.</span>
+          </li>
+          <li>
+            <span class="day__time">11:30</span>
+            <span class="day__dot" aria-hidden="true"></span>
+            <span class="day__title">Cohort standup, on the stairs.</span>
+            <span class="day__note">Three sentences each. What you shipped, what's stuck, what you need.</span>
+          </li>
+          <li>
+            <span class="day__time">13:00</span>
+            <span class="day__dot" aria-hidden="true"></span>
+            <span class="day__title">Lunch, cooked in pairs.</span>
+            <span class="day__note">Rotating. The schedule is on the fridge.</span>
+          </li>
+          <li>
+            <span class="day__time">14:30</span>
+            <span class="day__dot" aria-hidden="true"></span>
+            <span class="day__title">Office hours with a founder-in-residence.</span>
+            <span class="day__note">15-minute slots. Often runs over. Sometimes runs into the night.</span>
+          </li>
+          <li>
+            <span class="day__time">19:00</span>
+            <span class="day__dot" aria-hidden="true"></span>
+            <span class="day__title">Long table dinner.</span>
+            <span class="day__note">Wine. A guest. The kind of conversation you remember.</span>
+          </li>
+          <li>
+            <span class="day__time">21:00</span>
+            <span class="day__dot day__dot--hot" aria-hidden="true"></span>
+            <span class="day__title">The long shipping block.</span>
+            <span class="day__note">This is where most of the cohort's lifetime gets compressed into hours.</span>
+          </li>
+          <li>
+            <span class="day__time">02:00</span>
+            <span class="day__dot" aria-hidden="true"></span>
+            <span class="day__title">Paper club, if anyone's awake.</span>
+            <span class="day__note">Optional. Surprisingly always full.</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ COHORT ============ -->
+    <section id="cohort" class="cohort">
+      <header class="section__head section__head--split">
+        <div>
+          <span class="section__kicker">§ 04 — Cohort 06, in review</span>
+          <h2 class="section__title">Who was <em>in the room.</em></h2>
+        </div>
+        <p class="section__aside">
+          A non-exhaustive sketch of the spring cohort. The composition is
+          deliberately uneven — solo founders next to staff engineers next
+          to first-time researchers. The friction is the point.
+        </p>
+      </header>
+
+      <div class="cohort__grid">
+        <article class="resident glass">
+          <div class="panel__rim"></div>
+          <div class="resident__avatar"><span>K</span></div>
+          <div class="resident__body">
+            <h4>Kanae I.</h4>
+            <p class="resident__role">Voice models · ex-Sakana</p>
+            <p class="resident__line">Shipped a Japanese-first TTS model the cohort still uses for daily standup recaps.</p>
+          </div>
+        </article>
+
+        <article class="resident glass">
+          <div class="panel__rim"></div>
+          <div class="resident__avatar"><span>D</span></div>
+          <div class="resident__body">
+            <h4>Diego M.</h4>
+            <p class="resident__role">Climate · ex-Patch</p>
+            <p class="resident__line">Raised a $2.4M pre-seed in week six. Refused to leave the cohort early.</p>
+          </div>
+        </article>
+
+        <article class="resident glass">
+          <div class="panel__rim"></div>
+          <div class="resident__avatar"><span>P</span></div>
+          <div class="resident__body">
+            <h4>Priya R.</h4>
+            <p class="resident__role">Robotics · solo founder</p>
+            <p class="resident__line">First public demo of an under-desk arm she'd been building in private for two years.</p>
+          </div>
+        </article>
+
+        <article class="resident glass">
+          <div class="panel__rim"></div>
+          <div class="resident__avatar"><span>L</span></div>
+          <div class="resident__body">
+            <h4>Lin Z.</h4>
+            <p class="resident__role">Tools · ex-Linear</p>
+            <p class="resident__line">Open-sourced a dev tool that hit the front page of HN by week three.</p>
+          </div>
+        </article>
+
+        <article class="resident glass">
+          <div class="panel__rim"></div>
+          <div class="resident__avatar"><span>O</span></div>
+          <div class="resident__body">
+            <h4>Omar T.</h4>
+            <p class="resident__role">Music · independent</p>
+            <p class="resident__line">Built a small co-op of AI-augmented mastering engineers; now serves 40 indie labels.</p>
+          </div>
+        </article>
+
+        <article class="resident glass">
+          <div class="panel__rim"></div>
+          <div class="resident__avatar"><span>S</span></div>
+          <div class="resident__body">
+            <h4>Sasha V.</h4>
+            <p class="resident__role">Research · PhD candidate</p>
+            <p class="resident__line">Published a paper born from a 2 a.m. paper club conversation in House Berlin.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ APPLY ============ -->
+    <section id="apply" class="apply">
+      <div class="apply__card glass">
+        <div class="panel__rim"></div>
+        <div class="panel__shine"></div>
+
+        <span class="section__kicker">§ 05 — The application</span>
+        <h2 class="apply__title">
+          Tell us what <em>you're building,</em>
+          <br />
+          and who you'd want <em>next door.</em>
+        </h2>
+
+        <p class="apply__lede">
+          Applications take about forty minutes. Three short essays, a link
+          to something you've made, and one reference. Decisions are rolling.
+          We reply to every applicant within fourteen days, whether you're in
+          or out. We mean that.
+        </p>
+
+        <div class="apply__rows">
+          <div class="apply__row">
+            <span class="apply__dt">Deadline</span>
+            <span class="apply__dd">June 28, 23:59 UTC</span>
+          </div>
+          <div class="apply__row">
+            <span class="apply__dt">Cohort begins</span>
+            <span class="apply__dd">July 14</span>
+          </div>
+          <div class="apply__row">
+            <span class="apply__dt">Cost</span>
+            <span class="apply__dd">$0 for residents · $2,400 for housing</span>
+          </div>
+          <div class="apply__row">
+            <span class="apply__dt">Need-based stipend</span>
+            <span class="apply__dd">available · ask in your application</span>
+          </div>
+        </div>
+
+        <div class="apply__actions">
+          <a href="#" class="btn btn--primary btn--lg glass glass--button">
+            <span class="btn__label">Begin application</span>
+            <span class="btn__caret" aria-hidden="true">→</span>
+          </a>
+          <a href="mailto:hello@hackerhouse.cc" class="btn btn--ghost">
+            <span class="btn__dot" aria-hidden="true"></span>
+            hello@hackerhouse.cc
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section id="faq" class="faq">
+      <header class="section__head">
+        <span class="section__kicker">§ 06 — The fine print</span>
+        <h2 class="section__title">Questions, <em>answered honestly.</em></h2>
+      </header>
+
+      <div class="faq__list">
+        <details class="faq__item glass">
+          <div class="panel__rim"></div>
+          <summary>
+            <span>Is this an accelerator?</span>
+            <span class="faq__toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__body">
+            <p>
+              No. We take no equity. We don't write checks. We don't run a
+              demo day for investors. It's a residency — eight weeks of
+              focused company, in a house we've taken the time to make
+              good.
+            </p>
+          </div>
+        </details>
+
+        <details class="faq__item glass">
+          <div class="panel__rim"></div>
+          <summary>
+            <span>Do I need a company already?</span>
+            <span class="faq__toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__body">
+            <p>
+              No. About a third of each cohort joins solo, mid-project, or
+              between things. We accept people, not stages.
+            </p>
+          </div>
+        </details>
+
+        <details class="faq__item glass">
+          <div class="panel__rim"></div>
+          <summary>
+            <span>How selective is it, honestly?</span>
+            <span class="faq__toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__body">
+            <p>
+              The last cohort had 1,840 applicants for 24 seats. We aren't
+              looking for the most impressive résumé in the room — we're
+              looking for the person the rest of the room will be glad they
+              cooked dinner with.
+            </p>
+          </div>
+        </details>
+
+        <details class="faq__item glass">
+          <div class="panel__rim"></div>
+          <summary>
+            <span>Can I choose my house?</span>
+            <span class="faq__toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__body">
+            <p>
+              You can rank your preferences. Match is on a best-fit basis;
+              about 80% of admitted residents get their first choice.
+            </p>
+          </div>
+        </details>
+
+        <details class="faq__item glass">
+          <div class="panel__rim"></div>
+          <summary>
+            <span>What does the housing cost cover?</span>
+            <span class="faq__toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__body">
+            <p>
+              Bedroom, utilities, communal meals five nights a week, a
+              fully kitted workspace, and the weekly demo program. Travel
+              is on you, with need-based exceptions.
+            </p>
+          </div>
+        </details>
+
+        <details class="faq__item glass">
+          <div class="panel__rim"></div>
+          <summary>
+            <span>Who is behind it?</span>
+            <span class="faq__toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__body">
+            <p>
+              Hacker House Collection is independently funded by its
+              founder and alumni. We are not affiliated with any fund,
+              accelerator, or program.
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="foot">
+      <div class="foot__top">
+        <div class="foot__brand">
+          <span class="foot__mark" aria-hidden="true">✦</span>
+          <span class="foot__word">
+            <em>Hacker</em> House Collection
+          </span>
+        </div>
+
+        <div class="foot__cols">
+          <div class="foot__col">
+            <span class="foot__kicker">Houses</span>
+            <a href="#houses">San Francisco</a>
+            <a href="#houses">Tokyo</a>
+            <a href="#houses">Berlin</a>
+            <a href="#houses">Mexico City</a>
+          </div>
+          <div class="foot__col">
+            <span class="foot__kicker">Program</span>
+            <a href="#concept">Concept</a>
+            <a href="#day">A day</a>
+            <a href="#cohort">Cohort</a>
+            <a href="#apply">Apply</a>
+          </div>
+          <div class="foot__col">
+            <span class="foot__kicker">Elsewhere</span>
+            <a href="#">Dispatches</a>
+            <a href="#">Open letter</a>
+            <a href="#">Press kit</a>
+            <a href="mailto:hello@hackerhouse.cc">Email</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot__bottom">
+        <span>© Hacker House Collection · MMXXVI</span>
+        <span class="foot__bottom-sep" aria-hidden="true">/</span>
+        <span>An independent residency for builders.</span>
+        <span class="foot__bottom-sep" aria-hidden="true">/</span>
+        <span>Cohort 07 closes Jun 28.</span>
+      </div>
+    </footer>
+
+    </div><!-- /.paper -->
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
