@@ -1768,21 +1768,183 @@ img, svg { display: block; max-width: 100%; }
 }
 
 /* =========================================================
-   RESPONSIVE: small screens
+   RESPONSIVE: tablet & mobile
    ========================================================= */
-@media (max-width: 720px) {
-  .nav__brand .nav__wordmark { display: none; }
-  .nav__pill:not(.nav__pill--cta) { display: none; }
-  .hero__pane { max-width: 360px; padding: 40px 28px 32px; }
-  .hero__map-mask {
-    background:
-      linear-gradient(
-        180deg,
-        #ffffff 0%,
-        rgba(255, 255, 255, 0.6) 45%,
-        rgba(255, 255, 255, 0.9) 100%
-      );
+@media (max-width: 860px) {
+  :root { --nav-h: 64px; }
+
+  /* NAV — keep all pills, shrink padding/font */
+  .nav__pills { padding: 4px; gap: 2px; }
+  .nav__pill { padding: 8px 12px; font-size: 12.5px; }
+  .nav__pill--brand { padding: 10px 16px; font-size: 14px; gap: 8px; }
+
+  /* HERO — stacked layout on mobile. The content pane sits as its own
+     block at the top (clean white page background, dark text); the map
+     becomes a separate block below it. No blur, no overlap. */
+  .hero {
+    min-height: auto;
+    overflow: visible;
+    padding: calc(var(--nav-h) + 28px) var(--pad) 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
   }
+
+  /* Pane content — first block, normal flow */
+  .hero__left {
+    position: relative;
+    z-index: auto;
+    min-height: auto;
+    width: 100%;
+    margin: 0;
+    padding: 0 0 56px;
+    align-items: stretch;
+    pointer-events: auto;
+    order: 1;
+  }
+  .hero__pane {
+    max-width: 100%;
+    padding: 0;
+    color: var(--ink);
+    transform: none;
+  }
+
+  /* Map — second block, full-bleed below the pane */
+  .hero__map {
+    position: relative;
+    inset: auto;
+    width: 100vw;
+    margin-left: calc(-1 * var(--pad));
+    margin-right: calc(-1 * var(--pad));
+    height: 58vh;
+    min-height: 380px;
+    order: 2;
+    overflow: hidden;
+  }
+
+  /* Hide the atmospheric layers + veil + the desktop fade-to-white
+     map mask on mobile. They were all tied to the desktop "left pane
+     over map" composition, which doesn't exist in the stacked layout. */
+  .hero__fx,
+  .hero__veil,
+  .hero__map-mask { display: none !important; }
+
+  /* Text colors flip for the light page background */
+  .hero__kicker  { color: var(--ink-3); text-shadow: none; }
+  .hero__title   { color: var(--ink);   text-shadow: none; font-size: clamp(46px, 12vw, 72px); }
+  .hero__title em{ color: var(--ink); }
+  .hero__sub     { color: var(--ink-3); text-shadow: none; font-size: 14.5px; max-width: 38ch; }
+
+  /* Location block uses the page's standard hairline now */
+  .hero__loc {
+    border-top: 1px solid var(--rule);
+    background-image: none;
+  }
+  .hero__loc-label { color: var(--ink-4); text-shadow: none; }
+  .hero__loc-city  { color: var(--ink);   text-shadow: none; font-size: 22px; }
+  .hero__loc-meta  { color: var(--ink-3); text-shadow: none; }
+  .hero__loc-icon  { color: var(--ink-2); }
+  .hero__loc-temp  { color: var(--ink); }
+  .hero__loc-sep   { color: var(--ink-4); }
+  .hero__loc-desc  { color: var(--ink-3); }
+
+  /* House marker is positioned relative to .hero, which on mobile
+     starts at the top of the page — the projected coords drift as
+     you scroll. Hide it; the clean map view stands on its own. */
+  .house-marker { display: none !important; }
+
+  /* Scroll hint not needed — natural scroll is obvious */
+  .hero__scroll { display: none; }
+
+  /* SECTIONS — tighter vertical rhythm */
+  .concept { padding: 80px 0 64px; }
+  .houses  { padding: 64px 0 72px; }
+  .day     { padding: 64px 0 72px; }
+  .cohort  { padding: 72px 0 80px; }
+  .apply   { padding: 80px var(--pad); }
+  .faq     { padding: 80px 0 90px; }
+
+  .section__head { margin-bottom: 36px; }
+  .section__head--split { gap: 24px; }
+
+  /* DAY schedule — narrower time col */
+  .day__schedule li {
+    grid-template-columns: 76px 1fr;
+    gap: 4px 18px;
+    padding: 18px 0;
+  }
+  .day__time  { font-size: 11px; }
+  .day__title { font-size: 19px; line-height: 1.3; }
+  .day__note  { font-size: 13.5px; }
+
+  /* APPLY — stack rows, smaller title */
+  .apply__title { font-size: clamp(34px, 8.5vw, 52px); margin-bottom: 22px; }
+  .apply__lede { font-size: 14.5px; margin-bottom: 32px; }
+  .apply__row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 14px 0;
+  }
+  .apply__dt { font-size: 10.5px; }
+  .apply__dd { font-size: 16px; }
+  .apply__actions { gap: 12px; }
+  .btn { padding: 12px 18px; font-size: 13.5px; }
+
+  /* FAQ */
+  .faq__item summary { font-size: 18px; padding: 20px 0; gap: 16px; }
+  .faq__body { font-size: 13.5px; padding-bottom: 18px; }
+
+  /* HOUSES */
+  .house__body { padding: 20px 22px 24px; }
+  .house__name { font-size: 26px; }
+
+  /* CONCEPT */
+  .concept__card { padding: 32px 26px 36px; }
+  .concept__name { font-size: 28px; }
+
+  /* COHORT */
+  .resident { padding: 22px 22px 24px; }
+
+  /* FOOTER */
+  .foot { padding: 60px var(--pad) 28px; }
+  .foot__brand { font-size: 19px; }
+
+  /* PAGE VIGNETTE — softer on mobile so corners don't crowd content */
+  .page-vignette {
+    background: radial-gradient(
+      ellipse 110% 100% at 50% 50%,
+      transparent 55%,
+      rgba(0, 0, 0, 0.16) 85%,
+      rgba(0, 0, 0, 0.38) 100%
+    );
+  }
+
+  /* CAMERA INSPECTOR — desktop-only tool, no D key on touch */
+  .cam-inspect { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  :root { --pad: 18px; }
+
+  /* NAV — drop side pills on the smallest screens, keep brand mark */
+  .nav__pill:not(.nav__pill--brand) { display: none; }
+
+  /* HERO */
+  .hero__title { font-size: clamp(42px, 13vw, 56px); }
+  .hero__kicker { font-size: 10px; }
+
+  /* Section titles */
+  .section__title { font-size: clamp(30px, 8vw, 46px); }
+
+  /* HOUSES — tighter image aspect on phones */
+  .house__photo { aspect-ratio: 16 / 11; }
+
+  /* APPLY actions stack on tight screens */
+  .apply__actions { flex-direction: column; align-items: flex-start; }
+  .btn { width: 100%; justify-content: space-between; }
+
+  /* Footer cols — single col on tiny screens */
+  .foot__cols { grid-template-columns: 1fr; gap: 22px; }
 }
 
 /* =========================================================

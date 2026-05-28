@@ -109,6 +109,11 @@
     ctl.enableTilt = false;
     ctl.enableLook = false;
 
+    // Pass scroll events through to the page so the sections below the
+    // hero are reachable. The canvas only needs pointer events while the
+    // inspector is open — toggleInspector flips this back and forth.
+    viewer.scene.canvas.style.pointerEvents = "none";
+
     // Expose the viewer + focus to the inspector so D-toggle can drive
     // the camera once the page is interactive.
     inspector.viewer = viewer;
@@ -210,6 +215,10 @@
 
     // Wait briefly so the first frame paints before the intro starts
     setTimeout(startIntro, reduceMotion ? 0 : 450);
+
+    // Force a resize after first paint so the canvas matches whichever
+    // layout (desktop / stacked-mobile) the CSS actually settled on.
+    requestAnimationFrame(() => viewer.resize());
 
     // Keep the viewer sized correctly when the window resizes
     window.addEventListener("resize", () => viewer.resize());
@@ -534,6 +543,10 @@
     ctl.enableZoom = inspector.on;
     ctl.enableTilt = inspector.on;
     ctl.enableLook = inspector.on;
+    // Restore pointer events so the canvas receives drag/scroll while
+    // the inspector is open; remove them again on close so the page
+    // scrolls normally.
+    inspector.viewer.scene.canvas.style.pointerEvents = inspector.on ? "auto" : "none";
     const box = document.getElementById("cam-inspect");
     if (box) box.hidden = !inspector.on;
     if (inspector.on) {
