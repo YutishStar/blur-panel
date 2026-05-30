@@ -69,10 +69,13 @@ window.__siteLoaded = (() => {
       // dot; tweak `cam` to reframe the satellite view.
       anchor: { lon: 77.64905, lat: 12.95481 },
       apps:  { label: "applications closed", range: "Cohort 0 · shipped", status: "closed" },
-      heroTitle: { a: "Where it",   b: "all started." },
+      heroTitle: { a: "Where it",   b: "<em>all started.</em>" },
       heroDesc:  "After my tweet on X, I got on a call with over 50+ people and found the 10 most cracked builders. Got a sponsor for Diet Coke (super important). Made a WhatsApp group, added them all, found and booked the villa in Bangalore — 4 bedrooms, no AC, a big stage, a big lawn, and an awesome sunroof. After 30 days, 2 new co-founding startups came out, a Diet Coke tower that reached the ceiling, and someone raised $1.5M. Sleepless nights, unlimited fun, unforgettable friends, and insane progress.",
       actions: [
         { label: "Shipped!", variant: "ghost" },
+      ],
+      sponsors: [
+        { tagline: "Our unlimited diet coke sponsor", logo: "sponsors/cohort-00/diet-coke.svg", alt: "team.shiksha", size: "lg", url: "https://team.shiksha/" },
       ],
       photos: [
         "villas/cohort-00/IMG_1115.jpg",
@@ -97,14 +100,18 @@ window.__siteLoaded = (() => {
       title: "CRACKED HACKER HOUSE",
       sub:   "Cohort 01 · next stop",
       loc:   "Da Nang, Vietnam",
-      cam:    { lon: 108.25311, lat: 16.08339, zoom: 12.8, pitch: 45, bearing: 118 },
+      cam:    { lon: 108.2557, lat: 16.07573, zoom: 12.8, pitch: 45, bearing: 118 },
       anchor: { lon: 108.23098, lat: 16.06304 },
       apps:  { label: "applications filled!", range: "The house starts 1st July", status: "filled" },
-      heroTitle: { a: "Are you",   b: "Cracked enough?" },
+      heroTitle: { a: "Are you",   b: "<em>Cracked</em> enough?" },
       heroDesc:  "A house full of builders, creators, hackers, and ambitious misfits living together for thirty days.",
       actions: [
         { label: "Filled!", variant: "ghost" },
-        { label: "Apply to next cohort", variant: "primary", arrow: true, href: "#apply" },
+        { label: "Apply to next cohort", variant: "primary", arrow: true, cohortJump: 2 },
+      ],
+      sponsors: [
+        { tagline: "Our content sponsors",   logo: "sponsors/sponsor-1.png", alt: "Team1",    size: "sm", url: "https://x.com/Team1VN" },
+        { tagline: "Our credits sponsor",    logo: "sponsors/razorpay.png",  alt: "Razorpay", size: "md", url: "https://razorpay.com/" },
       ],
       photos: [
         "villas/cohort-01/HIx-N74aIAAgNFg.jpeg",
@@ -123,24 +130,25 @@ window.__siteLoaded = (() => {
       id: "02",
       badge: "Cohort 2, Canggu, Bali",
       title: "CRACKED HACKER HOUSE",
-      sub:   "Cohort 02 · coming soon",
+      sub:   "Cohort 02 · Starts 15th Aug!",
       loc:   "Canggu, Bali",
-      cam:    { lon: 115.18137, lat: -8.62414, zoom: 12.8, pitch: 45, bearing: 131.1 },
-      anchor: { lon: 115.15958, lat: -8.63821 },
+      cam:    { lon: 115.18879, lat: -8.65997, zoom: 12.8, pitch: 45, bearing: 131.2 },
+      anchor: { lon: 115.15130, lat: -8.67235 },
       apps:  { label: "applications open", range: "1st June – 20th June", status: "open" },
       ctaLabel: "Apply C2",
-      heroTitle: { a: "Cracked enough",   b: "for paradise?" },
-      heroDesc:  "Thirty days in a Canggu villa. Rice-paddy mornings, surf afternoons, and eight rooms of builders within a coconut's throw of each other.",
+      heroTitle: { a: "30 days.", b: "10 cracked fellows.", c: "<em>Bali.</em>" },
+      heroDesc:  "Starts 15th August. $500 buys a bed, a desk, and 30 days next to nine cracked builders in a Canggu villa. Compute credits, founder dinners, sponsor intros, scooters at the gate, and demo days that end in the ocean.",
       actions: [
-        { label: "Apply C2", variant: "primary", arrow: true, href: "#apply" },
+        { label: "Apply C2", variant: "primary", arrow: true, href: "https://tally.so/r/A7yDE0" },
       ],
-      photos: ["villas/cohort-02/01.jpg", "villas/cohort-02/02.jpg", "villas/cohort-02/03.jpg", "villas/cohort-02/04.jpg"],
+      sponsors: [],
+      photos: ["villas/cohort-02/01.png", "villas/cohort-02/02.png", "villas/cohort-02/03.png", "villas/cohort-02/04.png"],
       stats: [
-        { value: "16", label: "cracked" },
+        { value: "10", label: "builders" },
         { value: "30", label: "days" },
-        { value: "8",  label: "rooms" },
+        { value: "6",  label: "rooms" },
       ],
-      blurb: "Rice-paddy mornings, surf afternoons, work nights. Two pools, a coworking pavilion, and scooters parked at the gate.",
+      blurb: "Ten cracked builders living ten meters apart. Compute credits to ship faster, founder dinners on the rooftop, sponsor intros, and demo days that end in the ocean.",
     },
   ];
   let cohortIdx = 1; // default landing cohort: Da Nang, Vietnam (01)
@@ -310,15 +318,42 @@ window.__siteLoaded = (() => {
     if (appsLbl && c.apps) appsLbl.textContent = c.apps.label;
     if (appsRng && c.apps) appsRng.textContent = c.apps.range;
 
-    // Hero title + description vary per cohort. Title is split across two
-    // spans (line A plain, line B italic em) to match the existing markup.
+    // Hero title + description vary per cohort. Title is split across spans
+    // (each line is its own block via `.hero__title span { display: block }`).
+    // c.heroTitle accepts an optional third line `c` for cohorts that want a
+    // stat-style stack like "30 days. / 10 cracked fellows. / Bali."
     const heroTitleEl = document.querySelector("[data-hero-title]");
     const heroDescEl  = document.querySelector("[data-hero-desc]");
     if (heroTitleEl && c.heroTitle) {
-      heroTitleEl.innerHTML =
-        `<span>${c.heroTitle.a}</span><span><em>${c.heroTitle.b}</em></span>`;
+      // Each line can carry its own <em>...</em> markup — the renderer doesn't
+      // auto-italicise. Lets us put the brand word in serif italic while the
+      // rest stays in Geist sans.
+      const lines = [c.heroTitle.a, c.heroTitle.b, c.heroTitle.c]
+        .filter((l) => l != null)
+        .map((l) => `<span>${l}</span>`)
+        .join("");
+      heroTitleEl.innerHTML = lines;
     }
-    if (heroDescEl && c.heroDesc) heroDescEl.textContent = c.heroDesc;
+    if (heroDescEl && c.heroDesc) heroDescEl.innerHTML = c.heroDesc;
+
+    // Dock CTA — when the active cohort is "02" (applications open), the
+    // bottom-strip Apply button opens the Tally form in a new tab. On every
+    // other cohort it acts as a jump to the cohort-02 view so the user can
+    // read the pitch before applying.
+    const dockCta = document.querySelector("[data-dock-cta]");
+    if (dockCta) {
+      if (c.id === "02") {
+        dockCta.href   = "https://tally.so/r/A7yDE0";
+        dockCta.target = "_blank";
+        dockCta.rel    = "noopener noreferrer";
+        dockCta.removeAttribute("data-cohort-jump");
+      } else {
+        dockCta.href   = "#cohort-2";
+        dockCta.removeAttribute("target");
+        dockCta.removeAttribute("rel");
+        dockCta.dataset.cohortJump = "2";
+      }
+    }
 
     // Actions row — rebuild from c.actions[] so each cohort can declare
     // its own primary CTA, ghost status pill, and/or secondary buttons.
@@ -330,14 +365,62 @@ window.__siteLoaded = (() => {
           const cls   = a.variant === "ghost" ? "hero__apply hero__apply--ghost" : "hero__apply";
           const arrow = a.arrow ? '<span class="hero__apply-arrow" aria-hidden="true">→</span>' : "";
           const href  = a.href || "#apply";
-          return `<a href="${href}" class="${cls}"><span>${a.label}</span>${arrow}</a>`;
+          const jump  = a.cohortJump !== undefined ? ` data-cohort-jump="${a.cohortJump}"` : "";
+          // Absolute http(s) URLs open in a new tab — used for application
+          // form links so the user doesn't lose their place on the site.
+          const ext   = /^https?:\/\//.test(href) ? ' target="_blank" rel="noopener noreferrer"' : "";
+          return `<a href="${href}" class="${cls}"${jump}${ext}><span>${a.label}</span>${arrow}</a>`;
         })
         .join("");
     }
 
-    // Bottom-dock apply CTA — per-cohort label (falls back to "apply").
+    // Sponsors — rebuild rows from c.sponsors[]. Hides the whole block
+    // (label + rows) when a cohort has no sponsors declared.
+    const sponsorsEl    = document.querySelector("[data-hero-sponsors]");
+    const sponsorsLabel = document.querySelector("[data-hero-sponsors-label]");
+    if (sponsorsEl) {
+      const list = c.sponsors || [];
+      // Clear all rows but keep the label element.
+      sponsorsEl.querySelectorAll(".hero__sponsors-row").forEach((row) => row.remove());
+
+      if (list.length === 0) {
+        sponsorsEl.style.display = "none";
+      } else {
+        sponsorsEl.style.display = "";
+        if (sponsorsLabel) sponsorsLabel.style.display = "";
+        list.forEach((s) => {
+          const row = document.createElement("span");
+          row.className = "hero__sponsors-row";
+          const tagline = document.createElement("span");
+          tagline.className = "hero__sponsors-tagline";
+          tagline.innerHTML = `${s.tagline} &mdash;`;
+          const img = document.createElement("img");
+          const sizeCls = s.size === "sm" ? " hero__sponsor-logo--sm"
+                        : s.size === "lg" ? " hero__sponsor-logo--lg" : "";
+          img.className = "hero__sponsor-logo" + sizeCls;
+          img.src = s.logo;
+          img.alt = s.alt || "";
+          row.appendChild(tagline);
+          if (s.url) {
+            const link = document.createElement("a");
+            link.className = "hero__sponsor-link";
+            link.href   = s.url;
+            link.target = "_blank";
+            link.rel    = "noopener noreferrer";
+            link.setAttribute("aria-label", s.alt || s.tagline);
+            link.appendChild(img);
+            row.appendChild(link);
+          } else {
+            row.appendChild(img);
+          }
+          sponsorsEl.appendChild(row);
+        });
+      }
+    }
+
+    // Bottom-dock apply CTA — static across all cohorts.
     const dockCtaEl = document.querySelector("[data-dock-cta-label]");
-    if (dockCtaEl) dockCtaEl.textContent = c.ctaLabel || "apply";
+    if (dockCtaEl) dockCtaEl.textContent = "Apply C2";
 
     // Dock dot color is driven by [data-apps-status] on body — CSS swaps
     // the dot fill + pulse halo from green (open) → red (filled) → grey (closed).
@@ -355,6 +438,17 @@ window.__siteLoaded = (() => {
     const c = COHORTS[cohortIdx];
 
     applyCohortContent(c);
+
+    // Re-trigger the 2s appear animation on the hero pane content so the
+    // copy fades back in over the same window as the map flyTo, instead of
+    // snapping while the camera is still drifting.
+    const pane = document.querySelector(".hero__pane");
+    if (pane) {
+      pane.classList.remove("is-switching");
+      // force reflow so the animation restarts even when class is re-added
+      void pane.offsetWidth;
+      pane.classList.add("is-switching");
+    }
 
     // move the dot anchor so the marker rides along with the new city.
     // Uses the cohort's fixed `anchor` (not the camera center) so the dot
@@ -440,6 +534,18 @@ window.__siteLoaded = (() => {
   const nextBtn = document.querySelector("[data-cohort-next]");
   if (prevBtn) prevBtn.addEventListener("click", () => setCohort(cohortIdx - 1));
   if (nextBtn) nextBtn.addEventListener("click", () => setCohort(cohortIdx + 1));
+
+  // Cohort-jump links — any element with [data-cohort-jump="<n>"] is treated
+  // as an in-page navigation to that cohort instead of an anchor follow.
+  document.addEventListener("click", (e) => {
+    const jumpEl = e.target.closest("[data-cohort-jump]");
+    if (!jumpEl) return;
+    const idx = parseInt(jumpEl.dataset.cohortJump, 10);
+    if (Number.isNaN(idx)) return;
+    e.preventDefault();
+    setCohort(idx);
+  });
+
   updateNavButtons();
   applyCohortContent(COHORTS[cohortIdx]);
 
@@ -1428,6 +1534,10 @@ window.__siteLoaded = (() => {
       // panel links inside <a href="..."> would otherwise navigate or
       // push a hash; intercept and swap panels in place.
       e.preventDefault();
+      // Pills marked [data-disabled="true"] (cohorts / fellows / about
+      // while those pages are still being built) are inert — CSS shows
+      // a "coming soon" tooltip on hover; we just swallow the click here.
+      if (el.dataset.disabled === "true") return;
       activate(target);
     });
   });

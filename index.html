@@ -11,10 +11,50 @@
     href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css?v=14" />
+  <link rel="stylesheet" href="styles.css?v=31" />
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
 </head>
 <body class="page--single" data-apps-status="filled">
+  <!-- Mobile gate — overlays everything on narrow viewports until the
+       responsive layout ships. Hidden via CSS above the breakpoint. -->
+  <div class="mobile-gate" role="dialog" aria-modal="true" aria-label="Open on desktop">
+    <div class="mobile-gate__inner">
+      <span class="mobile-gate__brand">CrackedHQ<span class="mobile-gate__brand-dot">.</span></span>
+      <h1 class="mobile-gate__title">
+        <span>built for</span>
+        <span><em>desktop.</em></span>
+      </h1>
+      <p class="mobile-gate__body">
+        the cracked hackerhouse experience is best on a laptop for now. open
+        <strong>crackedhq.com</strong> on a bigger screen and the map, the
+        marker, and the passports will all behave.
+      </p>
+      <p class="mobile-gate__stamp">
+        <span class="mobile-gate__stamp-dot" aria-hidden="true"></span>
+        mobile view ships in <strong>2 days</strong>
+      </p>
+      <div class="mobile-gate__socials" aria-label="Find us">
+        <a href="https://x.com/crackedhousehq" target="_blank" rel="noopener noreferrer" class="mobile-gate__icon" aria-label="X / Twitter">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.675l-5.227-6.838L4.96 21.75H1.648l7.73-8.835L1.255 2.25h6.844l4.726 6.243z"/>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/cracked-hackerhouse" target="_blank" rel="noopener noreferrer" class="mobile-gate__icon" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.86-3.04-1.86 0-2.15 1.45-2.15 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.9 1.63-1.86 3.35-1.86 3.58 0 4.25 2.36 4.25 5.42v6.33zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zm-1.78 13.02h3.56V9H3.56v11.45z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/crackedhq/" target="_blank" rel="noopener noreferrer" class="mobile-gate__icon" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Site loader — counts 0% → 100% before the map flyTo + reveal start.
        JS resolves window.__siteLoaded when the count completes. -->
   <div id="site-loader" class="site-loader" role="status" aria-label="Loading">
@@ -39,19 +79,19 @@
         </button>
       </li>
       <li>
-        <button type="button" class="rail__pill" data-panel-link="cohorts">
+        <button type="button" class="rail__pill" data-panel-link="cohorts" data-disabled="true" aria-disabled="true">
           <span class="rail__pill-dot" aria-hidden="true"></span>
           <span class="rail__pill-label">cohorts</span>
         </button>
       </li>
       <li>
-        <button type="button" class="rail__pill" data-panel-link="fellows">
+        <button type="button" class="rail__pill" data-panel-link="fellows" data-disabled="true" aria-disabled="true">
           <span class="rail__pill-dot" aria-hidden="true"></span>
           <span class="rail__pill-label">fellows</span>
         </button>
       </li>
       <li>
-        <button type="button" class="rail__pill" data-panel-link="about">
+        <button type="button" class="rail__pill" data-panel-link="about" data-disabled="true" aria-disabled="true">
           <span class="rail__pill-dot" aria-hidden="true"></span>
           <span class="rail__pill-label">about us</span>
         </button>
@@ -89,7 +129,7 @@
 
             <h1 id="panel-main-title" class="hero__title" data-hero-title>
               <span>Are you</span>
-              <span><em>Cracked enough?</em></span>
+              <span><em>Cracked</em> enough?</span>
             </h1>
 
             <p class="hero__sub" data-hero-desc>
@@ -115,7 +155,7 @@
                   <span class="hero__fellow" style="background-image:url('fellows/UfGyY5_j_400x400.jpg')"></span>
                   <span class="hero__fellow" style="background-image:url('fellows/yDrxSxQu_400x400.jpg')"></span>
                 </span>
-                <span class="hero__fellows-count">+14</span>
+                <span class="hero__fellows-count">+30</span>
                 <span class="hero__fellows-globe" aria-hidden="true">
                   <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
                     <circle cx="8" cy="8" r="6.5"/>
@@ -126,6 +166,18 @@
                 <span class="hero__fellows-tagline">Fellows building startups, AI tools, airbnbs, companies and weird internet ideas.</span>
               </span>
             </button>
+
+            <div class="hero__sponsors" data-hero-sponsors>
+              <span class="hero__sponsors-label" data-hero-sponsors-label>The Sponsors</span>
+              <span class="hero__sponsors-row">
+                <span class="hero__sponsors-tagline">Our content sponsors &mdash;</span>
+                <img class="hero__sponsor-logo hero__sponsor-logo--sm" src="sponsors/sponsor-1.png" alt="Content sponsor" />
+              </span>
+              <span class="hero__sponsors-row">
+                <span class="hero__sponsors-tagline">Our credits sponsor &mdash;</span>
+                <img class="hero__sponsor-logo" src="sponsors/razorpay.png" alt="Razorpay" />
+              </span>
+            </div>
           </article>
         </div>
 
@@ -615,8 +667,8 @@
     </div>
 
     <div class="dock__center">
-      <a class="dock__cta" href="#apply">
-        <span data-dock-cta-label>apply</span>
+      <a class="dock__cta" href="#apply" data-dock-cta>
+        <span data-dock-cta-label>Apply C2</span>
         <span class="dock__cta-arrow" aria-hidden="true">→</span>
       </a>
     </div>
@@ -645,7 +697,7 @@
   </footer>
 
   <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
-  <script src="config.js"></script>
-  <script src="script.js"></script>
+  <script src="config.js?v=1"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>
