@@ -1,473 +1,465 @@
 /* Cracked Hacker House — interactions
  *
- * 1. Hero map:
- *      a. If a valid Google Maps API key is in config.js → render Google's
- *         Photorealistic 3D Tiles of Da Nang via CesiumJS, with a cinematic
- *         camera fly-in.
- *      b. Otherwise → fall back to the 2D Leaflet map (Bangalore + Da Nang
- *         with alumni dots), so the page keeps working while the key is set up.
- * 2. Cursor-tracked shine on the hero glass pane
- * 3. Scroll reveal
- * 4. Nav state on scroll
+ * Map: Maplibre GL JS, Esri satellite tiles (no token required).
+ * Inspector: press D to take manual control. Sliders drive bearing /
+ *   pitch / zoom. "Record view" snapshots the live values.
  */
 
-(() => {
-  const supportsHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+/* =========================================================
+   SITE LOADER — counts 0% → 100% in the center of the screen,
+   then fades out. Exposes window.__siteLoaded as a promise that
+   the map intro awaits so the iris reveal can't fire underneath.
+   ========================================================= */
+window.__siteLoaded = (() => {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const el  = document.getElementById("site-loader");
+  const num = el?.querySelector("[data-loader-num]");
+  if (!el || !num) return Promise.resolve();
 
-  // Camera inspector shared state. Filled in by initCesium3D once the
-  // viewer exists; read by toggleInspector / slider / readout code below.
-  const inspector = { on: false, viewer: null, place: null, raf: 0 };
+  return new Promise((resolve) => {
+    const finish = () => {
+      num.textContent = "100%";
+      el.classList.add("is-done");
+      // Resolve at the *start* of the fade-out, not after it finishes —
+      // the iris reveal needs to fire underneath the loader as it fades,
+      // otherwise the hero shows its black background in the gap.
+      resolve();
+      el.addEventListener("transitionend", () => {
+        el.remove();
+      }, { once: true });
+    };
 
-  /* ---------- locations ---------- */
-  const HOUSES = [
-    { id: "blr", name: "Bangalore", code: "H/01", coords: [12.9716, 77.5946] },
-    { id: "dad", name: "Da Nang",   code: "H/02", coords: [16.0544, 108.2022] },
-  ];
-
-  const ALUMNI = [
-    { name: "New York",   coords: [40.7128,  -74.0060] },
-    { name: "London",     coords: [51.5074,   -0.1278] },
-    { name: "Singapore",  coords: [ 1.3521,  103.8198] },
-    { name: "Lagos",      coords: [ 6.5244,    3.3792] },
-    { name: "Cape Town",  coords: [-33.9249,  18.4241] },
-    { name: "Dubai",      coords: [25.2048,   55.2708] },
-    { name: "Seoul",      coords: [37.5665,  126.9780] },
-    { name: "São Paulo",  coords: [-23.5505, -46.6333] },
-    { name: "Istanbul",   coords: [41.0082,   28.9784] },
-    { name: "Mumbai",     coords: [19.0760,   72.8777] },
-    { name: "Mexico City",coords: [19.4326,  -99.1332] },
-    { name: "Nairobi",    coords: [-1.2921,   36.8219] },
-  ];
-
-  /* ---------- map: choose the engine ---------- */
-  const mapEl = document.getElementById("map");
-  const cfg = window.CONFIG || {};
-  const apiKey = cfg.GOOGLE_MAPS_API_KEY;
-  const focus = cfg.FOCUS_LOCATION || { name: "Da Nang", lon: 108.224, lat: 16.054 };
-  const hasValidKey =
-    typeof apiKey === "string" &&
-    apiKey.length > 20 &&
-    !apiKey.includes("YOUR_") &&
-    !apiKey.includes("PLACEHOLDER");
-  const use3D = cfg.USE_3D === true && hasValidKey && !!window.Cesium;
-
-  if (mapEl) {
-    if (use3D) {
-      initCesium3D(mapEl, apiKey, focus);
-    } else if (window.L) {
-      initLeaflet2D(mapEl);
-    }
-  }
-
-  /* =========================================================
-     CESIUM — Google Photorealistic 3D Tiles, focused on Da Nang
-     ========================================================= */
-  async function initCesium3D(el, key, place) {
-    // Cesium will warn without an Ion token. We don't use any Ion-hosted
-    // assets — the imagery comes entirely from Google's 3D tileset.
-    Cesium.Ion.defaultAccessToken = "";
-
-    const viewer = new Cesium.Viewer(el, {
-      baseLayer: false,
-      baseLayerPicker: false,
-      geocoder: false,
-      homeButton: false,
-      sceneModePicker: false,
-      navigationHelpButton: false,
-      animation: false,
-      timeline: false,
-      fullscreenButton: false,
-      infoBox: false,
-      selectionIndicator: false,
-      requestRenderMode: true,
-      maximumRenderTimeChange: Infinity,
-    });
-
-    // The Google 3D tileset includes terrain; hide Cesium's default globe so
-    // it doesn't render as a separate sphere underneath.
-    viewer.scene.globe.show = false;
-
-    // Atmosphere: a subtle haze in the distance so the horizon doesn't end
-    // abruptly. Cheap, no post-process needed.
-    viewer.scene.fog.enabled = true;
-    viewer.scene.fog.density = 0.00022;
-    viewer.scene.fog.minimumBrightness = 0.85;
-    // Hide the Cesium sky/space tint — we want the page background to read
-    // through where the tileset doesn't cover.
-    viewer.scene.skyBox.show = false;
-    viewer.scene.sun.show = false;
-    viewer.scene.moon.show = false;
-    viewer.scene.backgroundColor = Cesium.Color.TRANSPARENT;
-
-    // Disable all user interaction — the camera is purely cinematic
-    // (the inspector flips these back on while it's open)
-    const ctl = viewer.scene.screenSpaceCameraController;
-    ctl.enableRotate = false;
-    ctl.enableTranslate = false;
-    ctl.enableZoom = false;
-    ctl.enableTilt = false;
-    ctl.enableLook = false;
-
-    // Pass scroll events through to the page so the sections below the
-    // hero are reachable. The canvas only needs pointer events while the
-    // inspector is open — toggleInspector flips this back and forth.
-    viewer.scene.canvas.style.pointerEvents = "none";
-
-    // Expose the viewer + focus to the inspector so D-toggle can drive
-    // the camera once the page is interactive.
-    inspector.viewer = viewer;
-    inspector.place = place;
-
-    // Narrow the field of view so the scene reads as long-lens cinema
-    // rather than wide-angle satellite. Subject compresses, distances
-    // collapse, and Son Tra fills the middle of the frame.
-    viewer.camera.frustum.fov = Cesium.Math.toRadians(50);
-
-    // Hide the little Cesium logo that ships with the widget; Google's
-    // attribution stays (required by the Map Tiles API ToS).
-    if (viewer.cesiumWidget && viewer.cesiumWidget.creditContainer) {
-      const cesiumLogo = viewer.cesiumWidget.creditContainer.querySelector(".cesium-credit-logoContainer");
-      if (cesiumLogo) cesiumLogo.style.display = "none";
-    }
-
-    // FINAL is the absolute camera world position + facing direction.
-    // Use the "Record view" tool in the inspector (press D) to capture
-    // these values — move the scene how you want, click End, copy/paste.
-    const FINAL = { lon: 108.1078, lat: 16.1367, height: 6229, heading: 113.4, pitch: -19.9 };
-
-    // START uses orbit-relative coords (lookAt around Da Nang) just for
-    // the dramatic fly-in. We read the Cartesian3 position it produces,
-    // then lerp toward FINAL's absolute position so the landing is exact.
-    const START = { heading: 72, pitch: -38, range: 44000 };
-    applyOrbit(viewer, place, START.heading, START.pitch, START.range);
-    const startPos    = viewer.camera.position.clone();
-    const startH      = Cesium.Math.toDegrees(viewer.camera.heading);
-    const startP      = Cesium.Math.toDegrees(viewer.camera.pitch);
-    const finalPos    = Cesium.Cartesian3.fromDegrees(FINAL.lon, FINAL.lat, FINAL.height);
-    const lerpScratch = new Cesium.Cartesian3();
-
-    // Load Google's Photorealistic 3D Tiles
-    let tileset;
-    try {
-      tileset = await Cesium.Cesium3DTileset.fromUrl(
-        `https://tile.googleapis.com/v1/3dtiles/root.json?key=${encodeURIComponent(key)}`,
-        { showCreditsOnScreen: true }
-      );
-      viewer.scene.primitives.add(tileset);
-    } catch (err) {
-      console.error(
-        "[Cracked Hacker House] Failed to load Google Photorealistic 3D Tiles. " +
-        "Check that the API key in config.js has 'Map Tiles API' enabled and " +
-        "isn't restricted from this origin.",
-        err
-      );
-      // graceful fallback: tear down Cesium and start Leaflet
-      viewer.destroy();
-      el.innerHTML = "";
-      if (window.L) initLeaflet2D(el);
+    if (reduceMotion) {
+      requestAnimationFrame(finish);
       return;
     }
 
-    // Cinematic intro: a slow descending orbit. The camera starts high
-    // and steep, and over a few seconds spirals in toward Da Nang,
-    // dropping range + pitch while sweeping ~60° around the focus.
-    // Once it lands on FINAL, an infinitely-slow orbit takes over so
-    // the scene keeps breathing.
-    const startIntro = () => {
-      startMarkerProjection(viewer, place);
-      const onLanded = () => {
-        document.getElementById("house-marker")?.classList.add("is-landed");
-      };
-      if (reduceMotion) {
-        viewer.camera.setView({
-          destination: finalPos,
-          orientation: { heading: Cesium.Math.toRadians(FINAL.heading), pitch: Cesium.Math.toRadians(FINAL.pitch), roll: 0 }
-        });
-        viewer.scene.requestRender();
-        onLanded();
-        return;
-      }
-      const duration = 3800; // ms — quick but still reads as cinematic
-      const t0 = performance.now();
-      const step = (now) => {
-        if (inspector.on) { requestAnimationFrame(step); return; }
-        const t = Math.min(1, (now - t0) / duration);
-        const e = easeInOutQuad(t);
-        Cesium.Cartesian3.lerp(startPos, finalPos, e, lerpScratch);
-        viewer.camera.setView({
-          destination: lerpScratch,
-          orientation: {
-            heading: Cesium.Math.toRadians(lerpAngle(startH, FINAL.heading, e)),
-            pitch:   Cesium.Math.toRadians(lerp(startP, FINAL.pitch, e)),
-            roll: 0
+    const duration = 1500;            // total count time — keep it fast
+    const t0 = performance.now();
+    const easeOut = (t) => 1 - Math.pow(1 - t, 2);
+    const tick = (now) => {
+      const t = Math.min(1, (now - t0) / duration);
+      num.textContent = Math.round(easeOut(t) * 100) + "%";
+      if (t < 1) requestAnimationFrame(tick);
+      else finish();
+    };
+    requestAnimationFrame(tick);
+  });
+})();
+
+(() => {
+  const supportsHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const reduceMotion  = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- inspector shared state ---------- */
+  const inspector = { on: false, map: null, el: null, place: null, raf: 0, flying: false, orbitBearing: 0 };
+
+  /* ---------- cohort locations ---------- */
+  const COHORTS = [
+    {
+      id: "00",
+      badge: "Cohort 0, Bangalore, India",
+      title: "CRACKED HACKER HOUSE",
+      sub:   'Cohort C0 · <span class="house-marker__sub-status">Shipped!</span>',
+      loc:   "Bangalore, India",
+      cam:    { lon: 77.67948, lat: 12.9662, zoom: 12.8, pitch: 45, bearing: 118.7 },
+      // anchor = where the house dot pins to the earth. Independent of `cam`,
+      // so dragging the camera (D → free-look) slides the dot across the
+      // frame without moving it geographically. Tweak this to reposition the
+      // dot; tweak `cam` to reframe the satellite view.
+      anchor: { lon: 77.64905, lat: 12.95481 },
+      apps:  { label: "applications closed", range: "Cohort 0 · shipped", status: "closed" },
+      heroTitle: { a: "Where it",   b: "all started." },
+      heroDesc:  "After my tweet on X, I got on a call with over 50+ people and found the 10 most cracked builders. Got a sponsor for Diet Coke (super important). Made a WhatsApp group, added them all, found and booked the villa in Bangalore — 4 bedrooms, no AC, a big stage, a big lawn, and an awesome sunroof. After 30 days, 2 new co-founding startups came out, a Diet Coke tower that reached the ceiling, and someone raised $1.5M. Sleepless nights, unlimited fun, unforgettable friends, and insane progress.",
+      actions: [
+        { label: "Shipped!", variant: "ghost" },
+      ],
+      photos: [
+        "villas/cohort-00/IMG_1115.jpg",
+        "villas/cohort-00/IMG_1118.jpg",
+        "villas/cohort-00/IMG_1120.jpg",
+        "villas/cohort-00/IMG_0150_Original.jpg",
+        "villas/cohort-00/IMG_0723_Original.jpg",
+        "villas/cohort-00/image.png",
+        "villas/cohort-00/image copy.png",
+        "villas/cohort-00/image copy 2.png",
+      ],
+      stats: [
+        { value: "10", label: "cracked" },
+        { value: "30", label: "days" },
+        { value: "$1.5M", label: "raised" },
+      ],
+      blurb: "Where it all started. 10 cracked builders, 4 rooms, no AC, and a Diet Coke tower that touched the ceiling.",
+    },
+    {
+      id: "01",
+      badge: 'Cohort 1, Da Nang, Vietnam <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status">Spots Filled!</span>',
+      title: "CRACKED HACKER HOUSE",
+      sub:   "Cohort 01 · next stop",
+      loc:   "Da Nang, Vietnam",
+      cam:    { lon: 108.25311, lat: 16.08339, zoom: 12.8, pitch: 45, bearing: 118 },
+      anchor: { lon: 108.23098, lat: 16.06304 },
+      apps:  { label: "applications filled!", range: "The house starts 1st July", status: "filled" },
+      heroTitle: { a: "Are you",   b: "Cracked enough?" },
+      heroDesc:  "A house full of builders, creators, hackers, and ambitious misfits living together for thirty days.",
+      actions: [
+        { label: "Filled!", variant: "ghost" },
+        { label: "Apply to next cohort", variant: "primary", arrow: true, href: "#apply" },
+      ],
+      photos: [
+        "villas/cohort-01/HIx-N74aIAAgNFg.jpeg",
+        "villas/cohort-01/HIx-N8ebcAA0Hr_.jpeg",
+        "villas/cohort-01/HIx-N8iawAAzFm1.jpeg",
+        "villas/cohort-01/HIx-N8paMAAHUK_.jpeg",
+      ],
+      stats: [
+        { value: "14",   label: "cracked" },
+        { value: "30",   label: "days" },
+        { value: "$5M+", label: "made by builders" },
+      ],
+      blurb: "Sleep is optional in this house, but shipping and having fun is undeniable.",
+    },
+    {
+      id: "02",
+      badge: "Cohort 2, Canggu, Bali",
+      title: "CRACKED HACKER HOUSE",
+      sub:   "Cohort 02 · coming soon",
+      loc:   "Canggu, Bali",
+      cam:    { lon: 115.18137, lat: -8.62414, zoom: 12.8, pitch: 45, bearing: 131.1 },
+      anchor: { lon: 115.15958, lat: -8.63821 },
+      apps:  { label: "applications open", range: "1st June – 20th June", status: "open" },
+      ctaLabel: "Apply C2",
+      heroTitle: { a: "Cracked enough",   b: "for paradise?" },
+      heroDesc:  "Thirty days in a Canggu villa. Rice-paddy mornings, surf afternoons, and eight rooms of builders within a coconut's throw of each other.",
+      actions: [
+        { label: "Apply C2", variant: "primary", arrow: true, href: "#apply" },
+      ],
+      photos: ["villas/cohort-02/01.jpg", "villas/cohort-02/02.jpg", "villas/cohort-02/03.jpg", "villas/cohort-02/04.jpg"],
+      stats: [
+        { value: "16", label: "cracked" },
+        { value: "30", label: "days" },
+        { value: "8",  label: "rooms" },
+      ],
+      blurb: "Rice-paddy mornings, surf afternoons, work nights. Two pools, a coworking pavilion, and scooters parked at the gate.",
+    },
+  ];
+  let cohortIdx = 1; // default landing cohort: Da Nang, Vietnam (01)
+
+  /* ---------- map init ---------- */
+  const mapEl = document.getElementById("map");
+  const cfg   = window.CONFIG || {};
+  // The house dot pins to the cohort's `anchor` (falling back to `cam` if a
+  // cohort hasn't declared one). This is INDEPENDENT of the camera framing:
+  // identical on initial load and every nav, so the dot never jumps. (The
+  // legacy cfg.FOCUS_LOCATION anchor is deliberately ignored — stale Da Nang
+  // data from the old MapKit build.)
+  const landingCohort = COHORTS[cohortIdx];
+  const landingAnchor = landingCohort.anchor || landingCohort.cam;
+  const focus = { name: landingCohort.loc, lon: landingAnchor.lon, lat: landingAnchor.lat };
+
+  if (mapEl && window.maplibregl) {
+    // Don't let a WebGL / tile failure kill the rest of the script.
+    try { initMap(mapEl, focus); }
+    catch (err) { console.warn("map init failed:", err); }
+  }
+
+  /* =========================================================
+     MAPLIBRE GL — Esri satellite tiles, focused on Da Nang
+     ========================================================= */
+  function initMap(el, place) {
+    const heroMapEl = el.parentElement;
+    if (heroMapEl) heroMapEl.style.clipPath = "circle(0px at 50% 50%)";
+
+    // FINAL is the target view — derived from the landing cohort's recorded
+    // camera. Use D → "Record view" to recapture and update COHORTS[].cam.
+    const FINAL = { ...COHORTS[cohortIdx].cam };
+    const START = { lon: place.lon, lat: place.lat, zoom: 10.0, pitch: 5,  bearing: 95  };
+
+    const map = new maplibregl.Map({
+      container: el,
+      style: {
+        version: 8,
+        sources: {
+          satellite: {
+            type: "raster",
+            tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
+            tileSize: 256,
+            attribution: "© Esri, Maxar, Earthstar Geographics"
           }
-        });
-        viewer.scene.requestRender();
-        if (t < 1) requestAnimationFrame(step);
-        else {
-          startSlowOrbit(viewer, FINAL);
-          onLanded();
-        }
-      };
-      requestAnimationFrame(step);
+        },
+        layers: [{ id: "satellite", type: "raster", source: "satellite" }]
+      },
+      center:  [START.lon, START.lat],
+      zoom:    START.zoom,
+      pitch:   START.pitch,
+      bearing: START.bearing,
+      interactive:        false,
+      attributionControl: true,
+      pitchWithRotate:    false,
+    });
+
+    el.style.pointerEvents = "none";
+    inspector.map   = map;
+    inspector.el    = el;
+    inspector.place = place;
+
+    const fireIris = () => {
+      const hm = document.getElementById("house-marker");
+      let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      if (hm && !hm.hidden && hm.style.transform) {
+        const dm = new DOMMatrix(hm.style.transform);
+        cx = dm.m41; cy = dm.m42;
+      }
+      triggerIrisReveal(cx, cy);
     };
 
-    // Wait briefly so the first frame paints before the intro starts
-    setTimeout(startIntro, reduceMotion ? 0 : 450);
+    map.on("load", () => {
+      startMarkerProjection(map, place, el);
 
-    // Force a resize after first paint so the canvas matches whichever
-    // layout (desktop / stacked-mobile) the CSS actually settled on.
-    requestAnimationFrame(() => viewer.resize());
+      const loaded = window.__siteLoaded || Promise.resolve();
 
-    // Keep the viewer sized correctly when the window resizes
-    window.addEventListener("resize", () => viewer.resize());
+      if (reduceMotion) {
+        map.jumpTo({ center: [FINAL.lon, FINAL.lat], zoom: FINAL.zoom, pitch: FINAL.pitch, bearing: FINAL.bearing });
+        document.getElementById("house-marker")?.classList.add("is-landed");
+        loaded.then(fireIris);
+        return;
+      }
+
+      // Fly the camera in *behind* the loader so the hero is already at
+      // (or very near) its final view by the time the loader hands off —
+      // no gap of black hero between the loader fade and the iris.
+      map.flyTo({
+        center:   [FINAL.lon, FINAL.lat],
+        zoom:     FINAL.zoom,
+        pitch:    FINAL.pitch,
+        bearing:  FINAL.bearing,
+        duration: 1800,
+        easing:   (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+      });
+      map.once("moveend", () => {
+        document.getElementById("house-marker")?.classList.add("is-landed");
+        startSlowOrbit(map, FINAL);
+      });
+
+      // The loader resolves the moment its fade begins, so the iris
+      // ripple starts immediately underneath it — they cross-fade
+      // instead of leaving a black header between them.
+      loaded.then(fireIris);
+    });
   }
 
-  /* Place the camera at a (heading, pitch, range) around the focus
-     point. We use lookAt + an immediate transform release so any
-     subsequent setView calls still operate in world space. */
-  function applyOrbit(viewer, place, headingDeg, pitchDeg, range) {
-    const center = Cesium.Cartesian3.fromDegrees(place.lon, place.lat, 0);
-    viewer.camera.lookAt(
-      center,
-      new Cesium.HeadingPitchRange(
-        Cesium.Math.toRadians(headingDeg),
-        Cesium.Math.toRadians(pitchDeg),
-        range
-      )
-    );
-    viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-    viewer.scene.requestRender();
+  /* Project the Da Nang anchor to screen space every frame so the
+     floating HACKER HOUSE marker tracks the camera. */
+  function startMarkerProjection(map, place, mapEl) {
+    const marker = document.getElementById("house-marker");
+    if (!marker) return;
+
+    const update = () => {
+      const pt   = map.project([place.lon, place.lat]);
+      const rect = mapEl.getBoundingClientRect();
+      if (pt && rect) {
+        marker.hidden = false;
+        marker.style.transform =
+          `translate3d(${rect.left + pt.x}px, ${rect.top + pt.y}px, 0)`;
+      } else {
+        marker.hidden = true;
+      }
+      requestAnimationFrame(update);
+    };
+    update();
   }
 
-  /* After the intro lands, keep the camera quietly orbiting the focus
-     at the final pitch + range. Very slow so it never reads as motion
-     sickness — about one revolution every six minutes. */
-  function startSlowOrbit(viewer, final) {
-    const degPerSec = 0.04; // 360° in ~2.5 hours — effectively frozen
+  /* After the fly-in, keep the camera very slowly rotating.
+     About one revolution every two hours — enough to feel alive. */
+  function startSlowOrbit(map, final) {
+    const degPerSec = 0.04;
     let last = performance.now();
-    let heading = final.heading;
-    const pos = Cesium.Cartesian3.fromDegrees(final.lon, final.lat, final.height);
+    inspector.orbitBearing = final.bearing;
+
     const tick = (now) => {
       const dt = (now - last) / 1000;
       last = now;
-      if (!inspector.on) {
-        heading = (heading + degPerSec * dt) % 360;
-        viewer.camera.setView({
-          destination: pos,
-          orientation: { heading: Cesium.Math.toRadians(heading), pitch: Cesium.Math.toRadians(final.pitch), roll: 0 }
-        });
-        viewer.scene.requestRender();
+      if (!inspector.on && !inspector.flying) {
+        inspector.orbitBearing = (inspector.orbitBearing + degPerSec * dt) % 360;
+        map.setBearing(inspector.orbitBearing);
       }
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }
 
-  /* tiny easing + lerp helpers */
-  function lerp(a, b, t) { return a + (b - a) * t; }
-  function easeInOutQuad(t) {
-    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-  }
-  /* lerp two angles on the short arc through ±360° */
-  function lerpAngle(a, b, t) {
-    let d = ((b - a + 540) % 360) - 180;
-    return a + d * t;
-  }
-
-  /* Project the Da Nang anchor to screen space every frame so the
-     floating HACKER HOUSE marker tracks the camera. */
-  function startMarkerProjection(viewer, place) {
-    const marker = document.getElementById("house-marker");
-    if (!marker) return;
-    const anchor = Cesium.Cartesian3.fromDegrees(place.lon, place.lat, 30);
-
-    const update = () => {
-      const project =
-        Cesium.SceneTransforms.worldToWindowCoordinates ||
-        Cesium.SceneTransforms.wgs84ToWindowCoordinates;
-      const win = project(viewer.scene, anchor);
-      if (!win) {
-        marker.hidden = true;
-        return;
-      }
-      // simple horizon test: the anchor is behind the camera if its
-      // dot product with the camera direction is negative
-      const cam = viewer.camera;
-      const toAnchor = Cesium.Cartesian3.subtract(anchor, cam.positionWC, new Cesium.Cartesian3());
-      const dot = Cesium.Cartesian3.dot(toAnchor, cam.directionWC);
-      if (dot <= 0) {
-        marker.hidden = true;
-        return;
-      }
-      marker.hidden = false;
-      marker.style.transform = `translate3d(${win.x}px, ${win.y}px, 0)`;
-    };
-
-    viewer.scene.postRender.addEventListener(update);
-    update();
-  }
-
   /* =========================================================
-     LEAFLET — 2D fallback (used while the API key is unset)
+     COHORT NAV — left/right arrows on the marker box fly the
+     camera between Bangalore (00) → Da Nang (01) → Canggu, Bali (02)
      ========================================================= */
-  function initLeaflet2D(el) {
-    const map = L.map(el, {
-      center: [25, -70],
-      zoom: 2.2,
-      minZoom: 2,
-      maxZoom: 12,
-      zoomControl: false,
-      attributionControl: true,
-      dragging: true,
-      scrollWheelZoom: true,
-      doubleClickZoom: true,
-      boxZoom: true,
-      keyboard: true,
-      touchZoom: true,
-      worldCopyJump: true,
-      preferCanvas: true,
-      zoomSnap: 0.25,
+  /* Sync all per-cohort DOM (marker box, hero title/desc/actions, badge,
+     apps label/range, dock dot status, expand panel) to a cohort. Runs on
+     initial load *and* on every nav, so the static HTML never has to be
+     hand-kept in sync with the default cohort. */
+  function applyCohortContent(c) {
+    const titleEl = document.querySelector("[data-marker-title]");
+    const subEl   = document.querySelector("[data-marker-sub]");
+    const locEl   = document.querySelector("[data-marker-loc]");
+    const badgeEl = document.querySelector("[data-cohort-label]");
+    const appsLbl = document.querySelector("[data-apps-label]");
+    const appsRng = document.querySelector("[data-apps-range]");
+    if (titleEl) titleEl.textContent = c.title;
+    if (subEl)   subEl.innerHTML     = c.sub;
+    if (locEl)   locEl.textContent   = c.loc;
+    if (badgeEl) badgeEl.innerHTML   = c.badge;
+    if (appsLbl && c.apps) appsLbl.textContent = c.apps.label;
+    if (appsRng && c.apps) appsRng.textContent = c.apps.range;
+
+    // Hero title + description vary per cohort. Title is split across two
+    // spans (line A plain, line B italic em) to match the existing markup.
+    const heroTitleEl = document.querySelector("[data-hero-title]");
+    const heroDescEl  = document.querySelector("[data-hero-desc]");
+    if (heroTitleEl && c.heroTitle) {
+      heroTitleEl.innerHTML =
+        `<span>${c.heroTitle.a}</span><span><em>${c.heroTitle.b}</em></span>`;
+    }
+    if (heroDescEl && c.heroDesc) heroDescEl.textContent = c.heroDesc;
+
+    // Actions row — rebuild from c.actions[] so each cohort can declare
+    // its own primary CTA, ghost status pill, and/or secondary buttons.
+    const actionsEl = document.querySelector("[data-hero-actions]");
+    if (actionsEl) {
+      const actions = c.actions || [{ label: "Apply", variant: "primary", arrow: true, href: "#apply" }];
+      actionsEl.innerHTML = actions
+        .map((a) => {
+          const cls   = a.variant === "ghost" ? "hero__apply hero__apply--ghost" : "hero__apply";
+          const arrow = a.arrow ? '<span class="hero__apply-arrow" aria-hidden="true">→</span>' : "";
+          const href  = a.href || "#apply";
+          return `<a href="${href}" class="${cls}"><span>${a.label}</span>${arrow}</a>`;
+        })
+        .join("");
+    }
+
+    // Bottom-dock apply CTA — per-cohort label (falls back to "apply").
+    const dockCtaEl = document.querySelector("[data-dock-cta-label]");
+    if (dockCtaEl) dockCtaEl.textContent = c.ctaLabel || "apply";
+
+    // Dock dot color is driven by [data-apps-status] on body — CSS swaps
+    // the dot fill + pulse halo from green (open) → red (filled) → grey (closed).
+    if (c.apps?.status) document.body.dataset.appsStatus = c.apps.status;
+
+    renderExpand(c);
+  }
+
+  function setCohort(nextIdx) {
+    if (!inspector.map) return;
+    if (nextIdx < 0 || nextIdx >= COHORTS.length) return;
+    if (nextIdx === cohortIdx) return;
+
+    cohortIdx = nextIdx;
+    const c = COHORTS[cohortIdx];
+
+    applyCohortContent(c);
+
+    // move the dot anchor so the marker rides along with the new city.
+    // Uses the cohort's fixed `anchor` (not the camera center) so the dot
+    // lands in the same composed spot it was authored at.
+    if (inspector.place) {
+      const a = c.anchor || c.cam;
+      inspector.place.lon  = a.lon;
+      inspector.place.lat  = a.lat;
+      inspector.place.name = c.loc;
+    }
+
+    // pause the slow orbit so it stops fighting the flyTo bearing
+    inspector.flying = true;
+
+    inspector.map.flyTo({
+      center:  [c.cam.lon, c.cam.lat],
+      zoom:    c.cam.zoom,
+      pitch:   c.cam.pitch,
+      bearing: c.cam.bearing,
+      duration: 4200,
+      essential: true,
+      easing: (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
     });
 
-    // CartoDB Voyager — subtle color in oceans, land, parks. Premium but alive.
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-      {
-        attribution: "© OpenStreetMap · © CARTO",
-        subdomains: "abcd",
-        maxZoom: 19,
-      }
-    ).addTo(map);
-
-    // Helper: a quadratic-bezier arc between two [lat, lng] points.
-    // Apex offset perpendicular to the segment, scaled by distance, so the
-    // result looks like a great-circle-ish flight path.
-    const arcPoints = (start, end, height = 0.22, segments = 48) => {
-      const [lat1, lng1] = start;
-      const [lat2, lng2] = end;
-      const dLat = lat2 - lat1;
-      const dLng = lng2 - lng1;
-      const dist = Math.hypot(dLat, dLng);
-      if (dist === 0) return [start, end];
-      const perpLat =  dLng / dist;
-      const perpLng = -dLat / dist;
-      const apexLat = (lat1 + lat2) / 2 + perpLat * dist * height;
-      const apexLng = (lng1 + lng2) / 2 + perpLng * dist * height;
-      const pts = [];
-      for (let i = 0; i <= segments; i++) {
-        const t = i / segments;
-        const it = 1 - t;
-        pts.push([
-          it * it * lat1 + 2 * it * t * apexLat + t * t * lat2,
-          it * it * lng1 + 2 * it * t * apexLng + t * t * lng2,
-        ]);
-      }
-      return pts;
-    };
-
-    ALUMNI.forEach((a) => {
-      const icon = L.divIcon({
-        className: "map-pin-wrap",
-        html: `<div class="map-pin map-pin--alumni"><span class="map-pin__dot"></span></div>`,
-        iconSize: [6, 6],
-        iconAnchor: [3, 3],
-      });
-      L.marker(a.coords, { icon, keyboard: false, interactive: false }).addTo(map);
+    inspector.map.once("moveend", () => {
+      inspector.flying = false;
+      inspector.orbitBearing = c.cam.bearing;
     });
 
-    const pinMarkers = HOUSES.map((h) => {
-      const labelSide = h.coords[1] > 100 ? "map-pin__label--left" : "";
-      const icon = L.divIcon({
-        className: "map-pin-wrap",
-        html: `
-          <div class="map-pin map-pin--active">
-            <span class="map-pin__halo"></span>
-            <span class="map-pin__dot"></span>
-            <span class="map-pin__label ${labelSide}">${h.name} · ${h.code}</span>
-          </div>
-        `,
-        iconSize: [14, 14],
-        iconAnchor: [7, 7],
-      });
-      return L.marker(h.coords, { icon, keyboard: false, interactive: false, opacity: 0 }).addTo(map);
-    });
+    updateNavButtons();
+  }
 
-    // Main hub-to-hub arc — curved, moss green, the most prominent line on the map.
-    // Drawn in two layers: a wide soft underglow + a sharp dashed top.
-    const hubArc = arcPoints(HOUSES[0].coords, HOUSES[1].coords, 0.28, 64);
-    const trailGlow = L.polyline(hubArc, {
-      color: "#3d6b4e",
-      weight: 6,
-      opacity: 0,
-      lineCap: "round",
-      interactive: false,
-    }).addTo(map);
-    const trail = L.polyline(hubArc, {
-      color: "#3d6b4e",
-      weight: 1.8,
-      opacity: 0,
-      dashArray: "3 8",
-      lineCap: "round",
-      interactive: false,
-    }).addTo(map);
+  function updateNavButtons() {
+    const prev = document.querySelector("[data-cohort-prev]");
+    const next = document.querySelector("[data-cohort-next]");
+    if (prev) prev.disabled = cohortIdx <= 0;
+    if (next) next.disabled = cohortIdx >= COHORTS.length - 1;
 
-    const bounds = L.latLngBounds(HOUSES.map((h) => h.coords));
-    const padForRightSide = () => ({
-      paddingTopLeft: [Math.round(window.innerWidth * 0.42), 120],
-      paddingBottomRight: [80, 120],
-    });
+    const prevLbl = document.querySelector("[data-prev-label]");
+    const nextLbl = document.querySelector("[data-next-label]");
+    const prevC = COHORTS[cohortIdx - 1];
+    const nextC = COHORTS[cohortIdx + 1];
+    if (prevLbl) prevLbl.textContent = prevC ? `C${parseInt(prevC.id, 10)}` : "";
+    if (nextLbl) nextLbl.textContent = nextC ? `C${parseInt(nextC.id, 10)}` : "";
+  }
 
-    if (reduceMotion) {
-      map.fitBounds(bounds, padForRightSide());
-      pinMarkers.forEach((m) => m.setOpacity(1));
-      trail.setStyle({ opacity: 0.85 });
-      trailGlow.setStyle({ opacity: 0.18 });
-    } else {
-      setTimeout(() => {
-        map.flyToBounds(bounds, { ...padForRightSide(), duration: 1.9, easeLinearity: 0.35 });
-      }, 500);
+  function renderExpand(c) {
+    const photosEl = document.querySelector("[data-marker-photos]");
+    const statsEl  = document.querySelector("[data-marker-stats]");
+    const blurbEl  = document.querySelector("[data-marker-blurb]");
 
-      let armed = false;
-      setTimeout(() => { armed = true; }, 550);
-      map.on("moveend", () => {
-        if (!armed) return;
-        armed = false;
-        pinMarkers.forEach((m, i) => setTimeout(() => m.setOpacity(1), i * 180));
-        let o = 0;
-        const t = setInterval(() => {
-          o += 0.08;
-          trail.setStyle({ opacity: Math.min(o, 0.85) });
-          trailGlow.setStyle({ opacity: Math.min(o * 0.22, 0.18) });
-          if (o >= 0.85) clearInterval(t);
-        }, 40);
+    if (photosEl) {
+      photosEl.innerHTML = "";
+      (c.photos || []).forEach((src) => {
+        const tile = document.createElement("span");
+        tile.className = "house-marker__photo";
+        tile.style.backgroundImage = `url('${src}')`;
+        photosEl.appendChild(tile);
       });
     }
 
-    window.addEventListener("resize", () => map.invalidateSize());
+    if (statsEl) {
+      statsEl.innerHTML = "";
+      (c.stats || []).forEach(({ value, label }) => {
+        const cell = document.createElement("div");
+        cell.className = "house-marker__stat";
+        const v = document.createElement("span");
+        v.className = "house-marker__stat-value";
+        v.textContent = value;
+        const l = document.createElement("span");
+        l.className = "house-marker__stat-label";
+        l.textContent = label;
+        cell.appendChild(v);
+        cell.appendChild(l);
+        statsEl.appendChild(cell);
+      });
+    }
+
+    if (blurbEl) blurbEl.textContent = c.blurb || "";
   }
+
+  const prevBtn = document.querySelector("[data-cohort-prev]");
+  const nextBtn = document.querySelector("[data-cohort-next]");
+  if (prevBtn) prevBtn.addEventListener("click", () => setCohort(cohortIdx - 1));
+  if (nextBtn) nextBtn.addEventListener("click", () => setCohort(cohortIdx + 1));
+  updateNavButtons();
+  applyCohortContent(COHORTS[cohortIdx]);
 
   /* =========================================================
      UI bits — cursor shine, scroll reveal, nav state
      ========================================================= */
   if (supportsHover && !reduceMotion) {
-    document.querySelectorAll(".hero__pane").forEach((el) => {
-      el.addEventListener("pointermove", (e) => {
-        const r = el.getBoundingClientRect();
-        el.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
-        el.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+    document.querySelectorAll(".hero__pane").forEach((pane) => {
+      pane.addEventListener("pointermove", (e) => {
+        const r = pane.getBoundingClientRect();
+        pane.style.setProperty("--mx", `${((e.clientX - r.left) / r.width)  * 100}%`);
+        pane.style.setProperty("--my", `${((e.clientY - r.top)  / r.height) * 100}%`);
       });
-      el.addEventListener("pointerleave", () => {
-        el.style.removeProperty("--mx");
-        el.style.removeProperty("--my");
+      pane.addEventListener("pointerleave", () => {
+        pane.style.removeProperty("--mx");
+        pane.style.removeProperty("--my");
       });
     });
   }
 
-  // Keep reveals narrow on the post-hero sections so content is never blanked
-  // out waiting for the observer to fire. Only a couple of accents fade in —
-  // and only ones whose absence on first paint doesn't make the page look empty.
   const revealTargets = document.querySelectorAll(".poster, .faq__item");
   if (!reduceMotion && "IntersectionObserver" in window) {
     revealTargets.forEach((t) => t.classList.add("reveal"));
@@ -486,47 +478,7 @@
   }
 
   /* =========================================================
-     Weather — Open-Meteo (no key required) for the focus location
-     ========================================================= */
-  fetchFocusWeather(focus).catch(() => { /* silent — placeholder stays */ });
-
-  async function fetchFocusWeather(place) {
-    const url =
-      `https://api.open-meteo.com/v1/forecast?latitude=${place.lat}` +
-      `&longitude=${place.lon}&current=temperature_2m,weather_code&timezone=auto`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("weather fetch failed");
-    const data = await res.json();
-    const t = Math.round(data?.current?.temperature_2m);
-    const code = data?.current?.weather_code;
-    if (!Number.isFinite(t) || code == null) return;
-
-    const wx = wmoToWeather(code);
-    const temp = document.getElementById("hero-loc-temp");
-    const desc = document.getElementById("hero-loc-desc");
-    const icon = document.getElementById("hero-loc-icon");
-    if (temp) temp.textContent = `${t}°C`;
-    if (desc) desc.textContent = wx.label;
-    if (icon) icon.textContent = wx.glyph;
-  }
-
-  /* WMO weather code → label + glyph. Tight subset, good enough for a chip. */
-  function wmoToWeather(code) {
-    if (code === 0) return { label: "Sunny", glyph: "☀" };
-    if (code >= 1 && code <= 3) return { label: "Mostly clear", glyph: "◐" };
-    if (code === 45 || code === 48) return { label: "Foggy", glyph: "≋" };
-    if (code >= 51 && code <= 57) return { label: "Drizzle", glyph: "☂" };
-    if (code >= 61 && code <= 67) return { label: "Rain", glyph: "☂" };
-    if (code >= 71 && code <= 77) return { label: "Snow", glyph: "❄" };
-    if (code >= 80 && code <= 82) return { label: "Showers", glyph: "☂" };
-    if (code >= 95 && code <= 99) return { label: "Storm", glyph: "⚡" };
-    return { label: "Clear", glyph: "◐" };
-  }
-
-  /* =========================================================
-     Camera inspector — press D to take manual control of the
-     Cesium camera and stream the live values to a readout box.
-     Read the numbers, paste them back, I bake them into the file.
+     Camera inspector — press D to take manual control
      ========================================================= */
   window.addEventListener("keydown", (e) => {
     if (e.key !== "d" && e.key !== "D") return;
@@ -535,20 +487,28 @@
   });
 
   function toggleInspector() {
-    if (!inspector.viewer) return;
+    if (!inspector.map) return;
     inspector.on = !inspector.on;
-    const ctl = inspector.viewer.scene.screenSpaceCameraController;
-    ctl.enableRotate = inspector.on;
-    ctl.enableTranslate = inspector.on;
-    ctl.enableZoom = inspector.on;
-    ctl.enableTilt = inspector.on;
-    ctl.enableLook = inspector.on;
-    // Restore pointer events so the canvas receives drag/scroll while
-    // the inspector is open; remove them again on close so the page
-    // scrolls normally.
-    inspector.viewer.scene.canvas.style.pointerEvents = inspector.on ? "auto" : "none";
+
+    const map = inspector.map;
+    if (inspector.on) {
+      map.scrollZoom.enable();
+      map.dragPan.enable();
+      map.dragRotate.enable();
+      map.touchPitch.enable();
+    } else {
+      map.scrollZoom.disable();
+      map.dragPan.disable();
+      map.dragRotate.disable();
+      map.touchPitch.disable();
+    }
+    if (inspector.el) {
+      inspector.el.style.pointerEvents = inspector.on ? "auto" : "none";
+    }
+
     const box = document.getElementById("cam-inspect");
     if (box) box.hidden = !inspector.on;
+
     if (inspector.on) {
       startInspectorReadout();
       initInspectorSliders();
@@ -562,20 +522,16 @@
   }
 
   /* =========================================================
-     Record View — click Record, move the map however you want,
-     click End. Snapshots the camera at that exact moment and
-     produces a ready-to-paste FINAL snippet.
+     Record View
      ========================================================= */
   function initGrabView() {
     const btn  = document.getElementById("cam-grab-btn");
     const copy = document.getElementById("cam-grab-copy");
     if (!btn) return;
-
     btn.onclick = () => {
       if (inspector.grabRecording) stopRecording();
       else startRecording();
     };
-
     if (copy) {
       copy.onclick = async () => {
         const code = document.getElementById("cam-grab-code");
@@ -584,20 +540,15 @@
           await navigator.clipboard.writeText(code.textContent);
           copy.textContent = "copied ✓";
           setTimeout(() => { copy.textContent = "copy"; }, 1400);
-        } catch { /* blocked */ }
+        } catch { /* clipboard blocked */ }
       };
     }
   }
 
   function startRecording() {
-    if (!inspector.viewer) return;
     inspector.grabRecording = true;
-
-    // Hide any previous result
     const result = document.getElementById("cam-grab-result");
     if (result) result.hidden = true;
-
-    // Swap button to "End" state — red dot, pulsing, clear label
     const btn = document.getElementById("cam-grab-btn");
     if (btn) {
       btn.classList.add("is-recording");
@@ -606,53 +557,49 @@
   }
 
   function stopRecording() {
-    if (!inspector.viewer) return;
     inspector.grabRecording = false;
-
-    // Reset button
     const btn = document.getElementById("cam-grab-btn");
     if (btn) {
       btn.classList.remove("is-recording");
       btn.querySelector(".cam-grab-btn__label").textContent = "Record view";
     }
 
-    // Snapshot absolute camera world position + facing direction
-    const cam    = inspector.viewer.camera;
-    const carto  = Cesium.Cartographic.fromCartesian(cam.positionWC);
-    const lon    = +(Cesium.Math.toDegrees(carto.longitude).toFixed(4));
-    const lat    = +(Cesium.Math.toDegrees(carto.latitude).toFixed(4));
-    const height = Math.round(carto.height);
-    const heading = +((((Cesium.Math.toDegrees(cam.heading) % 360) + 360) % 360).toFixed(1));
-    const pitch   = +(Cesium.Math.toDegrees(cam.pitch).toFixed(1));
+    const map     = inspector.map;
+    const center  = map.getCenter();
+    const lat     = +(center.lat.toFixed(5));
+    const lon     = +(center.lng.toFixed(5));
+    const zoom    = +(map.getZoom().toFixed(2));
+    const pitch   = +(map.getPitch().toFixed(1));
+    const heading = +((((map.getBearing() % 360) + 360) % 360).toFixed(1));
 
-    const snippet = `lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}`;
+    // Emit the FULL state — camera + dot anchor — in the exact shape of a
+    // cohort entry, so it can be pasted straight into COHORTS[]. The anchor
+    // is the dot's fixed earth-point (unchanged by camera drags), so the
+    // composition reproduces exactly on reload.
+    const place   = inspector.place || focus;
+    const aLon    = +(place.lon.toFixed(5));
+    const aLat    = +(place.lat.toFixed(5));
+    const snippet =
+      `cam: { lon: ${lon}, lat: ${lat}, zoom: ${zoom}, pitch: ${pitch}, bearing: ${heading} }, ` +
+      `anchor: { lon: ${aLon}, lat: ${aLat} }`;
     const code    = document.getElementById("cam-grab-code");
     const result  = document.getElementById("cam-grab-result");
     if (code)   code.textContent = snippet;
-    if (result) result.hidden = false;
+    if (result) result.hidden    = false;
   }
 
   function disarmGrab() {
-    // Called when inspector closes — reset everything cleanly
     if (inspector.grabRecording) stopRecording();
   }
 
   /* =========================================================
-     Pin dropper — click "Create pin point", then click the
-     scene. The picked world position is turned into lon/lat/h,
-     labeled A/B/C…, drawn as a Cesium entity, and pushed into
-     a clickable-to-copy list in the inspector UI.
+     Pin dropper
      ========================================================= */
   function initPinDropper() {
-    if (!inspector.viewer) return;
+    if (!inspector.map) return;
     const btn = document.getElementById("cam-pin-btn");
     if (!btn) return;
     if (!inspector.pins) inspector.pins = [];
-    if (!inspector.pinHandler) {
-      inspector.pinHandler = new Cesium.ScreenSpaceEventHandler(
-        inspector.viewer.scene.canvas
-      );
-    }
     if (!inspector.pinEscBound) {
       window.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && inspector.dropping) stopPinDrop();
@@ -667,45 +614,21 @@
   }
 
   function startPinDrop() {
-    if (!inspector.viewer || inspector.dropping) return;
+    if (!inspector.map || inspector.dropping) return;
     inspector.dropping = true;
     const btn = document.getElementById("cam-pin-btn");
     const lbl = btn?.querySelector(".cam-pin-btn__label");
     if (btn) btn.classList.add("is-armed");
     if (lbl) lbl.textContent = "click on the scene…";
-    inspector.viewer.scene.canvas.style.cursor = "crosshair";
-    // Suppress camera rotation while arming so the click isn't eaten by a
-    // drag-rotate. Restored on stopPinDrop.
-    const ctl = inspector.viewer.scene.screenSpaceCameraController;
-    inspector.savedCtl = {
-      rotate: ctl.enableRotate,
-      tilt: ctl.enableTilt,
-      look: ctl.enableLook,
-    };
-    ctl.enableRotate = false;
-    ctl.enableTilt = false;
-    ctl.enableLook = false;
-    inspector.pinHandler.setInputAction((evt) => {
-      const scene = inspector.viewer.scene;
-      // Prefer pickPosition (3D tileset depth) so we land on a building.
-      // Fall back to globe.pick for sky-or-edge cases.
-      let cart = scene.pickPosition(evt.position);
-      if (!Cesium.defined(cart)) {
-        const ray = inspector.viewer.camera.getPickRay(evt.position);
-        if (ray) cart = scene.globe.pick(ray, scene);
-      }
-      if (!Cesium.defined(cart)) {
-        stopPinDrop();
-        return;
-      }
-      const carto = Cesium.Cartographic.fromCartesian(cart);
-      addPin(
-        Cesium.Math.toDegrees(carto.longitude),
-        Cesium.Math.toDegrees(carto.latitude),
-        carto.height
-      );
+    if (inspector.map) inspector.map.getCanvas().style.cursor = "crosshair";
+
+    const handler = (e) => {
+      if (!inspector.dropping) return;
+      addPin(e.lngLat.lng, e.lngLat.lat);
       stopPinDrop();
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    };
+    inspector.pinClickHandler = handler;
+    inspector.map.once("click", handler);
   }
 
   function stopPinDrop() {
@@ -715,54 +638,27 @@
     const lbl = btn?.querySelector(".cam-pin-btn__label");
     if (btn) btn.classList.remove("is-armed");
     if (lbl) lbl.textContent = "+ Create pin point";
-    if (inspector.viewer) {
-      inspector.viewer.scene.canvas.style.cursor = "";
-      if (inspector.pinHandler) {
-        inspector.pinHandler.removeInputAction(
-          Cesium.ScreenSpaceEventType.LEFT_CLICK
-        );
-      }
-      const ctl = inspector.viewer.scene.screenSpaceCameraController;
-      if (inspector.savedCtl) {
-        ctl.enableRotate = inspector.savedCtl.rotate;
-        ctl.enableTilt = inspector.savedCtl.tilt;
-        ctl.enableLook = inspector.savedCtl.look;
-        inspector.savedCtl = null;
-      }
+    if (inspector.map) inspector.map.getCanvas().style.cursor = "";
+    if (inspector.pinClickHandler) {
+      inspector.map.off("click", inspector.pinClickHandler);
+      inspector.pinClickHandler = null;
     }
   }
 
-  function addPin(lon, lat, height) {
+  function addPin(lon, lat) {
     const label = pinLabel(inspector.pins.length);
-    const entity = inspector.viewer.entities.add({
-      position: Cesium.Cartesian3.fromDegrees(lon, lat, height),
-      point: {
-        pixelSize: 10,
-        color: Cesium.Color.WHITE,
-        outlineColor: Cesium.Color.fromCssColorString("#0b0b0b"),
-        outlineWidth: 2,
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      },
-      label: {
-        text: label,
-        font: "600 12px 'JetBrains Mono', monospace",
-        fillColor: Cesium.Color.WHITE,
-        outlineColor: Cesium.Color.fromCssColorString("#0b0b0b"),
-        outlineWidth: 3,
-        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        pixelOffset: new Cesium.Cartesian2(12, -10),
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      },
-    });
-    inspector.pins.push({ label, lon, lat, height, entity });
-    inspector.viewer.scene.requestRender();
+    const el    = document.createElement("div");
+    el.className   = "cam-pin-dot";
+    el.textContent = label;
+    const marker = new maplibregl.Marker({ element: el })
+      .setLngLat([lon, lat])
+      .addTo(inspector.map);
+    inspector.pins.push({ label, lon, lat, marker });
     renderPinList();
   }
 
-  /* A, B, …, Z, AA, AB, … so the dropper doesn't run out of labels. */
   function pinLabel(idx) {
-    let s = "";
-    let n = idx;
+    let s = "", n = idx;
     do {
       s = String.fromCharCode(65 + (n % 26)) + s;
       n = Math.floor(n / 26) - 1;
@@ -785,13 +681,8 @@
       const coords = document.createElement("span");
       coords.className = "cam-pin-row__coords";
       coords.title = "click to copy";
-      const copyText =
-        `${pin.label}: lon ${pin.lon.toFixed(6)}, ` +
-        `lat ${pin.lat.toFixed(6)}, ` +
-        `h ${pin.height.toFixed(1)}m`;
-      coords.textContent =
-        `${pin.lon.toFixed(5)}, ${pin.lat.toFixed(5)} · ` +
-        `${Math.round(pin.height)}m`;
+      const copyText = `${pin.label}: lon ${pin.lon.toFixed(6)}, lat ${pin.lat.toFixed(6)}`;
+      coords.textContent = `${pin.lon.toFixed(5)}, ${pin.lat.toFixed(5)}`;
       coords.addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(copyText);
@@ -802,16 +693,14 @@
             coords.classList.remove("is-copied");
             coords.textContent = prev;
           }, 900);
-        } catch {
-          /* clipboard may be blocked — silent */
-        }
+        } catch { /* blocked */ }
       });
 
       const del = document.createElement("button");
       del.type = "button";
       del.className = "cam-pin-row__del";
       del.setAttribute("aria-label", `delete pin ${pin.label}`);
-      del.textContent = "×";
+      del.textContent = "\xd7";
       del.addEventListener("click", () => removePin(i));
 
       li.append(name, coords, del);
@@ -822,105 +711,743 @@
   function removePin(idx) {
     const pin = inspector.pins[idx];
     if (!pin) return;
-    inspector.viewer.entities.remove(pin.entity);
+    pin.marker.remove();
     inspector.pins.splice(idx, 1);
-    // Re-label remaining pins so the list stays A, B, C…
-    inspector.pins.forEach((p, i) => {
-      p.label = pinLabel(i);
-      if (p.entity && p.entity.label) p.entity.label.text = p.label;
-    });
-    inspector.viewer.scene.requestRender();
+    inspector.pins.forEach((p, i) => { p.label = pinLabel(i); });
     renderPinList();
   }
 
-  /* Slider control: orbit around the focus point. Each slider directly
-     positions the camera via lookAt(focus, HeadingPitchRange), so
-     moving "orbit" sweeps the camera around Da Nang in a circle. */
+  /* =========================================================
+     Slider control — heading / pitch / distance
+     ========================================================= */
   function initInspectorSliders() {
-    if (!inspector.viewer) return;
-    const place = inspector.place || focus;
-    const focusCart = Cesium.Cartesian3.fromDegrees(place.lon, place.lat, 0);
+    if (!inspector.map) return;
+    const map = inspector.map;
 
-    const h = document.getElementById("cam-h");
-    const p = document.getElementById("cam-p");
-    const r = document.getElementById("cam-r");
+    const h  = document.getElementById("cam-h");
+    const p  = document.getElementById("cam-p");
+    const r  = document.getElementById("cam-r");
     const hv = document.getElementById("cam-h-val");
     const pv = document.getElementById("cam-p-val");
     const rv = document.getElementById("cam-r-val");
     if (!h || !p || !r) return;
 
-    // initialize the sliders from where the camera currently is, so
-    // moving them from there feels continuous.
-    const camCarto = Cesium.Cartographic.fromCartesian(inspector.viewer.camera.position);
-    const dLon = Cesium.Math.toDegrees(camCarto.longitude) - place.lon;
-    const dLat = Cesium.Math.toDegrees(camCarto.latitude) - place.lat;
-    const bearing = ((Math.atan2(dLon, dLat) * 180) / Math.PI + 360) % 360;
-    const range3D = Cesium.Cartesian3.distance(inspector.viewer.camera.position, focusCart);
-    h.value = bearing.toFixed(1);
-    p.value = "-15";
-    r.value = Math.max(500, Math.min(30000, Math.round(range3D))).toString();
+    // Maplibre ranges: bearing 0–360, pitch 0–85, zoom 8–18
+    h.min = "0";   h.max = "360"; h.step = "0.5";
+    p.min = "0";   p.max = "85";  p.step = "0.5";
+    r.min = "8";   r.max = "18";  r.step = "0.1";
+
+    h.value = String(((map.getBearing() % 360) + 360) % 360);
+    p.value = String(map.getPitch().toFixed(1));
+    r.value = String(map.getZoom().toFixed(1));
 
     const apply = () => {
-      const headingDeg = parseFloat(h.value);
-      const pitchDeg = parseFloat(p.value);
-      const rangeM = parseFloat(r.value);
-      hv.textContent = `${headingDeg.toFixed(0)}°`;
-      pv.textContent = `${pitchDeg.toFixed(0)}°`;
-      rv.textContent = `${Math.round(rangeM)}m`;
-      inspector.viewer.camera.lookAt(
-        focusCart,
-        new Cesium.HeadingPitchRange(
-          Cesium.Math.toRadians(headingDeg),
-          Cesium.Math.toRadians(pitchDeg),
-          rangeM
-        )
-      );
-      // release the lookAt frame so other inputs (mouse drag) work in
-      // world space again until the next slider event
-      inspector.viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-      inspector.viewer.scene.requestRender();
+      const hdg  = parseFloat(h.value);
+      const ptch = parseFloat(p.value);
+      const zm   = parseFloat(r.value);
+      if (hv) hv.textContent = `${hdg.toFixed(0)}\xb0`;
+      if (pv) pv.textContent = `${ptch.toFixed(0)}\xb0`;
+      if (rv) rv.textContent = `z${zm.toFixed(1)}`;
+      map.setBearing(hdg);
+      map.setPitch(ptch);
+      map.setZoom(zm);
     };
 
     h.oninput = apply;
     p.oninput = apply;
     r.oninput = apply;
-    // sync labels without moving the camera on open
-    hv.textContent = `${parseFloat(h.value).toFixed(0)}°`;
-    pv.textContent = `${parseFloat(p.value).toFixed(0)}°`;
-    rv.textContent = `${Math.round(parseFloat(r.value))}m`;
+
+    if (hv) hv.textContent = `${parseFloat(h.value).toFixed(0)}\xb0`;
+    if (pv) pv.textContent = `${parseFloat(p.value).toFixed(0)}\xb0`;
+    if (rv) rv.textContent = `z${parseFloat(r.value).toFixed(1)}`;
   }
 
   function startInspectorReadout() {
     const body = document.getElementById("cam-inspect-body");
     if (!body) return;
-    const place = inspector.place || focus;
+    const map = inspector.map;
+
     const tick = () => {
-      const cam = inspector.viewer.camera;
-      const carto = Cesium.Cartographic.fromCartesian(cam.position);
-      const lon = Cesium.Math.toDegrees(carto.longitude);
-      const lat = Cesium.Math.toDegrees(carto.latitude);
-      const height = carto.height;
-      const heading = ((Cesium.Math.toDegrees(cam.heading) % 360) + 360) % 360;
-      const pitch = Cesium.Math.toDegrees(cam.pitch);
-      const dLon = lon - place.lon;
-      const dLat = lat - place.lat;
+      const place   = inspector.place || focus;
+      const center  = map.getCenter();
+      const lat     = center.lat;
+      const lon     = center.lng;
+      const zoom    = map.getZoom().toFixed(2);
+      const pitch   = map.getPitch().toFixed(1);
+      const heading = (((map.getBearing() % 360) + 360) % 360).toFixed(1);
+      const dLon    = lon - place.lon;
+      const dLat    = lat - place.lat;
       body.textContent =
-        `arrivalLon    = place.lon ${dLon >= 0 ? "+" : "-"} ${Math.abs(dLon).toFixed(4)}\n` +
-        `arrivalLat    = place.lat ${dLat >= 0 ? "+" : "-"} ${Math.abs(dLat).toFixed(4)}\n` +
-        `arrivalHeight = ${Math.round(height)}\n` +
-        `arrivalHeading= ${heading.toFixed(1)}\n` +
-        `arrivalPitch  = ${pitch.toFixed(1)}\n` +
+        `center   lat ${lat.toFixed(5)}, lon ${lon.toFixed(5)}\n` +
+        `zoom     ${zoom}\n` +
+        `pitch    ${pitch}\xb0\n` +
+        `bearing  ${heading}\xb0\n` +
         `\n` +
-        `(abs lon ${lon.toFixed(4)}, lat ${lat.toFixed(4)})`;
+        `dot      lat ${place.lat.toFixed(5)}, lon ${place.lon.toFixed(5)}\n` +
+        `offset   dLon ${dLon >= 0 ? "+" : ""}${dLon.toFixed(4)},` +
+        ` dLat ${dLat >= 0 ? "+" : ""}${dLat.toFixed(4)}`;
       inspector.raf = requestAnimationFrame(tick);
     };
     tick();
   }
 
-  const nav = document.querySelector(".nav");
-  if (nav) {
-    const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 24);
+  /* =========================================================
+     Iris reveal
+     ========================================================= */
+  function triggerIrisReveal(cx, cy) {
+    const target = document.querySelector(".hero__map");
+    if (!target) return;
+
+    if (reduceMotion) {
+      target.style.clipPath = "none";
+      return;
+    }
+
+    const rx = (cx != null && isFinite(cx)) ? cx : window.innerWidth  / 2;
+    const ry = (cy != null && isFinite(cy)) ? cy : window.innerHeight / 2;
+
+    const maxR = Math.ceil(Math.max(
+      Math.hypot(rx,                     ry),
+      Math.hypot(window.innerWidth - rx, ry),
+      Math.hypot(rx,                     window.innerHeight - ry),
+      Math.hypot(window.innerWidth - rx, window.innerHeight - ry)
+    )) + 20;
+
+    target.style.transition = "none";
+    target.style.clipPath   = `circle(0px at ${rx}px ${ry}px)`;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        target.style.transition = "clip-path 1400ms cubic-bezier(0.16, 1, 0.3, 1)";
+        target.style.clipPath   = `circle(${maxR}px at ${rx}px ${ry}px)`;
+      });
+    });
+
+    target.addEventListener("transitionend", () => {
+      target.style.clipPath   = "none";
+      target.style.transition = "";
+    }, { once: true });
+  }
+
+  /* =========================================================
+     Nav scroll state + hero bottom clip
+     ---
+     Skipped on the one-pager (body.page--single) — the page no longer
+     scrolls and the hero must fill the panel edge-to-edge with no
+     rounded inset.
+     ========================================================= */
+  const isOnePager = document.body.classList.contains("page--single");
+  const nav    = document.querySelector(".nav");
+  const heroEl = document.querySelector(".hero");
+  if (nav && !heroEl) {
+    nav.classList.add("is-scrolled");
+  } else if (!isOnePager && (nav || heroEl)) {
+    const onScroll = () => {
+      const vh = window.innerHeight;
+      const s  = window.scrollY;
+      if (nav)    nav.classList.toggle("is-scrolled", s > vh * 0.85);
+      if (heroEl) {
+        const pct = Math.min(85, 3 + (s / vh) * 100);
+        heroEl.style.clipPath =
+          `inset(0 0 ${pct.toFixed(2)}% 0 round 0 0 44px 44px)`;
+      }
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
   }
+})();
+
+/* =========================================================
+   FAQ TERMINAL — its own IIFE so a map / WebGL failure
+   above can't keep the FAQ animation from running.
+   ========================================================= */
+(() => {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  setupTerminal();
+
+  function setupTerminal() {
+    const terminal = document.querySelector("[data-terminal]");
+    if (!terminal) return;
+    const screen   = terminal.querySelector("[data-terminal-screen]");
+    const src      = terminal.querySelector("[data-entries]");
+    if (!screen || !src) return;
+
+    const entries = Array.from(src.querySelectorAll("li")).map((li) => ({
+      cmd: li.dataset.cmd || "",
+      out: (li.querySelector(".t-src-a")?.textContent || "").trim(),
+    }));
+    if (!entries.length) return;
+
+    terminal.classList.add("is-live");
+
+    let skipped = false;
+    let started = false;
+    let activeCaret = null;
+
+    function makePrompt() {
+      const p = document.createElement("div");
+      p.className = "terminal__prompt";
+      p.innerHTML =
+        '<span class="t-user">cracked</span>' +
+        '<span class="t-at">@</span>' +
+        '<span class="t-host">hackerhouse</span> ' +
+        '<span class="t-path">~/faq</span> ' +
+        '<span class="t-sigil">$</span>' +
+        '<span class="t-input"></span>' +
+        '<span class="t-caret" aria-hidden="true"></span>';
+      screen.appendChild(p);
+      activeCaret = p.querySelector(".t-caret");
+      return p;
+    }
+
+    function makeOutput(text) {
+      const o = document.createElement("div");
+      o.className = "terminal__out";
+      o.textContent = text;
+      screen.appendChild(o);
+      return o;
+    }
+
+    function wait(ms) {
+      if (skipped) return Promise.resolve();
+      return new Promise((r) => setTimeout(r, ms));
+    }
+
+    async function typeInto(target, text) {
+      for (let i = 0; i < text.length; i++) {
+        if (skipped) { target.textContent = text; return; }
+        target.textContent += text[i];
+        const ch = text[i];
+        const base = ch === " " ? 22 : 18 + Math.random() * 38;
+        // small jitter pauses on punctuation
+        const extra = /[\.\?\!\/\-]/.test(ch) ? 80 : 0;
+        await wait(base + extra);
+      }
+    }
+
+    async function run() {
+      if (started) return;
+      started = true;
+
+      for (let i = 0; i < entries.length; i++) {
+        const item = entries[i];
+        const prompt = makePrompt();
+        const input  = prompt.querySelector(".t-input");
+
+        // leading space after $
+        input.textContent = " ";
+
+        await wait(i === 0 ? 280 : 460);
+        await typeInto(input, item.cmd);
+        await wait(260);
+
+        // "enter" — drop the caret, show output
+        if (activeCaret && activeCaret.parentNode === prompt) {
+          activeCaret.remove();
+          activeCaret = null;
+        }
+        makeOutput(item.out);
+        await wait(640);
+      }
+
+      // final idle prompt with blinking cursor
+      const finalPrompt = makePrompt();
+      finalPrompt.querySelector(".t-input").textContent = " ";
+    }
+
+    // Tap / click anywhere on the terminal to skip ahead
+    terminal.addEventListener("click", () => {
+      if (started) skipped = true;
+    });
+
+    if (reduceMotion) {
+      skipped = true;
+      run();
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (ents) => {
+        if (ents.some((e) => e.isIntersecting)) {
+          run();
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -10% 0px" }
+    );
+    io.observe(terminal);
+  }
+})();
+
+/* =========================================================
+   FELLOWS — draggable passport deck + open-viewer + page-turn
+
+   Each .passport in #passport-deck is a closed leather passport. They
+   sit stacked: depth 0 is the top, slightly larger and dead-centred;
+   deeper cards fan out behind with descending size + rotation.
+
+   Behaviours:
+   - drag horizontally → release: short drag springs back; longer
+     drag or fast flick flies the card off-screen and recycles it to
+     the back of the deck so the next fellow comes up.
+   - tap (no drag) → opens the viewer overlay; cover swings off behind
+     a two-page inside spread with bio (left) + fields (right).
+   - inside the viewer: a "stamps" button flips to the second spread,
+     where the colored ink stamps for each visited house fade in
+     one after another.
+
+   This IIFE is self-contained and bails out cleanly on any page that
+   has no #passport-deck — landing & houses pages keep working.
+   ========================================================= */
+(() => {
+  const deck = document.getElementById("passport-deck");
+  if (!deck) return;
+
+  const reduceMotion =
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const passports = Array.from(deck.querySelectorAll(".passport"));
+  if (!passports.length) return;
+
+  /* ---------- one-time mount: build cover contents into each card ----------
+     real passports are sparse. arc text up top, an emblem, the word
+     PASSPORT in foil mono caps, a biometric-chip glyph, and a tiny id.
+     no italic serif, no "REPUBLIC OF ..." — that read corny. */
+  passports.forEach((card) => {
+    const id     = card.dataset.fellowId      || Math.random().toString(36).slice(2, 8);
+    const num    = card.dataset.fellowNumber  || "";
+
+    card.innerHTML = `
+      <div class="passport__cover-inner">
+        <div class="passport__cover-arc">Cracked &middot; Hackerhouse</div>
+        <div class="passport__cover-emblem" aria-hidden="true">
+          <svg viewBox="0 0 116 116" width="100%" height="100%" fill="none">
+            <defs>
+              <linearGradient id="foil-${id}" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%"  stop-color="#ecdba8"/>
+                <stop offset="55%" stop-color="#cbb986"/>
+                <stop offset="100%" stop-color="#8e7842"/>
+              </linearGradient>
+            </defs>
+            <circle cx="58" cy="58" r="48" stroke="url(#foil-${id})" stroke-width="0.7"/>
+            <circle cx="58" cy="58" r="42" stroke="url(#foil-${id})" stroke-width="0.4" stroke-dasharray="1 3"/>
+            <circle cx="58" cy="58" r="20" stroke="url(#foil-${id})" stroke-width="0.5"/>
+            <text x="58" y="68" text-anchor="middle"
+                  font-family="Instrument Serif, serif" font-style="italic"
+                  font-size="32" fill="url(#foil-${id})">✦</text>
+          </svg>
+        </div>
+        <h2 class="passport__cover-title">Passport</h2>
+        <div class="passport__cover-base">
+          <div class="passport__cover-chip-icon" aria-hidden="true"></div>
+          <div class="passport__cover-base-id">${num.replace(/&middot;/g, "·")}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  /* ---------- focal scatter layout ----------
+     one big passport dead-centre is the focal point. four smaller ones
+     step outward to the sides (medium, then small). one small "back
+     peek" pokes above the focal so the silhouette reads as a curated
+     composition, not chaos. each slot defines x/y offset, scale, in-
+     plane rotation and z-index. */
+  const SCATTER = [
+    // 0: FOCAL — biggest, dead centre, on top
+    { x:    0, y: -20, s: 1.00, rot:   0, z: 16 },
+    // 1: left, medium
+    { x: -250, y:  25, s: 0.74, rot:  -8, z: 13 },
+    // 2: far-left, small
+    { x: -430, y:  55, s: 0.58, rot: -15, z: 11 },
+    // 3: right, medium
+    { x:  250, y:  25, s: 0.74, rot:   8, z: 14 },
+    // 4: far-right, small
+    { x:  430, y:  55, s: 0.58, rot:  15, z: 12 },
+    // 5: back peek — small, lifted up so its top edge pokes above the focal
+    { x:  -40, y:-170, s: 0.48, rot:  -3, z: 10 },
+  ];
+
+  let topZ = 16;
+  const layout = () => {
+    passports.forEach((card, i) => {
+      const p = SCATTER[i % SCATTER.length];
+      card._restX = p.x;
+      card._restY = p.y;
+      card._restRot = p.rot;
+      card._restScale = p.s;
+      card.dataset.depth = String(i);
+      card.style.left = "50%";
+      card.style.top = "50%";
+      card.style.right = "auto";
+      card.style.bottom = "auto";
+      card.style.zIndex = String(p.z);
+      card.style.opacity = "1";
+      card.style.filter = "";
+      card.style.transform =
+        `translate3d(calc(-50% + ${p.x}px), calc(-50% + ${p.y}px), 0) rotate(${p.rot}deg) scale(${p.s})`;
+      card.classList.remove("is-dragging");
+    });
+    topZ = 17;
+  };
+  layout();
+
+  /* ---------- drag — any passport, drop where released ---------- */
+  let drag = null;
+  const VEL_FRAMES = 6;
+
+  const onPointerDown = (e) => {
+    const card = e.target.closest(".passport");
+    if (!card || !deck.contains(card)) return;
+    if (e.target.closest(".passport-viewer")) return;
+
+    // bring the grabbed card to the top of the desk
+    topZ += 1;
+    card.style.zIndex = String(topZ);
+
+    card.setPointerCapture?.(e.pointerId);
+    drag = {
+      card,
+      pointerId: e.pointerId,
+      sx: e.clientX,
+      sy: e.clientY,
+      baseX: card._restX || 0,
+      baseY: card._restY || 0,
+      baseRot: card._restRot || 0,
+      baseScale: card._restScale || 1,
+      dx: 0,
+      dy: 0,
+      moved: false,
+      t0: performance.now(),
+      samples: [{ t: performance.now(), x: e.clientX, y: e.clientY }],
+    };
+    card.classList.add("is-dragging");
+  };
+
+  const onPointerMove = (e) => {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    const dx = e.clientX - drag.sx;
+    const dy = e.clientY - drag.sy;
+    drag.dx = dx;
+    drag.dy = dy;
+    if (!drag.moved && Math.hypot(dx, dy) > 6) drag.moved = true;
+
+    drag.samples.push({ t: performance.now(), x: e.clientX, y: e.clientY });
+    if (drag.samples.length > VEL_FRAMES) drag.samples.shift();
+
+    // tiny rotation tilt while held — feels like a card pinched between fingers
+    const tilt = Math.max(-6, Math.min(6, dx * 0.02));
+    // grabbed cards lift a touch — scale up by 4% of their resting scale
+    const liftScale = drag.baseScale * 1.04;
+    drag.card.style.transform =
+      `translate3d(calc(-50% + ${drag.baseX + dx}px), calc(-50% + ${drag.baseY + dy}px), 0) rotate(${drag.baseRot + tilt}deg) scale(${liftScale})`;
+  };
+
+  const onPointerUp = (e) => {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    const { card, dx, dy, samples, moved, t0, baseX, baseY, baseRot, baseScale } = drag;
+    drag = null;
+
+    card.classList.remove("is-dragging");
+
+    // velocity from the last samples — used for a short glide after release
+    let vx = 0, vy = 0;
+    if (samples.length >= 2) {
+      const a = samples[0];
+      const b = samples[samples.length - 1];
+      const dt = Math.max(1, b.t - a.t);
+      vx = (b.x - a.x) / dt;
+      vy = (b.y - a.y) / dt;
+    }
+    const dist = Math.hypot(dx, dy);
+
+    // tap (no real drag): open the viewer, leave the card where it was
+    if (!moved && (performance.now() - t0) < 380 && dist < 8) {
+      // restore exact resting pose (cancels any pre-tap nudge transform)
+      card.style.transform =
+        `translate3d(calc(-50% + ${baseX}px), calc(-50% + ${baseY}px), 0) rotate(${baseRot}deg) scale(${baseScale})`;
+      openViewer(card);
+      return;
+    }
+
+    // commit the new rest position. add a small momentum glide so it
+    // feels like the card has weight; clamp glide so it doesn't fly out.
+    const GLIDE = 90;             // ms-scaled
+    const MAX_GLIDE = 80;         // px
+    const gx = Math.max(-MAX_GLIDE, Math.min(MAX_GLIDE, vx * GLIDE));
+    const gy = Math.max(-MAX_GLIDE, Math.min(MAX_GLIDE, vy * GLIDE));
+    const newX = baseX + dx + gx;
+    const newY = baseY + dy + gy;
+
+    card._restX = newX;
+    card._restY = newY;
+
+    const settledTransform =
+      `translate3d(calc(-50% + ${newX}px), calc(-50% + ${newY}px), 0) rotate(${baseRot}deg) scale(${baseScale})`;
+    if (reduceMotion) {
+      card.style.transform = settledTransform;
+    } else {
+      card.style.transition = "transform 480ms cubic-bezier(0.16, 1, 0.3, 1)";
+      card.style.transform = settledTransform;
+      setTimeout(() => { card.style.transition = ""; }, 500);
+    }
+  };
+
+  deck.addEventListener("pointerdown", onPointerDown);
+  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  window.addEventListener("pointerup",   onPointerUp);
+  window.addEventListener("pointercancel", onPointerUp);
+
+  /* =========================================================
+     VIEWER — open / page-turn / close
+     ========================================================= */
+  const viewer = document.getElementById("passport-viewer");
+  const book   = document.getElementById("passport-book");
+  const spreadBio    = viewer?.querySelector(".passport-book__spread--bio");
+  const spreadStamps = viewer?.querySelector(".passport-book__spread--stamps");
+  const housesList   = viewer?.querySelector("[data-houses-list]");
+
+  function openViewer(card) {
+    if (!viewer) return;
+    const d = card.dataset;
+
+    // populate fields
+    viewer.querySelector("[data-fellow-photo-target]").style.backgroundImage  = `url("${d.fellowPhoto}")`;
+    viewer.querySelector("[data-fellow-surname-target]").textContent   = (d.fellowSurname || "").toUpperCase();
+    viewer.querySelector("[data-fellow-name-target]").textContent      = d.fellowName || "";
+    viewer.querySelector("[data-fellow-cohort-target]").textContent    = d.fellowCohort || "";
+    viewer.querySelector("[data-fellow-issued-target]").textContent    = d.fellowIssued || "";
+    viewer.querySelector("[data-fellow-role-target]").textContent      = d.fellowRole || "";
+    viewer.querySelector("[data-fellow-bio-target]").textContent       = d.fellowBio || "";
+    viewer.querySelector("[data-fellow-handle-target]").textContent    = d.fellowHandle || "";
+    viewer.querySelector("[data-fellow-handle-caption]").textContent   = d.fellowHandle || "";
+    viewer.querySelector("[data-fellow-number-caption]").textContent   = d.fellowNumber || "";
+
+    // build a synthetic MRZ line from name + number
+    const last = (d.fellowSurname || "FELLOW").toUpperCase().replace(/[^A-Z]/g, "");
+    const first = (d.fellowName || "").toUpperCase().replace(/[^A-Z]/g, "");
+    const numClean = (d.fellowNumber || "0000").replace(/[^0-9]/g, "").padEnd(9, "0");
+    const mrz1 = `P<CRK${last}<<${first}`.padEnd(44, "<");
+    const mrz2 = `${numClean}<CRK${d.fellowCohort?.replace(/[^0-9]/g, "").padStart(7, "0") || "0000000"}M${(d.fellowIssued || "").replace(/[^0-9]/g, "").padStart(7, "0")}`.padEnd(44, "<");
+    viewer.querySelector("[data-mrz-1]").textContent = mrz1.slice(0, 44);
+    viewer.querySelector("[data-mrz-2]").textContent = mrz2.slice(0, 44);
+
+    // configure visa stamps based on houses visited
+    const houses = (d.fellowHouses || "").split(",").map((s) => s.trim()).filter(Boolean);
+    viewer.querySelectorAll(".stamp").forEach((s) => s.classList.remove("is-on"));
+    if (houses.includes("bangalore")) viewer.querySelector(".stamp--blr").classList.add("is-on");
+    if (houses.includes("vietnam"))   viewer.querySelector(".stamp--vnm").classList.add("is-on");
+
+    // build the legend list
+    if (housesList) {
+      housesList.innerHTML = "";
+      const all = [
+        { key: "bangalore", label: "Bangalore",    meta: "cohort 00 · indira nagar", color: "blr", visited: houses.includes("bangalore") },
+        { key: "vietnam",   label: "Vietnam",      meta: "cohort 01 · my khe",       color: "vnm", visited: houses.includes("vietnam") },
+        { key: "bali",      label: "Bali",         meta: "cohort 02 · canggu",       color: "arg", visited: false },
+      ];
+      all.forEach((h) => {
+        const li = document.createElement("li");
+        li.className = "passport-book__legend-item" + (h.visited ? "" : " passport-book__legend-item--ghost");
+        li.innerHTML = `
+          <span class="passport-book__legend-dot passport-book__legend-dot--${h.color}"></span>
+          <span>${h.label}</span>
+          <span class="passport-book__legend-meta">${h.meta}</span>
+        `;
+        housesList.appendChild(li);
+      });
+    }
+
+    // clone the tapped passport's cover into the flipper so the cover
+    // we see swinging open is visually identical to the card the user
+    // tapped (same fellow's id, same serial, same emblem).
+    const flipper = viewer.querySelector("[data-cover-flipper]");
+    const tappedCoverInner = card.querySelector(".passport__cover-inner");
+    if (flipper) {
+      flipper.innerHTML = "";
+      if (tappedCoverInner) {
+        flipper.appendChild(tappedCoverInner.cloneNode(true));
+      }
+    }
+
+    const backCover = viewer.querySelector("[data-book-cover]");
+
+    // always start on the bio spread
+    setPage("bio");
+
+    // reset everything to the CLOSED pose with no transition. the book
+    // sits shifted left so the flipper (which lives at the right half
+    // of the spread) ends up centred in the viewport; the spread is
+    // hidden underneath; the back-cover hint is hidden.
+    const setClosed = (el, css) => {
+      if (!el) return;
+      el.style.transition = "none";
+      Object.assign(el.style, css);
+    };
+    setClosed(book, {
+      transform: "translateX(calc(var(--book-page-w) * -0.5)) scale(0.9)",
+      opacity: "0",
+    });
+    setClosed(flipper, { transform: "rotateY(0deg)", opacity: "1" });
+    setClosed(spreadBio, { opacity: "0" });
+    setClosed(spreadStamps, { opacity: "0" });
+    setClosed(backCover, { opacity: "0" });
+
+    viewer.hidden = false;
+    viewer.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+
+    // force a layout pass so the closed pose is committed BEFORE the
+    // animation transitions are applied. without this, the browser
+    // batches both updates and we'd see no transition.
+    void viewer.offsetWidth;
+
+    // two rAFs to be safe across browsers, then fire the choreographed
+    // open animation.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        viewer.classList.add("is-open");
+
+        // stage 1: the book glides up to its open pose
+        book.style.transition =
+          "transform 1100ms cubic-bezier(0.34, 1.06, 0.22, 1), " +
+          "opacity 380ms ease";
+        book.style.transform = "translateX(0) scale(1)";
+        book.style.opacity = "1";
+
+        // stage 2: the cover flips around its spine (left edge),
+        // starting 260ms in so the book has scaled in a touch first.
+        flipper.style.transition =
+          "transform 1100ms cubic-bezier(0.55, 0.02, 0.18, 0.98) 260ms";
+        flipper.style.transform = "rotateY(-180deg)";
+
+        // stage 3: the inside spread fades in mid-flip — by the time
+        // the cover has rotated past 90deg (≈ 260+550 = 810ms) the
+        // spread should be ~80% visible.
+        spreadBio.style.transition = "opacity 520ms ease 720ms";
+        spreadBio.style.opacity = "1";
+
+        // the small folded-back-cover hint appears at the very end
+        backCover.style.transition = "opacity 360ms ease 1240ms";
+        backCover.style.opacity = "1";
+      });
+    });
+  }
+
+  function closeViewer() {
+    if (!viewer) return;
+    viewer.classList.remove("is-open");
+    viewer.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    setTimeout(() => { viewer.hidden = true; }, 380);
+  }
+
+  function setPage(page) {
+    if (!book) return;
+    book.dataset.page = page;
+    spreadBio?.classList.toggle("is-on", page === "bio");
+    spreadStamps?.classList.toggle("is-on", page === "stamps");
+    // clear any inline opacity/transition left over from the open
+    // animation so the CSS .is-on rules drive page switches normally.
+    [spreadBio, spreadStamps].forEach((el) => {
+      if (!el) return;
+      el.style.opacity = "";
+      el.style.transition = "";
+    });
+  }
+
+  viewer?.querySelector(".passport-viewer__close")?.addEventListener("click", closeViewer);
+  viewer?.querySelector("[data-viewer-scrim]")?.addEventListener("click", closeViewer);
+  window.addEventListener("keydown", (e) => {
+    if (!viewer || viewer.hidden) return;
+    if (e.key === "Escape") closeViewer();
+    if (e.key === "ArrowRight") setPage("stamps");
+    if (e.key === "ArrowLeft")  setPage("bio");
+  });
+  viewer?.querySelector("[data-page-next]")?.addEventListener("click", () => setPage("stamps"));
+  viewer?.querySelector("[data-page-prev]")?.addEventListener("click", () => setPage("bio"));
+})();
+
+/* =========================================================
+   PANEL SWITCHER — one-pager navigation
+   ---
+   The landing page is no longer a scrolling document. Four panels stack
+   in the same viewport and a vertical rail of pills on the right swaps
+   the visible one. Any element with [data-panel-link="X"] activates the
+   panel whose [data-panel="X"] matches. The active panel name is also
+   mirrored to body[data-active-panel] so the brand/rail/dock chrome can
+   flip between light + dark themes.
+   ========================================================= */
+(() => {
+  const body = document.body;
+  if (!body.classList.contains("page--single")) return;
+
+  const panels = Array.from(document.querySelectorAll(".panel[data-panel]"));
+  const links  = Array.from(document.querySelectorAll("[data-panel-link]"));
+  if (!panels.length) return;
+
+  // pills live inside the .rail — kept separately so we can update their
+  // active state distinctly from generic in-content panel links.
+  const pills = Array.from(document.querySelectorAll(".rail__pill[data-panel-link]"));
+
+  const initial =
+    document.querySelector(".panel.is-active")?.dataset.panel || "main";
+  body.dataset.activePanel = initial;
+
+  function activate(name) {
+    if (!name) return;
+    const next = panels.find((p) => p.dataset.panel === name);
+    if (!next || next.classList.contains("is-active")) {
+      // already active — nothing to do
+      body.dataset.activePanel = name;
+      return;
+    }
+
+    panels.forEach((p) => {
+      const on = p === next;
+      p.classList.toggle("is-active", on);
+      p.setAttribute("aria-hidden", on ? "false" : "true");
+    });
+    pills.forEach((b) => {
+      const on = b.dataset.panelLink === name;
+      b.classList.toggle("is-active", on);
+      if (on) b.setAttribute("aria-current", "page");
+      else    b.removeAttribute("aria-current");
+    });
+    body.dataset.activePanel = name;
+
+    // Let other modules know — e.g. MapLibre auto-listens for window
+    // resize, and the fellows deck can choose to relayout. Cheap to fire.
+    window.dispatchEvent(new CustomEvent("panel:change", { detail: { name } }));
+  }
+
+  links.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      const target = el.dataset.panelLink;
+      if (!target) return;
+      // panel links inside <a href="..."> would otherwise navigate or
+      // push a hash; intercept and swap panels in place.
+      e.preventDefault();
+      activate(target);
+    });
+  });
+
+  // Esc → back to main, unless the passport viewer is open (it has its
+  // own Esc handler that closes the viewer first).
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    const viewer = document.getElementById("passport-viewer");
+    if (viewer && !viewer.hidden) return;
+    if (body.dataset.activePanel !== "main") activate("main");
+  });
+
+  // When the map's panel becomes visible again, nudge MapLibre so it
+  // recomputes its canvas size (a noop if dimensions haven't changed but
+  // safe insurance after long visibility:hidden runs on some browsers).
+  window.addEventListener("panel:change", (e) => {
+    if (e.detail?.name !== "main") return;
+    // dispatch a window resize one frame later so the panel transition
+    // has committed before MapLibre measures.
+    requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+  });
 })();

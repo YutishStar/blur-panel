@@ -3,435 +3,648 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cracked Hackerhouse — A residency for the cracked</title>
-  <meta name="description" content="Cracked Hackerhouse — a curated residency for builders, hackers, and the cracked. Four cities. One cohort." />
+  <title>Cracked Hackerhouse — for cracked people, wherever we go next</title>
+  <meta name="description" content="Cracked Hackerhouse — a community of cracked people living, traveling, and building together. Cohort zero in Bangalore. Next stop, Vietnam." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.122/Build/Cesium/Widgets/widgets.css" />
-  <script>window.CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.122/Build/Cesium/';</script>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=14" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
 </head>
-<body>
-  <!-- glass pill nav, centered. The dark pill is the brand mark, not a CTA. -->
-  <header class="nav">
-    <nav class="nav__pills" aria-label="Primary">
-      <a class="nav__pill" href="#about">about us</a>
-      <a class="nav__pill nav__pill--brand" href="#top" aria-label="Cracked Hackerhouse — back to main">
-        <span class="nav__wordmark">Cracked <em>Hackerhouse</em></span>
-      </a>
-      <a class="nav__pill" href="#cohort">fellows</a>
-    </nav>
-  </header>
+<body class="page--single" data-apps-status="filled">
+  <!-- Site loader — counts 0% → 100% before the map flyTo + reveal start.
+       JS resolves window.__siteLoaded when the count completes. -->
+  <div id="site-loader" class="site-loader" role="status" aria-label="Loading">
+    <span class="site-loader__num" data-loader-num>0%</span>
+    <span class="site-loader__sub">cracked hacker house</span>
+  </div>
 
-  <!-- screen-level corner vignette — pulls the eye toward the center
-       of the viewport (i.e. the map) on every section as you scroll -->
+  <!-- Centered brand at the top of the page — replaces the old nav bar. -->
+  <a class="brand" href="#main" data-panel-link="main" aria-label="CrackedHQ — main">
+    CrackedHQ<span class="brand__dot">.</span>
+  </a>
+
+  <!-- Right-side rail of pills. Collapsed by default; the stack expands on
+       hover, and each pill grows + reveals its label. Tap a pill to swap
+       the visible panel underneath. -->
+  <nav class="rail" aria-label="Primary">
+    <ul class="rail__list">
+      <li>
+        <button type="button" class="rail__pill is-active" data-panel-link="main" aria-current="page">
+          <span class="rail__pill-dot" aria-hidden="true"></span>
+          <span class="rail__pill-label">main</span>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="rail__pill" data-panel-link="cohorts">
+          <span class="rail__pill-dot" aria-hidden="true"></span>
+          <span class="rail__pill-label">cohorts</span>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="rail__pill" data-panel-link="fellows">
+          <span class="rail__pill-dot" aria-hidden="true"></span>
+          <span class="rail__pill-label">fellows</span>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="rail__pill" data-panel-link="about">
+          <span class="rail__pill-dot" aria-hidden="true"></span>
+          <span class="rail__pill-label">about us</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Screen-level corner vignette — present across every panel. -->
   <div class="page-vignette" aria-hidden="true"></div>
 
-  <main id="top">
-    <!-- ============ HERO ============ -->
-    <section class="hero">
-      <!-- LAYER 1: real map, behind everything. Right-weighted. -->
-      <div class="hero__map" aria-hidden="true">
-        <div id="map" class="map"></div>
-        <!-- soft white gradient that fades the map into the page on the left -->
-        <div class="hero__map-mask" aria-hidden="true"></div>
-      </div>
+  <main id="top" class="stage">
 
-      <!-- LAYER 1.5: cinematic atmospheric overlays. Each is a single
-           absolutely-positioned div with a single blend mode. Order
-           below = stacking order from bottom to top. -->
-      <div class="hero__fx hero__fx-cool" aria-hidden="true"></div>
-      <div class="hero__fx hero__fx-clouds" aria-hidden="true"></div>
-      <div class="hero__fx hero__fx-vignette" aria-hidden="true"></div>
-      <div class="hero__fx hero__fx-horizon" aria-hidden="true"></div>
+    <!-- ============ PANEL · MAIN ============ -->
+    <section class="panel panel--main is-active" data-panel="main" aria-labelledby="panel-main-title">
+      <section class="hero">
+        <!-- LAYER 1: real map, behind everything. Right-weighted. -->
+        <div class="hero__map" aria-hidden="true">
+          <div id="map" class="map"></div>
+          <div class="hero__map-mask" aria-hidden="true"></div>
+        </div>
 
-      <!-- LAYER 1.7: the glass VEIL — a heat-map of frosted blur over the
-           left half of the hero, dissolving into the map just past 50%.
-           Independent of the content panel above it. -->
-      <div class="hero__veil" aria-hidden="true"></div>
+        <!-- LAYER 1.5: cinematic atmospheric overlays. -->
+        <div class="hero__fx hero__fx-cool" aria-hidden="true"></div>
+        <div class="hero__fx hero__fx-clouds" aria-hidden="true"></div>
+        <div class="hero__fx hero__fx-vignette" aria-hidden="true"></div>
+        <div class="hero__fx hero__fx-horizon" aria-hidden="true"></div>
 
-      <!-- LAYER 2: small glass pane on the LEFT, very short copy + Apply -->
-      <div class="hero__left">
-        <article class="hero__pane glass">
-          <span class="hero__kicker">
-            <span class="hero__live" aria-hidden="true"></span>
-            the residency · live
-          </span>
+        <!-- LAYER 1.7: glass veil over the left half. -->
+        <div class="hero__veil" aria-hidden="true"></div>
 
-          <h1 class="hero__title">
-            <span>Live with</span>
-            <span><em>cracked talent.</em></span>
-          </h1>
+        <!-- LAYER 2: glass pane on the LEFT — copy, CTAs, fellows -->
+        <div class="hero__left">
+          <article class="hero__pane glass">
+            <div class="hero__cohort"><span class="hero__cohort-dot" aria-hidden="true"></span><span data-cohort-label>Cohort 1, Da Nang, Vietnam <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status">Spots Filled!</span></span></div>
 
-          <p class="hero__sub">
-            Eight weeks. Four cities. One cohort of fellows.
-          </p>
+            <h1 id="panel-main-title" class="hero__title" data-hero-title>
+              <span>Are you</span>
+              <span><em>Cracked enough?</em></span>
+            </h1>
 
-          <a href="#apply" class="hero__apply">
-            <span>Apply now</span>
-            <span class="hero__apply-arrow" aria-hidden="true">→</span>
-          </a>
+            <p class="hero__sub" data-hero-desc>
+              A house full of builders, creators, hackers, and ambitious misfits living together for thirty days.
+            </p>
 
-          <div class="hero__loc" id="hero-loc">
-            <span class="hero__loc-label">current location</span>
-            <h2 class="hero__loc-city">Da Nang, Viet&nbsp;Nam</h2>
-            <div class="hero__loc-meta">
-              <span class="hero__loc-icon" id="hero-loc-icon" aria-hidden="true">◐</span>
-              <span class="hero__loc-temp" id="hero-loc-temp">—°C</span>
-              <span class="hero__loc-sep" aria-hidden="true">|</span>
-              <span class="hero__loc-desc" id="hero-loc-desc">—</span>
+            <div class="hero__actions" data-hero-actions>
+              <a href="#apply" class="hero__apply hero__apply--ghost">
+                <span>Filled!</span>
+              </a>
+              <a href="#apply" class="hero__apply">
+                <span>Apply to next cohort</span>
+                <span class="hero__apply-arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
+
+            <button type="button" class="hero__fellows" data-panel-link="fellows" aria-label="Meet the cracked — open the fellows panel">
+              <span class="hero__fellows-label">The Cracked Fellows</span>
+              <span class="hero__fellows-row">
+                <span class="hero__fellows-stack" aria-hidden="true">
+                  <span class="hero__fellow" style="background-image:url('fellows/90960705.jpeg')"></span>
+                  <span class="hero__fellow" style="background-image:url('fellows/BHEWwnjs_400x400.jpg')"></span>
+                  <span class="hero__fellow" style="background-image:url('fellows/UfGyY5_j_400x400.jpg')"></span>
+                  <span class="hero__fellow" style="background-image:url('fellows/yDrxSxQu_400x400.jpg')"></span>
+                </span>
+                <span class="hero__fellows-count">+14</span>
+                <span class="hero__fellows-globe" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                    <circle cx="8" cy="8" r="6.5"/>
+                    <path d="M8 1.5c-1.7 1.6-2.8 3.9-2.8 6.5s1.1 4.9 2.8 6.5c1.7-1.6 2.8-3.9 2.8-6.5s-1.1-4.9-2.8-6.5z"/>
+                    <path d="M1.5 8h13"/>
+                  </svg>
+                </span>
+                <span class="hero__fellows-tagline">Fellows building startups, AI tools, airbnbs, companies and weird internet ideas.</span>
+              </span>
+            </button>
+          </article>
+        </div>
+
+        <!-- LAYER 3: floating HACKER HOUSE marker -->
+        <div id="house-marker" class="house-marker" hidden>
+          <div class="house-marker__card glass">
+            <div class="house-marker__row">
+              <button type="button" class="house-marker__nav house-marker__nav--prev" data-cohort-prev aria-label="Previous cohort">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M10 3 L4 8 L10 13"/>
+                </svg>
+                <span class="house-marker__nav-label" data-prev-label>C0</span>
+              </button>
+              <div class="house-marker__text">
+                <span class="house-marker__title" data-marker-title>CRACKED HACKER HOUSE</span>
+                <span class="house-marker__sub" data-marker-sub>Cohort 01 &middot; next stop</span>
+                <span class="house-marker__loc">
+                  <span class="house-marker__loc-dot" aria-hidden="true"></span>
+                  <span data-marker-loc>Da Nang, Vietnam</span>
+                </span>
+              </div>
+              <button type="button" class="house-marker__nav house-marker__nav--next" data-cohort-next aria-label="Next cohort">
+                <span class="house-marker__nav-label" data-next-label>C2</span>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6 3 L12 8 L6 13"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Expansion section — hidden by default, reveals on card hover.
+                 Photos + stats + blurb are swapped per cohort by setCohort(). -->
+            <div class="house-marker__expand" aria-hidden="true">
+              <div class="house-marker__photos" data-marker-photos></div>
+              <div class="house-marker__stats" data-marker-stats></div>
+              <p class="house-marker__blurb" data-marker-blurb></p>
             </div>
           </div>
-        </article>
-      </div>
-
-      <!-- LAYER 3: floating HACKER HOUSE marker, anchored to Da Nang coords -->
-      <div id="house-marker" class="house-marker" hidden>
-        <div class="house-marker__card glass">
-          <div class="house-marker__text">
-            <span class="house-marker__title">HACKER HOUSE</span>
-            <span class="house-marker__sub">Cohort 1</span>
-          </div>
-        </div>
-        <div class="house-marker__beam" aria-hidden="true"></div>
-        <div class="house-marker__dot" aria-hidden="true"></div>
-      </div>
-
-      <!-- scroll hint -->
-      <div class="hero__scroll" aria-hidden="true">
-        <span>scroll</span>
-        <span class="hero__scroll-line"></span>
-      </div>
-
-      <!-- camera inspector — press D to toggle. See camera-inspector.md. -->
-      <div id="cam-inspect" class="cam-inspect" hidden>
-        <div class="cam-inspect__head">
-          <span>CAM · free-look ON</span>
-          <span class="cam-inspect__hint">slide · drag · scroll · D to close</span>
-        </div>
-        <div class="cam-inspect__sliders">
-          <label class="cam-slider">
-            <span class="cam-slider__name">orbit ↻</span>
-            <input type="range" id="cam-h" min="0" max="360" step="0.5" value="105" />
-            <span class="cam-slider__val" id="cam-h-val">105°</span>
-          </label>
-          <label class="cam-slider">
-            <span class="cam-slider__name">pitch ↕</span>
-            <input type="range" id="cam-p" min="-89" max="-1" step="0.5" value="-19" />
-            <span class="cam-slider__val" id="cam-p-val">-19°</span>
-          </label>
-          <label class="cam-slider">
-            <span class="cam-slider__name">range →</span>
-            <input type="range" id="cam-r" min="500" max="30000" step="100" value="20200" />
-            <span class="cam-slider__val" id="cam-r-val">20200m</span>
-          </label>
-        </div>
-        <!-- RECORD VIEW — hit Record, move the map, hit End. -->
-        <div class="cam-grab">
-          <div class="cam-grab__row">
-            <button type="button" id="cam-grab-btn" class="cam-grab-btn">
-              <span class="cam-grab-btn__dot" aria-hidden="true"></span>
-              <span class="cam-grab-btn__label">Record view</span>
-            </button>
-          </div>
-          <div id="cam-grab-result" class="cam-grab-result" hidden>
-            <code id="cam-grab-code" class="cam-grab-code"></code>
-            <button type="button" id="cam-grab-copy" class="cam-grab-copy">copy</button>
-          </div>
+          <div class="house-marker__beam" aria-hidden="true"></div>
+          <div class="house-marker__dot" aria-hidden="true"></div>
         </div>
 
-        <div class="cam-inspect__pins">
-          <div class="cam-inspect__pins-head">
-            <button type="button" id="cam-pin-btn" class="cam-pin-btn">
-              <span class="cam-pin-btn__dot" aria-hidden="true"></span>
-              <span class="cam-pin-btn__label">+ Create pin point</span>
-            </button>
-            <span class="cam-pin-hint">click on the scene · esc to cancel</span>
+        <!-- camera inspector — press D to toggle. -->
+        <div id="cam-inspect" class="cam-inspect" hidden>
+          <div class="cam-inspect__head">
+            <span>CAM · free-look ON</span>
+            <span class="cam-inspect__hint">slide · drag · scroll · D to close</span>
           </div>
-          <ol id="cam-pin-list" class="cam-pin-list"></ol>
+          <div class="cam-inspect__sliders">
+            <label class="cam-slider">
+              <span class="cam-slider__name">orbit ↻</span>
+              <input type="range" id="cam-h" min="0" max="360" step="0.5" value="105" />
+              <span class="cam-slider__val" id="cam-h-val">105°</span>
+            </label>
+            <label class="cam-slider">
+              <span class="cam-slider__name">pitch ↕</span>
+              <input type="range" id="cam-p" min="-89" max="-1" step="0.5" value="-19" />
+              <span class="cam-slider__val" id="cam-p-val">-19°</span>
+            </label>
+            <label class="cam-slider">
+              <span class="cam-slider__name">range →</span>
+              <input type="range" id="cam-r" min="500" max="30000" step="100" value="20200" />
+              <span class="cam-slider__val" id="cam-r-val">20200m</span>
+            </label>
+          </div>
+          <div class="cam-grab">
+            <div class="cam-grab__row">
+              <button type="button" id="cam-grab-btn" class="cam-grab-btn">
+                <span class="cam-grab-btn__dot" aria-hidden="true"></span>
+                <span class="cam-grab-btn__label">Record view</span>
+              </button>
+            </div>
+            <div id="cam-grab-result" class="cam-grab-result" hidden>
+              <code id="cam-grab-code" class="cam-grab-code"></code>
+              <button type="button" id="cam-grab-copy" class="cam-grab-copy">copy</button>
+            </div>
+          </div>
+          <div class="cam-inspect__pins">
+            <div class="cam-inspect__pins-head">
+              <button type="button" id="cam-pin-btn" class="cam-pin-btn">
+                <span class="cam-pin-btn__dot" aria-hidden="true"></span>
+                <span class="cam-pin-btn__label">+ Create pin point</span>
+              </button>
+              <span class="cam-pin-hint">click on the scene · esc to cancel</span>
+            </div>
+            <ol id="cam-pin-list" class="cam-pin-list"></ol>
+          </div>
+          <pre id="cam-inspect-body" class="cam-inspect__body"></pre>
         </div>
-        <pre id="cam-inspect-body" class="cam-inspect__body"></pre>
+      </section>
+    </section>
+
+    <!-- ============ PANEL · COHORTS ============ -->
+    <section class="panel panel--cohorts" data-panel="cohorts" aria-labelledby="panel-cohorts-title" aria-hidden="true">
+      <div class="panel__inner panel__inner--cohorts">
+        <header class="panel__head panel__head--cohorts">
+          <span class="panel__eyebrow">the journey</span>
+          <h2 id="panel-cohorts-title" class="panel__title">three rooms. <em>one cohort at a time.</em></h2>
+          <p class="panel__lede">
+            bangalore shipped. da nang boards in july. bali is on the menu. and whoever shows up next gets the keys.
+          </p>
+        </header>
+
+        <ol class="journey" aria-label="Cohort journey">
+          <li class="journey__node journey__node--shipped">
+            <div class="journey__head">
+              <span class="journey__index">00</span>
+              <span class="journey__status">
+                <span class="journey__status-dot" aria-hidden="true"></span>
+                shipped
+              </span>
+            </div>
+            <span class="journey__rail" aria-hidden="true"></span>
+            <span class="journey__rail-dot" aria-hidden="true"></span>
+            <h3 class="journey__city">Bangalore<small>India</small></h3>
+            <dl class="journey__meta">
+              <div><dt>when</dt><dd>jun – jul '25</dd></div>
+              <div><dt>house</dt><dd>indira nagar</dd></div>
+              <div><dt>fellows</dt><dd>6</dd></div>
+              <div><dt>weeks</dt><dd>4</dd></div>
+            </dl>
+            <p class="journey__note">where the idea got real. four weeks, six rooms, one dosa-fueled prototype.</p>
+          </li>
+
+          <li class="journey__node journey__node--live">
+            <div class="journey__head">
+              <span class="journey__index">01</span>
+              <span class="journey__status">
+                <span class="journey__status-dot" aria-hidden="true"></span>
+                boarding
+              </span>
+            </div>
+            <span class="journey__rail" aria-hidden="true"></span>
+            <span class="journey__rail-dot" aria-hidden="true"></span>
+            <h3 class="journey__city">Da Nang<small>Vietnam</small></h3>
+            <dl class="journey__meta">
+              <div><dt>when</dt><dd>1 jul '26</dd></div>
+              <div><dt>house</dt><dd>my khe beach</dd></div>
+              <div><dt>fellows</dt><dd>18</dd></div>
+              <div><dt>weeks</dt><dd>6</dd></div>
+            </dl>
+            <p class="journey__note">applications filled. eighteen fellows. one beachside villa. doors open july 1.</p>
+          </li>
+
+          <li class="journey__node journey__node--planning">
+            <div class="journey__head">
+              <span class="journey__index">02</span>
+              <span class="journey__status">
+                <span class="journey__status-dot" aria-hidden="true"></span>
+                planning
+              </span>
+            </div>
+            <span class="journey__rail" aria-hidden="true"></span>
+            <span class="journey__rail-dot" aria-hidden="true"></span>
+            <h3 class="journey__city">Canggu<small>Bali</small></h3>
+            <dl class="journey__meta">
+              <div><dt>when</dt><dd>late '26</dd></div>
+              <div><dt>house</dt><dd>canggu</dd></div>
+              <div><dt>fellows</dt><dd>tbd</dd></div>
+              <div><dt>apply</dt><dd>1 – 30 jun</dd></div>
+            </dl>
+            <p class="journey__note">applications open 1 june – 30 june. rice-paddy wifi, sunset surf, an indo-pacific cohort.</p>
+          </li>
+
+          <li class="journey__node journey__node--unknown">
+            <div class="journey__head">
+              <span class="journey__index">??</span>
+              <span class="journey__status">
+                <span class="journey__status-dot" aria-hidden="true"></span>
+                your call
+              </span>
+            </div>
+            <span class="journey__rail-dot" aria-hidden="true"></span>
+            <h3 class="journey__city">Wherever<small>we go next</small></h3>
+            <dl class="journey__meta">
+              <div><dt>cohort</dt><dd>03</dd></div>
+              <div><dt>when</dt><dd>2027</dd></div>
+              <div><dt>house</dt><dd>tbd</dd></div>
+              <div><dt>fellows</dt><dd>tbd</dd></div>
+            </dl>
+            <p class="journey__note">tokyo? lisbon? mexico city? lagos? we follow the cracked. tell us where.</p>
+          </li>
+        </ol>
       </div>
     </section>
 
-    <!-- ============ TICKER ============ -->
-    <section class="ticker" aria-label="Dispatches">
-      <div class="ticker__track">
-        <span>Cohort 07 — open call closes June 28</span>
-        <span aria-hidden="true">/</span>
-        <span>House Tokyo · 6 seats</span>
-        <span aria-hidden="true">/</span>
-        <span>House Berlin · 4 seats</span>
-        <span aria-hidden="true">/</span>
-        <span>House SF · closed</span>
-        <span aria-hidden="true">/</span>
-        <span>House CDMX · 9 seats</span>
-        <span aria-hidden="true">/</span>
-        <span>Cohort 07 — open call closes June 28</span>
-        <span aria-hidden="true">/</span>
-        <span>House Tokyo · 6 seats</span>
-        <span aria-hidden="true">/</span>
-        <span>House Berlin · 4 seats</span>
-        <span aria-hidden="true">/</span>
-      </div>
-    </section>
-
-    <!-- ============ MISSION ============ -->
-    <section id="about" class="mission">
-      <div class="mission__inner">
-        <h2 class="mission__title">
-          cracked hackerhouse exists to <em>forge and connect</em> ambitious builders
+    <!-- ============ PANEL · ABOUT ============ -->
+    <section class="panel panel--about" data-panel="about" aria-labelledby="panel-about-title" aria-hidden="true">
+      <div class="panel__inner panel__inner--about">
+        <span class="panel__eyebrow">about us</span>
+        <h2 id="panel-about-title" class="panel__title panel__title--about">
+          welcome to <em>cracked hackerhouse</em>
         </h2>
-        <div class="mission__body">
-          <p>
-            traditionally, ambitious builders like yourself have been constrained by the
-            time requirements of school and work.
-          </p>
-          <p>
-            we run 8 week-long cohorts so you can go full time on your craft. we provide
-            <em>housing, a workspace, and the people</em> so you can live and ship with
-            equally cracked peers.
-          </p>
-          <p>
-            you can think of us as &ldquo;college&rdquo; meets &ldquo;residency&rdquo;.
-          </p>
+        <div class="panel__body panel__body--about">
+          <p>a house full of cracked people in one city, building together.</p>
+          <p>no curriculum. no schedule. <em>the people, the city, the work.</em></p>
+          <p>cohort zero ran in bangalore. next stop &mdash; <em>vietnam.</em> then <em>bali.</em> then wherever makes sense.</p>
         </div>
       </div>
     </section>
 
-    <!-- ============ HOMES — poster card scroller ============ -->
-    <section id="houses" class="homes">
-      <div class="homes__head">
-        <h2 class="homes__title">live with <em>cracked</em> talent</h2>
-        <div class="homes__body">
-          <p>
-            silicon valley is our first hub because of its unmatched talent density. but
-            many bright minds cannot live here due to visa restrictions, high costs, and/or
-            family obligations.
+    <!-- ============ PANEL · FELLOWS ============ -->
+    <section class="panel panel--fellows" data-panel="fellows" aria-labelledby="panel-fellows-title" aria-hidden="true">
+      <div class="panel__inner panel__inner--fellows">
+        <header class="panel__head panel__head--fellows">
+          <span class="panel__eyebrow">the fellows</span>
+          <h2 id="panel-fellows-title" class="panel__title">the people who <em>showed up</em></h2>
+          <p class="panel__lede">
+            every fellow gets a passport. <span class="panel__lede-key">drag</span> any passport &middot; <span class="panel__lede-key">tap</span> to open.
           </p>
-          <p>
-            with <a class="link-underline" href="#houses">houses</a> across four cities,
-            we support those builders wherever they are — connecting the most capable
-            talent globally.
-          </p>
+        </header>
+
+        <div class="fellows-stage fellows-stage--in-panel" aria-label="Fellows">
+          <div class="passport-deck" id="passport-deck">
+            <article class="passport"
+                     data-fellow-id="vagdev"
+                     data-fellow-name="Vagdev"
+                     data-fellow-surname="Korrapati"
+                     data-fellow-handle="@vagdev"
+                     data-fellow-role="Distributed systems · ex-Stripe"
+                     data-fellow-bio="Builds payment rails for emerging markets. Came to Bangalore to ship; stayed for the dosa."
+                     data-fellow-cohort="00"
+                     data-fellow-issued="06 · 2025"
+                     data-fellow-number="CRK · 00 · 0001"
+                     data-fellow-houses="bangalore"
+                     data-fellow-photo="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+            <article class="passport"
+                     data-fellow-id="riza"
+                     data-fellow-name="Riza"
+                     data-fellow-surname="Aydin"
+                     data-fellow-handle="@rzaydn"
+                     data-fellow-role="ML researcher · agents &amp; evals"
+                     data-fellow-bio="Trains small models that think. Was in the Bangalore house for cohort zero, now setting up the Vietnam kitchen."
+                     data-fellow-cohort="00 → 01"
+                     data-fellow-issued="06 · 2025"
+                     data-fellow-number="CRK · 00 · 0002"
+                     data-fellow-houses="bangalore,vietnam"
+                     data-fellow-photo="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+            <article class="passport"
+                     data-fellow-id="ashrith"
+                     data-fellow-name="Ashrith"
+                     data-fellow-surname="Reddy"
+                     data-fellow-handle="@ashr1th"
+                     data-fellow-role="Founder · climate hardware"
+                     data-fellow-bio="Designs cold-chain sensors for vaccine logistics. Pitched his first investor from the indira nagar dining table."
+                     data-fellow-cohort="00"
+                     data-fellow-issued="06 · 2025"
+                     data-fellow-number="CRK · 00 · 0003"
+                     data-fellow-houses="bangalore"
+                     data-fellow-photo="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+            <article class="passport"
+                     data-fellow-id="kalash"
+                     data-fellow-name="Kalash"
+                     data-fellow-surname="Mehta"
+                     data-fellow-handle="@kalashm"
+                     data-fellow-role="Compiler hacker · WASM &amp; Rust"
+                     data-fellow-bio="Wrote a JIT in two weekends. Brought a mechanical keyboard to vietnam in checked luggage."
+                     data-fellow-cohort="01"
+                     data-fellow-issued="06 · 2026"
+                     data-fellow-number="CRK · 01 · 0004"
+                     data-fellow-houses="vietnam"
+                     data-fellow-photo="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+            <article class="passport"
+                     data-fellow-id="karthik"
+                     data-fellow-name="Karthik"
+                     data-fellow-surname="Iyer"
+                     data-fellow-handle="@karthik"
+                     data-fellow-role="Designer-engineer · interfaces"
+                     data-fellow-bio="Ships the kind of UI that makes you whisper 'oh, that&rsquo;s nice.' Argues for the em-dash."
+                     data-fellow-cohort="00 → 01"
+                     data-fellow-issued="06 · 2025"
+                     data-fellow-number="CRK · 00 · 0005"
+                     data-fellow-houses="bangalore,vietnam"
+                     data-fellow-photo="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+            <article class="passport"
+                     data-fellow-id="tanish"
+                     data-fellow-name="Tanish"
+                     data-fellow-surname="Star"
+                     data-fellow-handle="@staryutish"
+                     data-fellow-role="Founder · CrackedHQ"
+                     data-fellow-bio="Started the house because nobody else would. Drinks cold-brew at midnight, picks the next city."
+                     data-fellow-cohort="00 → 01"
+                     data-fellow-issued="06 · 2025"
+                     data-fellow-number="CRK · 00 · 0000"
+                     data-fellow-houses="bangalore,vietnam"
+                     data-fellow-photo="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+          </div>
         </div>
       </div>
 
-      <div class="homes__rail" role="region" aria-label="Houses">
-        <div class="homes__track">
-          <article class="poster poster--sf">
-            <span class="poster__chip poster__chip--tl">est jun 2024 · ben &amp; co.</span>
-            <span class="poster__chip poster__chip--tr">san francisco</span>
-            <h3 class="poster__name">the<br/>haight</h3>
-            <span class="poster__chip poster__chip--bl">6 bedrooms · cohort 07</span>
-          </article>
+      <!-- Passport viewer overlay — sits inside the fellows panel but covers
+           the whole viewport when opened. -->
+      <div class="passport-viewer" id="passport-viewer" hidden aria-hidden="true">
+        <button class="passport-viewer__close" type="button" aria-label="close passport">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <path d="M3 3l10 10M13 3L3 13"/>
+          </svg>
+        </button>
 
-          <article class="poster poster--tyo">
-            <span class="poster__chip poster__chip--tl">est mar 2025 · kanae i.</span>
-            <span class="poster__chip poster__chip--tr">tokyo</span>
-            <h3 class="poster__name">shimo<br/><em>kitazawa</em></h3>
-            <span class="poster__chip poster__chip--bl">5 bedrooms · 6 seats open</span>
-          </article>
+        <div class="passport-viewer__scrim" data-viewer-scrim></div>
 
-          <article class="poster poster--ber">
-            <span class="poster__chip poster__chip--tl">est may 2024 · lukas c.</span>
-            <span class="poster__chip poster__chip--tr">berlin</span>
-            <h3 class="poster__name"><em>kreuz</em><br/>berg</h3>
-            <span class="poster__chip poster__chip--bl">7 bedrooms · 4 seats open</span>
-          </article>
+        <div class="passport-viewer__book" data-page="bio" id="passport-book">
+          <div class="passport-book__cover-flipper" data-cover-flipper aria-hidden="true"></div>
+          <div class="passport-book__cover" data-book-cover></div>
+          <div class="passport-book__spine" aria-hidden="true"></div>
 
-          <article class="poster poster--cdmx">
-            <span class="poster__chip poster__chip--tl">est aug 2025 · diego m.</span>
-            <span class="poster__chip poster__chip--tr">mexico city</span>
-            <h3 class="poster__name">roma<br/><em>norte</em></h3>
-            <span class="poster__chip poster__chip--bl">8 bedrooms · 9 seats open</span>
-          </article>
+          <div class="passport-book__spread passport-book__spread--bio is-on">
+            <div class="passport-book__page passport-book__page--left">
+              <div class="passport-book__paper" aria-hidden="true"></div>
+              <div class="passport-book__photo-frame">
+                <div class="passport-book__photo" data-fellow-photo-target></div>
+                <div class="passport-book__photo-corner" aria-hidden="true"></div>
+              </div>
+              <div class="passport-book__seal" aria-hidden="true">
+                <svg viewBox="0 0 80 80" width="100%" height="100%">
+                  <defs>
+                    <path id="seal-arc-top" d="M 12 40 a 28 28 0 0 1 56 0" />
+                    <path id="seal-arc-bot" d="M 14 44 a 26 26 0 0 0 52 0" />
+                  </defs>
+                  <circle cx="40" cy="40" r="30" fill="none" stroke="currentColor" stroke-width="0.7"/>
+                  <circle cx="40" cy="40" r="26" fill="none" stroke="currentColor" stroke-width="0.4"/>
+                  <text font-family="JetBrains Mono, monospace" font-size="5.6" letter-spacing="2" fill="currentColor">
+                    <textPath href="#seal-arc-top" startOffset="50%" text-anchor="middle">CRACKED · HACKER · HOUSE</textPath>
+                  </text>
+                  <text font-family="JetBrains Mono, monospace" font-size="5" letter-spacing="2.4" fill="currentColor">
+                    <textPath href="#seal-arc-bot" startOffset="50%" text-anchor="middle">FELLOW · PASSPORT</textPath>
+                  </text>
+                  <text x="40" y="44" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="18" fill="currentColor">✦</text>
+                </svg>
+              </div>
+              <div class="passport-book__photo-stamp" aria-hidden="true">VERIFIED BY ORB · CRACKED HQ</div>
+            </div>
 
-          <article class="poster poster--dnn">
-            <span class="poster__chip poster__chip--tl">est jan 2026 · current cohort</span>
-            <span class="poster__chip poster__chip--tr">đà nẵng</span>
-            <h3 class="poster__name">my<br/><em>khe</em></h3>
-            <span class="poster__chip poster__chip--bl">10 bedrooms · live now</span>
-          </article>
+            <div class="passport-book__page passport-book__page--right">
+              <div class="passport-book__paper" aria-hidden="true"></div>
+
+              <div class="passport-book__header">
+                <span class="passport-book__country">CRACKED · HACKERHOUSE</span>
+                <span class="passport-book__type">TYPE · P · CRK</span>
+              </div>
+
+              <div class="passport-book__fields">
+                <div class="passport-book__field">
+                  <span class="passport-book__field-label">Surname / Nom</span>
+                  <span class="passport-book__field-value" data-fellow-surname-target>—</span>
+                </div>
+                <div class="passport-book__field">
+                  <span class="passport-book__field-label">Given names / Prénoms</span>
+                  <span class="passport-book__field-value" data-fellow-name-target>—</span>
+                </div>
+                <div class="passport-book__field passport-book__field--two">
+                  <div>
+                    <span class="passport-book__field-label">Cohort</span>
+                    <span class="passport-book__field-value passport-book__field-value--mono" data-fellow-cohort-target>—</span>
+                  </div>
+                  <div>
+                    <span class="passport-book__field-label">Date of issue</span>
+                    <span class="passport-book__field-value passport-book__field-value--mono" data-fellow-issued-target>—</span>
+                  </div>
+                </div>
+                <div class="passport-book__field">
+                  <span class="passport-book__field-label">Role</span>
+                  <span class="passport-book__field-value passport-book__field-value--small" data-fellow-role-target>—</span>
+                </div>
+                <div class="passport-book__field passport-book__field--bio">
+                  <span class="passport-book__field-label">Notes</span>
+                  <span class="passport-book__field-value passport-book__field-value--bio" data-fellow-bio-target>—</span>
+                </div>
+                <div class="passport-book__field">
+                  <span class="passport-book__field-label">Handle</span>
+                  <span class="passport-book__field-value passport-book__field-value--mono passport-book__field-value--small" data-fellow-handle-target>—</span>
+                </div>
+              </div>
+
+              <div class="passport-book__mrz" aria-hidden="true">
+                <div class="passport-book__mrz-line" data-mrz-1>P&lt;CRK&lt;&lt;FELLOW&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                <div class="passport-book__mrz-line" data-mrz-2>0000000000CRK0000000M0000000&lt;&lt;&lt;&lt;&lt;&lt;&lt;0</div>
+              </div>
+
+              <button class="passport-book__page-nav passport-book__page-nav--next" type="button" data-page-next aria-label="turn page · stamps">
+                <span>stamps</span>
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 8h10M9 4l4 4-4 4"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="passport-book__spread passport-book__spread--stamps">
+            <div class="passport-book__page passport-book__page--left passport-book__page--stamps">
+              <div class="passport-book__paper" aria-hidden="true"></div>
+              <div class="passport-book__stamps-eyebrow">visas &middot; residencies</div>
+              <p class="passport-book__stamps-note">every cracked house leaves a mark. this fellow has been in&hellip;</p>
+
+              <div class="stamp stamp--blr" data-stamp="bangalore" aria-hidden="true">
+                <svg viewBox="0 0 220 140" width="100%" height="100%">
+                  <defs>
+                    <path id="blr-arc-top" d="M 30 70 a 80 80 0 0 1 160 0"/>
+                    <path id="blr-arc-bot" d="M 36 76 a 74 74 0 0 0 148 0"/>
+                  </defs>
+                  <rect x="6" y="10" width="208" height="120" rx="14" fill="none" stroke="currentColor" stroke-width="2.2"/>
+                  <rect x="12" y="16" width="196" height="108" rx="10" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3"/>
+                  <text font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="5" fill="currentColor" font-weight="600">
+                    <textPath href="#blr-arc-top" startOffset="50%" text-anchor="middle">COHORT · 00 · INDIRA NAGAR</textPath>
+                  </text>
+                  <text x="110" y="78" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="34" fill="currentColor">Bangalore</text>
+                  <text x="110" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4" fill="currentColor">06 · 2025 → 09 · 2025</text>
+                  <text font-family="JetBrains Mono, monospace" font-size="7" letter-spacing="3" fill="currentColor">
+                    <textPath href="#blr-arc-bot" startOffset="50%" text-anchor="middle">VERIFIED BY CRACKED HQ</textPath>
+                  </text>
+                </svg>
+              </div>
+
+              <div class="stamp stamp--vnm" data-stamp="vietnam" aria-hidden="true">
+                <svg viewBox="0 0 220 140" width="100%" height="100%">
+                  <defs>
+                    <path id="vnm-arc-top" d="M 110 110 m -68 0 a 68 68 0 1 1 136 0"/>
+                  </defs>
+                  <ellipse cx="110" cy="70" rx="100" ry="56" fill="none" stroke="currentColor" stroke-width="2.4"/>
+                  <ellipse cx="110" cy="70" rx="92" ry="48" fill="none" stroke="currentColor" stroke-width="0.6"/>
+                  <text font-family="JetBrains Mono, monospace" font-size="9.5" letter-spacing="4" fill="currentColor" font-weight="600">
+                    <textPath href="#vnm-arc-top" startOffset="50%" text-anchor="middle">CRACKED HACKER HOUSE · ĐÀ NẴNG</textPath>
+                  </text>
+                  <text x="110" y="64" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="30" fill="currentColor">Vietnam</text>
+                  <text x="110" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4" fill="currentColor">06 · 2026 → 09 · 2026</text>
+                  <text x="110" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7" letter-spacing="3" fill="currentColor">COHORT · 01 · MY KHE</text>
+                </svg>
+              </div>
+
+              <div class="stamp stamp--arg stamp--ghost" aria-hidden="true">
+                <svg viewBox="0 0 220 140" width="100%" height="100%">
+                  <rect x="10" y="12" width="200" height="116" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 5"/>
+                  <text x="110" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4" fill="currentColor">RESERVED · CANGGU</text>
+                  <text x="110" y="88" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="26" fill="currentColor">Bali</text>
+                  <text x="110" y="108" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7.4" letter-spacing="3" fill="currentColor">COHORT · 02 · COMING SOON</text>
+                </svg>
+              </div>
+            </div>
+
+            <div class="passport-book__page passport-book__page--right passport-book__page--stamps">
+              <div class="passport-book__paper" aria-hidden="true"></div>
+
+              <div class="passport-book__legend">
+                <div class="passport-book__legend-title">houses visited</div>
+                <ul class="passport-book__legend-list" data-houses-list></ul>
+                <p class="passport-book__legend-note">
+                  we pick cities that are friendly to visiting builders and full of cracked people doing real work. <br>
+                  next stop &mdash; <em>bali</em>.
+                </p>
+              </div>
+
+              <div class="passport-book__signature">
+                <span class="passport-book__signature-line"></span>
+                <span class="passport-book__signature-label">signed by the cracked</span>
+              </div>
+
+              <button class="passport-book__page-nav passport-book__page-nav--prev" type="button" data-page-prev aria-label="turn back · bio">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M13 8H3M7 4L3 8l4 4"/>
+                </svg>
+                <span>bio</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="passport-viewer__caption" aria-hidden="true">
+          <span data-fellow-handle-caption>—</span>
+          <span class="passport-viewer__caption-sep">·</span>
+          <span data-fellow-number-caption>—</span>
         </div>
       </div>
     </section>
-
-    <!-- ============ WHAT TO EXPECT — text + floating polaroids ============ -->
-    <section id="day" class="expect">
-      <div class="expect__inner">
-        <h2 class="expect__title">what to <em>expect</em></h2>
-
-        <div class="expect__body">
-          <p>
-            use <em>demo day</em> to prove your craft to potential collaborators,
-            employees, and investors — like a16z, 1517 fund, and f.
-          </p>
-          <p>
-            stay clear minded and accountable with <em>weekly syncs</em> and
-            <em>coaching sessions</em>.
-          </p>
-          <p>
-            connect with someone who will 10x your trajectory through <em>intros</em> and
-            <em>fireside chats</em> &mdash; with people like <span class="link-underline">sam altman</span>,
-            <span class="link-underline">kevin hartz</span>, and <strong>danielle strachman</strong>.
-          </p>
-          <p>
-            most of all, expect spontaneous adventures and late night conversations with
-            your fellow residents&hellip; living the <em>joy of building together</em> is
-            what really makes the house. <span class="expect__heart" aria-hidden="true">❤</span>
-          </p>
-        </div>
-
-        <!-- floating polaroids -->
-        <figure class="polaroid polaroid--tl" aria-hidden="true"
-                style="background-image:url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80')"></figure>
-        <figure class="polaroid polaroid--tr" aria-hidden="true"
-                style="background-image:url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=900&q=80')"></figure>
-        <figure class="polaroid polaroid--bl" aria-hidden="true"
-                style="background-image:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80')"></figure>
-        <figure class="polaroid polaroid--br" aria-hidden="true"
-                style="background-image:url('https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=900&q=80')"></figure>
-      </div>
-    </section>
-
-    <!-- ============ FAQ ============ -->
-    <section id="faq" class="faq">
-      <h2 class="faq__title"><em>questions?</em></h2>
-
-      <div class="faq__list">
-        <details class="faq__item">
-          <summary>
-            <span>are there any perks?</span>
-            <span class="faq__toggle" aria-hidden="true"></span>
-          </summary>
-          <div class="faq__body">
-            <p>yes! lots of them. residents get compute credits, food discounts, founder office hours, and even free therapy.</p>
-          </div>
-        </details>
-        <details class="faq__item">
-          <summary>
-            <span>do i need to be a founder?</span>
-            <span class="faq__toggle" aria-hidden="true"></span>
-          </summary>
-          <div class="faq__body">
-            <p>no. about a third of every cohort joins solo, mid-project, or between things. we accept people, not stages.</p>
-          </div>
-        </details>
-        <details class="faq__item">
-          <summary>
-            <span>how long is the program?</span>
-            <span class="faq__toggle" aria-hidden="true"></span>
-          </summary>
-          <div class="faq__body">
-            <p>8 weeks per cohort. we run three cohorts per year — summer, fall, and winter.</p>
-          </div>
-        </details>
-        <details class="faq__item">
-          <summary>
-            <span>do you help with visas?</span>
-            <span class="faq__toggle" aria-hidden="true"></span>
-          </summary>
-          <div class="faq__body">
-            <p>yes. we sponsor short-term visas for our international residents and run satellite houses in countries with easier entry for those who need them.</p>
-          </div>
-        </details>
-        <details class="faq__item">
-          <summary>
-            <span>can i do this online?</span>
-            <span class="faq__toggle" aria-hidden="true"></span>
-          </summary>
-          <div class="faq__body">
-            <p>no. the magic of the house is being in the same room as the rest of the cohort — cooking, debugging, and shipping side by side.</p>
-          </div>
-        </details>
-        <details class="faq__item">
-          <summary>
-            <span>can i be in school or have a job?</span>
-            <span class="faq__toggle" aria-hidden="true"></span>
-          </summary>
-          <div class="faq__body">
-            <p>part-time, maybe. full-time, no. the cohort works best when everyone is in deep on the same thing. you don't have to ship a startup — but you have to be all the way in for 8 weeks.</p>
-          </div>
-        </details>
-      </div>
-    </section>
-
-    <!-- ============ APPLY BANNER ============ -->
-    <section id="apply" class="apply">
-      <div class="apply__card">
-        <div class="apply__aurora" aria-hidden="true"></div>
-        <div class="apply__grain" aria-hidden="true"></div>
-
-        <div class="apply__content">
-          <h2 class="apply__title">
-            apply like over 10,000+ <em>builders</em>
-          </h2>
-          <p class="apply__lede">
-            residencies are growing rapidly in popularity. apply now to be part of
-            <strong>the residency</strong> that started it all.
-          </p>
-          <a href="#" class="apply__btn">apply now</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ FOOTER ============ -->
-    <footer class="foot">
-      <div class="foot__top">
-        <div class="foot__brand-col">
-          <div class="foot__brand">
-            <span class="foot__mark" aria-hidden="true">✦</span>
-            <span class="foot__word">cracked <em>hackerhouse</em></span>
-          </div>
-          <p class="foot__tag">a home for <strong>ambitious inventors, builders, and creatives.</strong></p>
-
-          <div class="foot__social" aria-label="Social">
-            <a href="#" aria-label="X / Twitter" class="foot__icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.675l-5.227-6.838L4.96 21.75H1.648l7.73-8.835L1.255 2.25h6.844l4.726 6.243z"/>
-              </svg>
-            </a>
-            <a href="#" aria-label="LinkedIn" class="foot__icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-                <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.86-3.04-1.86 0-2.15 1.45-2.15 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.9 1.63-1.86 3.35-1.86 3.58 0 4.25 2.36 4.25 5.42v6.33zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zm-1.78 13.02h3.56V9H3.56v11.45z"/>
-              </svg>
-            </a>
-            <a href="#" aria-label="Instagram" class="foot__icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                <rect x="3" y="3" width="18" height="18" rx="5"/>
-                <circle cx="12" cy="12" r="4"/>
-                <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor"/>
-              </svg>
-            </a>
-          </div>
-
-          <p class="foot__copy">© 2026 — made with love and care for builders like you</p>
-        </div>
-
-        <nav class="foot__cols" aria-label="Footer">
-          <a href="#top" class="foot__link foot__link--active">main</a>
-          <a href="#about" class="foot__link">about us</a>
-          <a href="#" class="foot__link">donate</a>
-          <a href="#houses" class="foot__link">homes</a>
-          <a href="#" class="foot__link">for investors</a>
-          <a href="mailto:hello@crackedhacker.house" class="foot__link">contact us</a>
-          <a href="#" class="foot__link">brand kit</a>
-          <a href="#" class="foot__link">keep updated</a>
-        </nav>
-      </div>
-
-      <div class="foot__wordmark" aria-hidden="true">Crackedhq</div>
-    </footer>
   </main>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="https://cdn.jsdelivr.net/npm/cesium@1.122/Build/Cesium/Cesium.js"></script>
+  <!-- Thin bottom strip — applications status, apply CTA, socials, copy.
+       Persistent across every panel. -->
+  <footer class="dock" aria-label="Site footer">
+    <div class="dock__left">
+      <span class="dock__apps-dot" aria-hidden="true"></span>
+      <span class="dock__apps-label" data-apps-label>applications filled!</span>
+      <span class="dock__apps-range" data-apps-range>The house starts 1st July</span>
+    </div>
+
+    <div class="dock__center">
+      <a class="dock__cta" href="#apply">
+        <span data-dock-cta-label>apply</span>
+        <span class="dock__cta-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <div class="dock__right">
+      <div class="dock__socials" aria-label="Social">
+        <a href="https://x.com/crackedhousehq" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" class="dock__icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.675l-5.227-6.838L4.96 21.75H1.648l7.73-8.835L1.255 2.25h6.844l4.726 6.243z"/>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/cracked-hackerhouse" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="dock__icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+            <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.86-3.04-1.86 0-2.15 1.45-2.15 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.9 1.63-1.86 3.35-1.86 3.58 0 4.25 2.36 4.25 5.42v6.33zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zm-1.78 13.02h3.56V9H3.56v11.45z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/crackedhq/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="dock__icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
   <script src="config.js"></script>
   <script src="script.js"></script>
 </body>

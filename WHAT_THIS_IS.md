@@ -1,12 +1,14 @@
-# Cracked Hacker House — Landing Site
+# Cracked Hacker House — Site
 
-A one-page, production-grade landing page for **Cracked Hacker House**: a curated, multi-city residency for builders, hackers, and founders who are, frankly, a little cracked.
+A small, production-grade marketing site for **Cracked Hacker House**: a curated, multi-city residency for builders, hackers, and founders who are, frankly, a little cracked.
 
-The page exists to do three things, in order of importance:
+The site exists to do three things, in order of importance:
 
 1. Make someone feel something the first time they see it.
 2. Convince them this is a serious, hand-made operation — not a coworking franchise.
 3. Get the right people to click **Apply**.
+
+Today it is a single landing page (`index.html`). The nav and footer link to `houses.html` and `fellows.html`, but those pages don't exist yet — the links are placeholders until those sub-pages are built.
 
 ---
 
@@ -16,51 +18,58 @@ The visual language is **premium editorial white** — a clean, gallery-quality 
 
 Direct references (see `/references`):
 
-- `look and feel.png` — the master reference. A bright white page, a black pill nav with "apply now" as the dark anchor, an italic editorial serif headline ("live and grow with the ambitious"), and a single hero subject.
-- `layout.png` — the structural diagram. Glass pane on the **left** (headline, sub-copy, apply button); the world **map as Layer 1 on the right**, with a trail moving across the house locations.
-- `glass pane on the left.png` — the panel treatment itself: a soft, rounded glass tile with a real `backdrop-filter: blur()`, a faint inner highlight, and minimal type.
-- `map (behind but focus on the right side).png` — a desaturated map with colored pins per city; the trail animates between them.
+- `look and feel.png` — the master reference. A bright white page, a black pill nav, an italic editorial serif headline ("live and grow with the ambitious"), and a single hero subject.
+- `layout.png` — the structural diagram. Glass pane on the **left** (headline, sub-copy, apply button); the world **map as Layer 1 on the right**.
 
 Concretely, the page leans on:
 
-- A **bright, paper-white** canvas (`#fafaf7` / `#ffffff`) — no warm photographic backdrop, no grain veil, no light leaks. Restraint is the look.
-- A **live map** as the right-hand hero element, rendered behind the content with city pins for each house (SF · Tokyo · Berlin · Mexico City) and an animated trail that traces a route between them.
-- A single **liquid-glass pane** on the left of the hero — real `backdrop-filter: blur()`, soft rounded corners, a thin 1px inner stroke, a near-imperceptible top highlight. It carries the headline, one line of sub-copy, and the Apply button. Nothing else.
-- A **black pill nav** at the top, with `apply now` as the filled-dark anchor (per `look and feel.png`).
+- A **dark, cinematic** hero canvas (satellite imagery + atmospheric overlays) that resolves to bright editorial white below the fold.
+- A **live MapLibre GL map** with Esri World Imagery tiles as the right-hand hero element, focused on Da Nang. No API key required.
+- A single **liquid-glass pane** on the left of the hero with the headline, sub-copy, apply CTA, and fellows preview.
+- A **centered pill nav**: four text pills (`main`, `houses`, `about us`, `fellows`) flanking a serif `CrackedHQ.` wordmark, plus an applications-open status badge anchored to the right.
 - Type stack:
-  - **Display:** `Instrument Serif` *italic* — characterful, editorial, set very large. This is the voice of the page.
+  - **Display:** `Instrument Serif` *italic* — characterful, editorial, set very large.
   - **Body:** `Geist` — clean modern grotesque, neutral, set small.
-  - **Mono accents:** `JetBrains Mono` — used sparingly for indices, coordinates, and pin labels on the map.
-- A **near-monochrome palette**: paper white, ink black, a single warm-neutral mid-grey, and one accent (a quiet moss or oxblood) reserved for the map trail and active pin only.
+  - **Mono accents:** `JetBrains Mono` — indices, coordinates, chips.
+- **Near-monochrome palette**: paper white, ink black, one warm-neutral mid-grey, one accent (moss green `#3d6b4e`) for the live-dot only.
 
 No frameworks, no build step — just `index.html`, `styles.css`, `script.js`.
 
 ---
 
-## Sections
+## Pages
 
-| § | Section | Purpose |
+| Path | File | Status |
 |---|---|---|
-| — | Top nav | Black pill, `main · about us · apply now · homes · inspire`; `apply now` is the filled dark anchor. |
-| 00 | Hero | Editorial italic headline + Apply on the **left glass pane**. Live map on the **right** with animated trail across the four cities. |
-| — | Dispatch ticker | Minimal mono strip — current cohort, seats remaining per city. |
-| 01 | The Concept | Three quiet white cards. Plenty of negative space. |
-| 02 | The Houses | SF · Tokyo · Berlin · Mexico City — large editorial photography, set against white with mono captions. |
-| 03 | A Day in the House | Timeline of a typical Tuesday, rendered as a single glass tile over the map. |
-| 04 | Cohort 06, in Review | Roster sketch — names, one-line bios, the rooms they shipped from. |
-| 05 | The Application | Closing card — deadline, dates, cost, stipend, Apply CTA. |
-| 06 | FAQ | Honest answers, set as a clean accordion. No glass here — just type and rules. |
-| — | Footer | Mono, three columns, mark + tagline. |
+| `/` | `index.html` | Landing — the cinematic page. **Built.** |
+| `/houses` | `houses.html` | Houses directory. **Planned — link exists in nav and footer; file not yet created.** |
+| `/fellows` | `fellows.html` | Fellows roster. **Planned — link exists in nav and the hero fellows row; file not yet created.** |
+
+## Sections — landing (`index.html`)
+
+| § | Section | Class / ID |
+|---|---|---|
+| — | Top nav | `.nav` (centered pills + right status badge) |
+| 00 | Hero | `.hero` — cinematic 3D map + glass pane left |
+| 01 | Mission / About | `#about .mission` |
+| 02 | What to Expect | `#day .expect` — body copy + floating polaroids |
+| 03 | FAQ | `#faq .faq` — `<details>` accordion |
+| 04 | Apply banner | `#apply .apply` — aurora gradient card |
+| — | Footer | `.foot` — brand + nav links + giant wordmark |
 
 ---
 
 ## Interactions
 
-- **Map trail**: an animated path connects the four city pins in a continuous loop; the active pin pulses; on hover the pin reveals its seat count.
-- **Cursor-tracked shine** on the hero glass pane (CSS variables updated from JS).
-- **Scroll reveal** with a soft fade + 4px upward nudge — no blur-ins, no parallax. The page should feel calm, not cinematic.
-- **Nav state**: the pill compresses slightly and gains a hairline border once the page has scrolled past the hero.
-- **Reduced motion**: every animation is disabled when `prefers-reduced-motion: reduce` is set.
+- **Cinematic map intro**: camera flies from a high orbit to the `FINAL` framing over 1800ms (easeInOutQuad), then enters a near-imperceptible slow drift (0.04°/s ≈ one revolution every 2.5 hours).
+- **Iris reveal**: the map is clipped to a zero-radius circle on load; after the intro lands it expands from the house-marker position over 1400ms.
+- **House marker**: a floating glass card (HACKER HOUSE · Cohort 1 · Da Nang, Vietnam) tracks the Da Nang anchor in screen space via `map.project()` every frame.
+- **Cursor-tracked shine** on the hero glass pane (CSS variables updated from JS pointer events).
+- **Scroll reveal** with a soft fade on `.poster` and `.faq__item` elements via IntersectionObserver.
+- **Nav state**: `is-scrolled` class flips pill text from white-on-dark to ink-on-white once the page scrolls past 85vh. Standalone pages (any page without a `.hero` element) get this class applied at load.
+- **Hero clipping**: `inset()` clip-path shrinks the hero from the bottom as the sheet rises, keeping a ~15vh map strip visible at all times.
+- **Reduced motion**: animations and transitions skip / jump to end state when `prefers-reduced-motion: reduce` is set.
+- **Camera inspector**: press `D` to open a dev tool to re-frame the map. See `camera-inspector.md`.
 
 ---
 
@@ -69,42 +78,38 @@ No frameworks, no build step — just `index.html`, `styles.css`, `script.js`.
 It's a static site. Any of these works:
 
 ```bash
-# from the project root
 python3 -m http.server 5173
 # then open http://localhost:5173
 ```
 
 ```bash
-# or, with Node
 npx serve .
 ```
 
-You can also just **double-click `index.html`** to open it in the browser — the only external resources are Google Fonts, the map tiles, and a handful of Unsplash photos, all of which load over the network.
+You can also just **double-click `index.html`** — the only external resources are Google Fonts, the MapLibre GL JS CDN, the Esri tile server, and a handful of Unsplash photos.
 
-> Heads-up: real `backdrop-filter` is required for the hero glass pane to look right. Modern Safari, Chrome, Edge, and Firefox all support it. On Firefox specifically, make sure `layout.css.backdrop-filter.enabled` is on (it is, by default, on recent versions).
+> Heads-up: real `backdrop-filter` is required for the hero veil and glass elements to look right. Modern Safari, Chrome, Edge, and Firefox all support it.
 
 ---
 
 ## Editing Guide
 
-The most likely things you'll want to change:
-
-- **Brand name** — search `Cracked Hacker House` in `index.html`. It appears in the nav mark, the footer, and the document title.
-- **Houses, dates, seats** — `index.html`, inside `<section id="houses">`. Each city's map pin is also defined in `script.js` (`MAP_PINS`), keyed by city code (`sf`, `tyo`, `ber`, `mex`).
-- **Cohort number, application deadline, cost** — search `Cohort 07` and `June 28` in `index.html`; both appear in the hero glass pane, the apply section, and the ticker.
-- **Map style / trail color** — `styles.css`, `:root` variables `--map-tint` (the desaturation on the map tiles) and `--trail` (the accent color of the animated path).
-- **Apply form** — currently the Apply CTAs are anchor links to `#apply` and a placeholder `href="#"` on the main button. Point that at your actual application form / Tally / Typeform / Airtable.
-- **Color palette** — `:root` in `styles.css`. The page is intentionally near-monochrome; the only chromatic variable that should ever change is `--trail`.
+- **Brand name** — search `Cracked Hacker House` / `CrackedHQ` in `index.html`.
+- **Cohort badge** — `.hero__cohort` in the hero pane; update text directly.
+- **Map focus / camera framing** — `config.js` (`FOCUS_LOCATION`), and the `FINAL` constant in `script.js`. Use the camera inspector (press `D`) to find a framing.
+- **Apply form URL** — the `href="#"` on `.apply__btn` and any other Apply CTAs. Point at your Tally / Typeform / Airtable form before going live.
+- **Footer placeholder links** — `donate`, `for investors`, `brand kit`, `keep updated` all currently have `href="#"`. Wire these up before launch.
+- **Color palette** — `:root` in `styles.css`.
 
 ---
 
 ## What's Intentionally Not Here
 
-- No warm tungsten backdrop. No grain. No light leaks.
 - No tracking / analytics.
 - No newsletter modal.
 - No cookie banner (no cookies set).
-- No `<form>` element — Apply is a link out to your real application form. Wire that up before going live.
+- No `<form>` element — Apply is a link out to an external form.
+- No build step, no framework, no package.json.
 
 ---
 
@@ -112,9 +117,15 @@ The most likely things you'll want to change:
 
 ```
 blur panel/
-├── index.html      — markup + content
-├── styles.css      — glass pane, map styling, typography, layout, motion
-├── script.js       — map trail, cursor shine, scroll reveal, nav state
-├── references/     — moodboard: look and feel, layout, glass pane, map
-└── WHAT_THIS_IS.md — this file
+├── index.html            — landing page (the cinematic one)
+├── styles.css            — layout, glass pane, map, typography, motion, page chrome
+├── script.js             — map, cursor shine, scroll reveal, nav state, iris reveal, camera inspector
+├── config.js             — runtime config (gitignored)
+├── config.example.js     — template for config.js
+├── .gitignore
+├── .env.example          — note redirecting to config.example.js
+├── camera-inspector.md   — how to use the D-key camera dev tool
+├── design-guidelines.md  — locked design system reference
+├── references/           — moodboard: look and feel, layout, glass pane, map
+└── WHAT_THIS_IS.md       — this file
 ```

@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fellows — Cracked Hackerhouse</title>
+  <meta name="description" content="The people of the Cracked Hackerhouse. Each fellow gets a passport &mdash; drag one aside to meet the next, tap to open and see where they have been." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--fellows">
+  <header class="nav is-scrolled">
+    <nav class="nav__pills" aria-label="Primary">
+      <a class="nav__pill" href="index.html">main</a>
+      <a class="nav__pill" href="houses.html">houses</a>
+      <a class="nav__wordmark-link" href="index.html" aria-label="CrackedHQ — home">CrackedHQ<span class="nav__wordmark-dot">.</span></a>
+      <a class="nav__pill" href="index.html#about">about us</a>
+      <a class="nav__pill nav__pill--current" href="fellows.html" aria-current="page">fellows</a>
+    </nav>
+
+    <div class="nav__right">
+      <div class="nav__apps-status">
+        <span class="nav__apps-dot" aria-hidden="true"></span>
+        <span class="nav__apps-label">applications filled!</span>
+        <span class="nav__apps-range">The house starts 1st July</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="page page--fellows-main">
+    <!-- ============ PAGE HERO ============ -->
+    <section class="page-hero page-hero--fellows">
+      <div class="page-hero__inner">
+        <span class="page-hero__eyebrow">the fellows</span>
+        <h1 class="page-hero__title">the people who <em>showed up</em></h1>
+        <div class="page-hero__body">
+          <p>
+            every fellow gets a passport. open one and you&rsquo;ll find a
+            name, a photo, a sentence or two, and the stamps from every
+            house they&rsquo;ve lived in with us.
+          </p>
+          <p class="page-hero__caption">
+            <span class="page-hero__caption-key">drag</span> any passport. <span class="page-hero__caption-key">tap</span> to open.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PASSPORT STACK ============ -->
+    <section class="fellows-stage" aria-label="Fellows">
+      <!-- the stage holds the deck. each .passport is rendered closed and
+           absolutely positioned in the centre; JS lays them out in a stack
+           and wires up the drag-to-flick physics + tap-to-open. -->
+      <div class="passport-deck" id="passport-deck">
+
+        <!-- 1 / Vagdev -->
+        <article class="passport"
+                 data-fellow-id="vagdev"
+                 data-fellow-name="Vagdev"
+                 data-fellow-surname="Korrapati"
+                 data-fellow-handle="@vagdev"
+                 data-fellow-role="Distributed systems · ex-Stripe"
+                 data-fellow-bio="Builds payment rails for emerging markets. Came to Bangalore to ship; stayed for the dosa."
+                 data-fellow-cohort="00"
+                 data-fellow-issued="06 · 2025"
+                 data-fellow-number="CRK · 00 · 0001"
+                 data-fellow-houses="bangalore"
+                 data-fellow-photo="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+        <!-- 2 / Riza -->
+        <article class="passport"
+                 data-fellow-id="riza"
+                 data-fellow-name="Riza"
+                 data-fellow-surname="Aydin"
+                 data-fellow-handle="@rzaydn"
+                 data-fellow-role="ML researcher · agents &amp; evals"
+                 data-fellow-bio="Trains small models that think. Was in the Bangalore house for cohort zero, now setting up the Vietnam kitchen."
+                 data-fellow-cohort="00 → 01"
+                 data-fellow-issued="06 · 2025"
+                 data-fellow-number="CRK · 00 · 0002"
+                 data-fellow-houses="bangalore,vietnam"
+                 data-fellow-photo="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+        <!-- 3 / Ashrith -->
+        <article class="passport"
+                 data-fellow-id="ashrith"
+                 data-fellow-name="Ashrith"
+                 data-fellow-surname="Reddy"
+                 data-fellow-handle="@ashr1th"
+                 data-fellow-role="Founder · climate hardware"
+                 data-fellow-bio="Designs cold-chain sensors for vaccine logistics. Pitched his first investor from the indira nagar dining table."
+                 data-fellow-cohort="00"
+                 data-fellow-issued="06 · 2025"
+                 data-fellow-number="CRK · 00 · 0003"
+                 data-fellow-houses="bangalore"
+                 data-fellow-photo="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+        <!-- 4 / Kalash -->
+        <article class="passport"
+                 data-fellow-id="kalash"
+                 data-fellow-name="Kalash"
+                 data-fellow-surname="Mehta"
+                 data-fellow-handle="@kalashm"
+                 data-fellow-role="Compiler hacker · WASM &amp; Rust"
+                 data-fellow-bio="Wrote a JIT in two weekends. Brought a mechanical keyboard to vietnam in checked luggage."
+                 data-fellow-cohort="01"
+                 data-fellow-issued="06 · 2026"
+                 data-fellow-number="CRK · 01 · 0004"
+                 data-fellow-houses="vietnam"
+                 data-fellow-photo="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+        <!-- 5 / Karthik -->
+        <article class="passport"
+                 data-fellow-id="karthik"
+                 data-fellow-name="Karthik"
+                 data-fellow-surname="Iyer"
+                 data-fellow-handle="@karthik"
+                 data-fellow-role="Designer-engineer · interfaces"
+                 data-fellow-bio="Ships the kind of UI that makes you whisper 'oh, that&rsquo;s nice.' Argues for the em-dash."
+                 data-fellow-cohort="00 → 01"
+                 data-fellow-issued="06 · 2025"
+                 data-fellow-number="CRK · 00 · 0005"
+                 data-fellow-houses="bangalore,vietnam"
+                 data-fellow-photo="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+        <!-- 6 / Tanish -->
+        <article class="passport"
+                 data-fellow-id="tanish"
+                 data-fellow-name="Tanish"
+                 data-fellow-surname="Star"
+                 data-fellow-handle="@staryutish"
+                 data-fellow-role="Founder · CrackedHQ"
+                 data-fellow-bio="Started the house because nobody else would. Drinks cold-brew at midnight, picks the next city."
+                 data-fellow-cohort="00 → 01"
+                 data-fellow-issued="06 · 2025"
+                 data-fellow-number="CRK · 00 · 0000"
+                 data-fellow-houses="bangalore,vietnam"
+                 data-fellow-photo="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85"></article>
+
+      </div>
+
+      <p class="fellows-stage__hint" aria-hidden="true">
+        <span class="fellows-stage__hint-text">drag any passport &middot; tap to open</span>
+      </p>
+    </section>
+
+    <!-- ============ PASSPORT VIEWER OVERLAY ============ -->
+    <!-- the overlay opens when a closed passport is tapped. it renders the
+         same passport at full size, with the cover swung open and a paged
+         inside spread you can flip between (bio ↔ stamps). -->
+    <div class="passport-viewer" id="passport-viewer" hidden aria-hidden="true">
+      <button class="passport-viewer__close" type="button" aria-label="close passport">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+          <path d="M3 3l10 10M13 3L3 13"/>
+        </svg>
+      </button>
+
+      <div class="passport-viewer__scrim" data-viewer-scrim></div>
+
+      <div class="passport-viewer__book" data-page="bio" id="passport-book">
+        <!-- the closed-cover element that flips open on viewer open. JS
+             clones the tapped card's cover-inner into here so the cover
+             we see flipping IS the same passport. positioned at the
+             spine; rotates -180deg around its left edge. -->
+        <div class="passport-book__cover-flipper" data-cover-flipper aria-hidden="true"></div>
+
+        <!-- spine + folded cover stays as a back-half visual -->
+        <div class="passport-book__cover" data-book-cover></div>
+        <div class="passport-book__spine" aria-hidden="true"></div>
+
+        <!-- bio spread (page 1) -->
+        <div class="passport-book__spread passport-book__spread--bio is-on">
+          <div class="passport-book__page passport-book__page--left">
+            <div class="passport-book__paper" aria-hidden="true"></div>
+            <div class="passport-book__photo-frame">
+              <div class="passport-book__photo" data-fellow-photo-target></div>
+              <div class="passport-book__photo-corner" aria-hidden="true"></div>
+            </div>
+            <div class="passport-book__seal" aria-hidden="true">
+              <svg viewBox="0 0 80 80" width="100%" height="100%">
+                <defs>
+                  <path id="seal-arc-top" d="M 12 40 a 28 28 0 0 1 56 0" />
+                  <path id="seal-arc-bot" d="M 14 44 a 26 26 0 0 0 52 0" />
+                </defs>
+                <circle cx="40" cy="40" r="30" fill="none" stroke="currentColor" stroke-width="0.7"/>
+                <circle cx="40" cy="40" r="26" fill="none" stroke="currentColor" stroke-width="0.4"/>
+                <text font-family="JetBrains Mono, monospace" font-size="5.6" letter-spacing="2" fill="currentColor">
+                  <textPath href="#seal-arc-top" startOffset="50%" text-anchor="middle">CRACKED · HACKER · HOUSE</textPath>
+                </text>
+                <text font-family="JetBrains Mono, monospace" font-size="5" letter-spacing="2.4" fill="currentColor">
+                  <textPath href="#seal-arc-bot" startOffset="50%" text-anchor="middle">FELLOW · PASSPORT</textPath>
+                </text>
+                <text x="40" y="44" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="18" fill="currentColor">✦</text>
+              </svg>
+            </div>
+            <div class="passport-book__photo-stamp" aria-hidden="true">VERIFIED BY ORB · CRACKED HQ</div>
+          </div>
+
+          <div class="passport-book__page passport-book__page--right">
+            <div class="passport-book__paper" aria-hidden="true"></div>
+
+            <div class="passport-book__header">
+              <span class="passport-book__country">CRACKED · HACKERHOUSE</span>
+              <span class="passport-book__type">TYPE · P · CRK</span>
+            </div>
+
+            <div class="passport-book__fields">
+              <div class="passport-book__field">
+                <span class="passport-book__field-label">Surname / Nom</span>
+                <span class="passport-book__field-value" data-fellow-surname-target>—</span>
+              </div>
+              <div class="passport-book__field">
+                <span class="passport-book__field-label">Given names / Prénoms</span>
+                <span class="passport-book__field-value" data-fellow-name-target>—</span>
+              </div>
+              <div class="passport-book__field passport-book__field--two">
+                <div>
+                  <span class="passport-book__field-label">Cohort</span>
+                  <span class="passport-book__field-value passport-book__field-value--mono" data-fellow-cohort-target>—</span>
+                </div>
+                <div>
+                  <span class="passport-book__field-label">Date of issue</span>
+                  <span class="passport-book__field-value passport-book__field-value--mono" data-fellow-issued-target>—</span>
+                </div>
+              </div>
+              <div class="passport-book__field">
+                <span class="passport-book__field-label">Role</span>
+                <span class="passport-book__field-value passport-book__field-value--small" data-fellow-role-target>—</span>
+              </div>
+              <div class="passport-book__field passport-book__field--bio">
+                <span class="passport-book__field-label">Notes</span>
+                <span class="passport-book__field-value passport-book__field-value--bio" data-fellow-bio-target>—</span>
+              </div>
+              <div class="passport-book__field">
+                <span class="passport-book__field-label">Handle</span>
+                <span class="passport-book__field-value passport-book__field-value--mono passport-book__field-value--small" data-fellow-handle-target>—</span>
+              </div>
+            </div>
+
+            <div class="passport-book__mrz" aria-hidden="true">
+              <div class="passport-book__mrz-line" data-mrz-1>P&lt;CRK&lt;&lt;FELLOW&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+              <div class="passport-book__mrz-line" data-mrz-2>0000000000CRK0000000M0000000&lt;&lt;&lt;&lt;&lt;&lt;&lt;0</div>
+            </div>
+
+            <button class="passport-book__page-nav passport-book__page-nav--next" type="button" data-page-next aria-label="turn page · stamps">
+              <span>stamps</span>
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10M9 4l4 4-4 4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- stamps spread (page 2) -->
+        <div class="passport-book__spread passport-book__spread--stamps">
+          <div class="passport-book__page passport-book__page--left passport-book__page--stamps">
+            <div class="passport-book__paper" aria-hidden="true"></div>
+            <div class="passport-book__stamps-eyebrow">visas &middot; residencies</div>
+            <p class="passport-book__stamps-note">every cracked house leaves a mark. this fellow has been in&hellip;</p>
+
+            <!-- the Argentina ghost stamp always lives on this page;
+                 Bangalore / Vietnam are toggled by data attributes. -->
+            <div class="stamp stamp--blr" data-stamp="bangalore" aria-hidden="true">
+              <svg viewBox="0 0 220 140" width="100%" height="100%">
+                <defs>
+                  <path id="blr-arc-top" d="M 30 70 a 80 80 0 0 1 160 0"/>
+                  <path id="blr-arc-bot" d="M 36 76 a 74 74 0 0 0 148 0"/>
+                </defs>
+                <rect x="6" y="10" width="208" height="120" rx="14" fill="none" stroke="currentColor" stroke-width="2.2"/>
+                <rect x="12" y="16" width="196" height="108" rx="10" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3"/>
+                <text font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="5" fill="currentColor" font-weight="600">
+                  <textPath href="#blr-arc-top" startOffset="50%" text-anchor="middle">COHORT · 00 · INDIRA NAGAR</textPath>
+                </text>
+                <text x="110" y="78" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="34" fill="currentColor">Bangalore</text>
+                <text x="110" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4" fill="currentColor">06 · 2025 → 09 · 2025</text>
+                <text font-family="JetBrains Mono, monospace" font-size="7" letter-spacing="3" fill="currentColor">
+                  <textPath href="#blr-arc-bot" startOffset="50%" text-anchor="middle">VERIFIED BY CRACKED HQ</textPath>
+                </text>
+              </svg>
+            </div>
+
+            <div class="stamp stamp--vnm" data-stamp="vietnam" aria-hidden="true">
+              <svg viewBox="0 0 220 140" width="100%" height="100%">
+                <defs>
+                  <path id="vnm-arc-top" d="M 110 110 m -68 0 a 68 68 0 1 1 136 0"/>
+                </defs>
+                <ellipse cx="110" cy="70" rx="100" ry="56" fill="none" stroke="currentColor" stroke-width="2.4"/>
+                <ellipse cx="110" cy="70" rx="92" ry="48" fill="none" stroke="currentColor" stroke-width="0.6"/>
+                <text font-family="JetBrains Mono, monospace" font-size="9.5" letter-spacing="4" fill="currentColor" font-weight="600">
+                  <textPath href="#vnm-arc-top" startOffset="50%" text-anchor="middle">CRACKED HACKER HOUSE · ĐÀ NẴNG</textPath>
+                </text>
+                <text x="110" y="64" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="30" fill="currentColor">Vietnam</text>
+                <text x="110" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4" fill="currentColor">06 · 2026 → 09 · 2026</text>
+                <text x="110" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7" letter-spacing="3" fill="currentColor">COHORT · 01 · MY KHE</text>
+              </svg>
+            </div>
+
+            <div class="stamp stamp--arg stamp--ghost" aria-hidden="true">
+              <svg viewBox="0 0 220 140" width="100%" height="100%">
+                <rect x="10" y="12" width="200" height="116" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 5"/>
+                <text x="110" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4" fill="currentColor">RESERVED · BUENOS AIRES</text>
+                <text x="110" y="88" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="26" fill="currentColor">Argentina</text>
+                <text x="110" y="108" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7.4" letter-spacing="3" fill="currentColor">COHORT · 02 · COMING SOON</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="passport-book__page passport-book__page--right passport-book__page--stamps">
+            <div class="passport-book__paper" aria-hidden="true"></div>
+
+            <div class="passport-book__legend">
+              <div class="passport-book__legend-title">houses visited</div>
+              <ul class="passport-book__legend-list" data-houses-list>
+                <!-- filled by JS -->
+              </ul>
+              <p class="passport-book__legend-note">
+                we pick cities that are friendly to visiting builders and full of cracked people doing real work. <br>
+                next stop &mdash; <em>buenos aires</em>.
+              </p>
+            </div>
+
+            <div class="passport-book__signature">
+              <span class="passport-book__signature-line"></span>
+              <span class="passport-book__signature-label">signed by the cracked</span>
+            </div>
+
+            <button class="passport-book__page-nav passport-book__page-nav--prev" type="button" data-page-prev aria-label="turn back · bio">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 8H3M7 4L3 8l4 4"/>
+              </svg>
+              <span>bio</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="passport-viewer__caption" aria-hidden="true">
+        <span data-fellow-handle-caption>—</span>
+        <span class="passport-viewer__caption-sep">·</span>
+        <span data-fellow-number-caption>—</span>
+      </div>
+    </div>
+
+    <!-- ============ APPLY BANNER ============ -->
+    <section id="apply" class="apply">
+      <div class="apply__card">
+        <div class="apply__aurora" aria-hidden="true"></div>
+        <div class="apply__grain" aria-hidden="true"></div>
+
+        <div class="apply__content">
+          <h2 class="apply__title">
+            want your own <em>passport</em>?
+          </h2>
+          <p class="apply__lede">
+            applications for the <strong>vietnam</strong> cohort are open. apply now and we&rsquo;ll issue you one.
+          </p>
+          <a href="index.html#apply" class="apply__btn">apply now</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="foot">
+      <div class="foot__top">
+        <div class="foot__brand-col">
+          <div class="foot__brand">
+            <span class="foot__mark" aria-hidden="true">✦</span>
+            <span class="foot__word">cracked hackerhouse</span>
+          </div>
+          <p class="foot__tag">a home for <strong>cracked people, wherever we go next.</strong></p>
+
+          <div class="foot__social" aria-label="Social">
+            <a href="#" aria-label="X / Twitter" class="foot__icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.675l-5.227-6.838L4.96 21.75H1.648l7.73-8.835L1.255 2.25h6.844l4.726 6.243z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="LinkedIn" class="foot__icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.86-3.04-1.86 0-2.15 1.45-2.15 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.9 1.63-1.86 3.35-1.86 3.58 0 4.25 2.36 4.25 5.42v6.33zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zm-1.78 13.02h3.56V9H3.56v11.45z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="Instagram" class="foot__icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor"/>
+              </svg>
+            </a>
+          </div>
+
+          <p class="foot__copy">© 2026 — made with love by the cracked, for the cracked</p>
+        </div>
+
+        <nav class="foot__cols" aria-label="Footer">
+          <a href="index.html" class="foot__link">main</a>
+          <a href="index.html#about" class="foot__link">about us</a>
+          <a href="#" class="foot__link">donate</a>
+          <a href="houses.html" class="foot__link">houses</a>
+          <a href="#" class="foot__link">for investors</a>
+          <a href="mailto:hello@crackedhacker.house" class="foot__link">contact us</a>
+          <a href="#" class="foot__link">brand kit</a>
+          <a href="fellows.html" class="foot__link foot__link--active">fellows</a>
+        </nav>
+      </div>
+
+      <div class="foot__wordmark" aria-hidden="true">Crackedhq</div>
+    </footer>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

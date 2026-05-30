@@ -32,7 +32,7 @@
   --mono:         "JetBrains Mono", ui-monospace, Menlo, monospace;
 
   /* sizing */
-  --nav-h:        72px;
+  --nav-h:        112px;
   --pad:          clamp(20px, 4vw, 56px);
   --max:          1320px;
 }
@@ -84,6 +84,51 @@ img, svg { display: block; max-width: 100%; }
 }
 
 /* =========================================================
+   SITE LOADER — full-viewport white takeover.
+   Sits above every other layer (nav 100, vignette 50, inspector 200)
+   so the page reads as a single counting screen until JS resolves it,
+   then fades out and hands off to the iris reveal.
+   ========================================================= */
+.site-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(244, 243, 238, 0.45);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  opacity: 1;
+  transition: opacity 360ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.site-loader.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+.site-loader__num {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: clamp(15px, 1.4vw, 19px);
+  line-height: 1;
+  color: #ffffff;
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+.site-loader__sub {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: clamp(9px, 0.78vw, 11px);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  user-select: none;
+}
+
+/* =========================================================
    NAV — black pill, white page
    ========================================================= */
 .nav {
@@ -99,65 +144,285 @@ img, svg { display: block; max-width: 100%; }
 }
 .nav > * { pointer-events: auto; }
 
-/* centered glass pill — no tint, no inner glow, just real blur of what's behind */
-.nav__pills {
-  display: inline-flex;
+/* ── nav: left wordmark ────────────────────────────────────────────────── */
+.nav__logo {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 12px rgba(11, 11, 11, 0.4);
+  text-decoration: none;
+  transition: opacity 200ms ease;
+  justify-self: start;
+}
+.nav__logo:hover { opacity: 0.75; }
+.nav.is-scrolled .nav__logo { color: var(--ink); text-shadow: none; }
+
+/* ── nav: right cluster — pinned to the far right edge ─────────────────── */
+.nav__right {
+  position: absolute;
+  right: var(--pad);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px;
+  gap: 10px;
+}
+
+/* applications-open status badge — liquid glass */
+.nav__apps-status {
+  display: inline-grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  align-items: center;
+  padding: 10px 18px 10px 14px;
   background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0) 100%
+    155deg,
+    rgba(255, 255, 255, 0.26) 0%,
+    rgba(255, 255, 255, 0.10) 45%,
+    rgba(255, 255, 255, 0.05) 100%
   );
-  border: 0;
   border-radius: 999px;
-  backdrop-filter: blur(22px) saturate(125%);
-  -webkit-backdrop-filter: blur(22px) saturate(125%);
-  box-shadow: 0 10px 28px -22px rgba(11, 11, 11, 0.18);
-  transition: box-shadow 220ms ease, backdrop-filter 220ms ease, background 220ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+  border-right-color: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(40px) saturate(200%) brightness(1.06);
+  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.06);
+  box-shadow:
+    0 1.5px 0 rgba(255, 255, 255, 0.60) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 10px 36px -10px rgba(0, 0, 0, 0.32),
+    0 2px 10px -4px rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+  transition: box-shadow 220ms ease, background 220ms ease;
+}
+.nav__apps-status:hover {
+  box-shadow:
+    0 1.5px 0 rgba(255, 255, 255, 0.70) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 14px 44px -10px rgba(0, 0, 0, 0.38),
+    0 2px 12px -4px rgba(0, 0, 0, 0.22);
+}
+.nav.is-scrolled .nav__apps-status {
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.22) 45%,
+    rgba(255, 255, 255, 0.10) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.80);
+  border-bottom-color: rgba(11, 11, 11, 0.10);
+  border-right-color: rgba(11, 11, 11, 0.10);
+  backdrop-filter: blur(30px) saturate(160%) brightness(1.04);
+  -webkit-backdrop-filter: blur(30px) saturate(160%) brightness(1.04);
+}
+.nav__apps-dot {
+  grid-row: 1 / 3;
+  align-self: center;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #56c771;
+  box-shadow: 0 0 0 0 rgba(86, 199, 113, 0.5);
+  animation: apps-dot-pulse 2.6s ease-in-out infinite;
+}
+@keyframes apps-dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(86, 199, 113, 0.5); }
+  50%       { box-shadow: 0 0 0 5px rgba(86, 199, 113, 0); }
+}
+.nav.is-scrolled .nav__apps-dot { background: #3d9152; box-shadow: none; animation: none; }
+.nav__apps-label {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  line-height: 1.3;
+}
+.nav.is-scrolled .nav__apps-label { color: var(--ink-2); text-shadow: none; }
+.nav__apps-range {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.65);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  line-height: 1.3;
+}
+.nav.is-scrolled .nav__apps-range { color: var(--ink-3); text-shadow: none; }
+
+/* hamburger circle button */
+.nav__menu-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.90);
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 0;
+}
+.nav__menu-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+.nav.is-scrolled .nav__menu-btn {
+  background: rgba(11, 11, 11, 0.06);
+  border-color: rgba(11, 11, 11, 0.14);
+  color: var(--ink-2);
+}
+.nav.is-scrolled .nav__menu-btn:hover { background: rgba(11, 11, 11, 0.10); }
+
+/* centered pill — same dark-veil atmosphere as the hero left side.
+   Visually the blur descends from the top of the screen like the bottom
+   tip of a spear: the element is anchored to the top of the nav, extends
+   upward beyond the viewport (so its top edge is invisible), and only
+   dissolves at the bottom + sides. No border, no border-radius —
+   feels smushed and amorphous, never reads as a card. */
+.nav__pills {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0;
+  /* the masked-away upper region must not capture clicks — let pointer
+     events pass through the empty padding, then the individual pills
+     re-enable themselves. */
+  pointer-events: none;
+  /* anchor to the top of the nav so the blur shaft can extend upward */
+  align-self: flex-start;
+  /* margin-top pulls the element above the viewport;
+     padding-top brings the content back to its original (centered) position */
+  margin-top: -120px;
+  padding: 152px 44px 14px;
+  background: rgba(11, 18, 26, 0.22);
+  border: none;
+  border-radius: 0;
+  backdrop-filter: blur(52px) saturate(145%);
+  -webkit-backdrop-filter: blur(52px) saturate(145%);
+  box-shadow: none;
+  -webkit-mask-image:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0)    0%,
+      rgba(0,0,0,0.15) 4%,
+      rgba(0,0,0,0.55) 9%,
+      rgba(0,0,0,0.92) 14%,
+      rgba(0,0,0,1)    20%,
+      rgba(0,0,0,1)    80%,
+      rgba(0,0,0,0.92) 86%,
+      rgba(0,0,0,0.55) 91%,
+      rgba(0,0,0,0.15) 96%,
+      rgba(0,0,0,0)    100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,1)   0%,
+      rgba(0,0,0,1)   72%,
+      rgba(0,0,0,0.85) 82%,
+      rgba(0,0,0,0.5) 90%,
+      rgba(0,0,0,0.18) 96%,
+      rgba(0,0,0,0)   100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0)    0%,
+      rgba(0,0,0,0.15) 4%,
+      rgba(0,0,0,0.55) 9%,
+      rgba(0,0,0,0.92) 14%,
+      rgba(0,0,0,1)    20%,
+      rgba(0,0,0,1)    80%,
+      rgba(0,0,0,0.92) 86%,
+      rgba(0,0,0,0.55) 91%,
+      rgba(0,0,0,0.15) 96%,
+      rgba(0,0,0,0)    100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,1)   0%,
+      rgba(0,0,0,1)   72%,
+      rgba(0,0,0,0.85) 82%,
+      rgba(0,0,0,0.5) 90%,
+      rgba(0,0,0,0.18) 96%,
+      rgba(0,0,0,0)   100%
+    );
+  mask-composite: intersect;
+  transition: background 220ms ease;
+}
+/* scrolled over the white sheet: same edge-dissolve so the pill never
+   reads as a hard rectangle. Tint shifts to a softer dark wash that
+   stays visible on a light background. */
+.nav.is-scrolled .nav__pills {
+  background: rgba(11, 11, 11, 0.12);
+  backdrop-filter: blur(44px) saturate(150%);
+  -webkit-backdrop-filter: blur(44px) saturate(150%);
 }
 
 .nav__pill {
   display: inline-flex;
   align-items: center;
-  padding: 9px 16px;
-  font-size: 13.5px;
-  letter-spacing: 0.005em;
-  color: rgba(255, 255, 255, 0.92);
+  /* re-enable clicks on the individual pills (parent has pointer-events: none) */
+  pointer-events: auto;
+  padding: 14px 22px;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.72);
   text-shadow: 0 1px 10px rgba(11, 11, 11, 0.35);
   border-radius: 999px;
-  transition: color 180ms ease, background 180ms ease, text-shadow 180ms ease;
+  transition: color 160ms ease, background 160ms ease;
 }
-.nav__pill:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
-/* once scrolled past the hero, the nav sits over the white page —
-   flip everything back to dark ink and drop the text-shadow. */
-.nav.is-scrolled .nav__pill {
-  color: var(--ink-2);
-  text-shadow: none;
-}
+.nav__pill:hover { color: rgba(255, 255, 255, 0.95); background: rgba(255, 255, 255, 0.08); }
+.nav.is-scrolled .nav__pill { color: var(--ink-2); text-shadow: none; }
 .nav.is-scrolled .nav__pill:hover { color: var(--ink); background: rgba(11, 11, 11, 0.04); }
+
+/* CrackedHQ. wordmark in the center of the nav */
+.nav__wordmark-link {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 12px rgba(11, 11, 11, 0.4);
+  text-decoration: none;
+  padding: 14px 26px;
+  white-space: nowrap;
+  transition: opacity 160ms ease;
+}
+.nav__wordmark-link:hover { opacity: 0.65; }
+.nav__wordmark-dot { opacity: 0.6; }
+.nav.is-scrolled .nav__wordmark-link { color: var(--ink); text-shadow: none; }
 
 /* the center pill is the brand mark — a solid black ink pill that
    anchors the nav. Links back to the top of the page. */
 .nav__pill--brand {
-  background: var(--ink);
-  color: #fff;
-  padding: 11px 24px;
+  background: #f3f0e8;
+  color: var(--ink);
+  padding: 16px 36px;
   gap: 10px;
   font-family: var(--serif);
-  font-size: 15.5px;
+  font-size: 17px;
   letter-spacing: 0.005em;
   line-height: 1;
   border: 0;
   text-shadow: none;
-  box-shadow: 0 8px 22px -14px rgba(11, 11, 11, 0.55);
+  box-shadow: 0 6px 20px -10px rgba(11, 11, 11, 0.28);
   transition: background 200ms ease, transform 200ms ease;
 }
 .nav__pill--brand em { font-style: italic; }
 .nav__pill--brand:hover {
-  background: #1a1a1a;
-  color: #fff;
+  background: #ede9dd;
+  color: var(--ink);
   transform: translateY(-1px);
 }
 .nav__wing {
@@ -165,19 +430,50 @@ img, svg { display: block; max-width: 100%; }
   color: currentColor;
   margin-right: 2px;
 }
-.nav__wordmark { display: inline-flex; align-items: baseline; gap: 4px; }
+.nav__wordmark { display: inline-flex; align-items: baseline; gap: 0; }
+
+/* "Cracked." → "Cracked Hackerhouse" expand on hover */
+.nav__wm-dot {
+  display: inline-block;
+  max-width: 1ch;
+  overflow: hidden;
+  /* dot snaps away first to clear space before the text arrives */
+  transition: max-width 220ms cubic-bezier(.4, 0, 1, 1),
+              opacity    180ms ease;
+}
+.nav__pill--brand:hover .nav__wm-dot {
+  max-width: 0;
+  opacity: 0;
+}
+.nav__wm-expand {
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 0;
+  vertical-align: baseline;
+  /* expo-out: rushes off the mark, then glides softly into place */
+  transition: max-width 560ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity    400ms ease 100ms;
+}
+.nav__pill--brand:hover .nav__wm-expand {
+  max-width: 260px;
+  opacity: 1;
+}
 /* the brand pill stays black-on-white in both hero and scrolled states */
-.nav.is-scrolled .nav__pill--brand { color: #fff; background: var(--ink); }
+.nav.is-scrolled .nav__pill--brand { background: #f3f0e8; color: var(--ink); }
 
 /* =========================================================
    HERO — map (layer 1) on right, glass pane on left
    ========================================================= */
 .hero {
-  position: relative;
-  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 1;
   padding: calc(var(--nav-h) + 20px) var(--pad) 80px;
   overflow: hidden;
-  background: var(--bg);
+  background: #000;
 }
 
 /* --- LAYER 1: the actual Leaflet map --- */
@@ -191,102 +487,45 @@ img, svg { display: block; max-width: 100%; }
   inset: 0;
   width: 100%;
   height: 100%;
-  background: var(--bg);
+  background: transparent;
 }
-/* Leaflet overrides — keep it pure white, no zoom chrome */
-.leaflet-container {
-  background: #ffffff !important;
-  font-family: var(--mono) !important;
-  outline: none;
-}
-.leaflet-control-attribution {
-  background: rgba(255, 255, 255, 0.7) !important;
-  color: var(--ink-4) !important;
-  font-size: 9px !important;
-  font-family: var(--mono) !important;
-  padding: 2px 6px !important;
-  letter-spacing: 0.02em;
-}
-.leaflet-control-attribution a { color: var(--ink-3) !important; }
-.leaflet-control-zoom { display: none !important; }
-/* Voyager already has its own pastel palette — leave it alone */
-.leaflet-tile-pane { opacity: 1; filter: contrast(1.02) saturate(1.05); }
-
-/* --- Cesium overrides: keep the widget invisible chrome-wise --- */
-.cesium-viewer,
-.cesium-widget,
-.cesium-widget canvas {
+/* --- Maplibre GL overrides --- */
+.maplibregl-map {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
+}
+.maplibregl-canvas-container,
+.maplibregl-canvas {
+  width: 100% !important;
+  height: 100% !important;
   outline: none;
 }
-.cesium-widget canvas {
+.maplibregl-canvas {
   display: block;
-  /* Filmic color grade. Saturation lifts the turquoise coastline; the
-     small hue rotation warms shadows so the scene reads as morning;
-     contrast stays close to neutral so bloom isn't fighting it. */
   filter: contrast(1.06) saturate(1.18) brightness(1.04) hue-rotate(-3deg);
 }
-
-/* Google attribution must stay visible (Map Tiles API requirement) — we
-   keep it on the page but fade it back to a near-invisible resting state,
-   and bring it up to full visibility on hover. */
-.cesium-viewer-bottom,
-.cesium-widget-credits {
+.maplibregl-ctrl-attrib {
   font-family: var(--mono) !important;
-  font-size: 9.5px !important;
-  letter-spacing: 0.04em;
-  color: var(--ink-3) !important;
-  background: rgba(255, 255, 255, 0.0) !important;
-  padding: 2px 8px !important;
-  border-radius: 4px;
-  bottom: 8px !important;
-  right: 8px !important;
-  left: auto !important;
-  max-width: 60%;
-  opacity: 0.12;
-  transition: opacity 260ms ease, background 260ms ease;
+  font-size: 9px !important;
+  background: transparent !important;
+  color: rgba(255,255,255,0.5) !important;
+  opacity: 0.5;
+  transition: opacity 260ms ease;
 }
-.cesium-viewer-bottom:hover,
-.cesium-widget-credits:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.65) !important;
-}
-.cesium-credit-textContainer,
-.cesium-credit-textContainer * { color: var(--ink-3) !important; }
-.cesium-credit-textContainer a { color: var(--ink-2) !important; }
-.cesium-credit-imageContainer img {
-  max-height: 14px;
-  opacity: 0.7;
-  filter: grayscale(0.4);
-}
-.cesium-credit-expand-link { color: var(--ink-2) !important; }
-.cesium-credit-lightbox-overlay { background: rgba(11, 11, 11, 0.4) !important; }
-.cesium-credit-lightbox {
-  background: var(--bg) !important;
-  color: var(--ink) !important;
-  border: 1px solid var(--rule);
-  font-family: var(--sans);
-}
+.maplibregl-ctrl-attrib:hover { opacity: 1; }
+.maplibregl-ctrl-attrib a { color: rgba(255,255,255,0.7) !important; }
+.maplibregl-ctrl-bottom-right { bottom: 6px !important; right: 8px !important; }
+/* Hide compass / zoom controls — cinematic, no UI chrome */
+.maplibregl-ctrl-group { display: none !important; }
 
-/* Hide Cesium's perf metrics / toolbar / fullscreen pieces just in case */
-.cesium-performanceDisplay-defaultContainer,
-.cesium-viewer-toolbar,
-.cesium-viewer-fullscreenContainer { display: none !important; }
-
-/* very light mask — map shows through almost everywhere; only soft fade at top/bottom edges */
+/* Mask kept as a hook in case we need an edge fade later, but no fade
+   to white at the bottom now — the sheet's rounded edge owns that seam. */
 .hero__map-mask {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.0) 0%,
-      rgba(255, 255, 255, 0.0) 82%,
-      rgba(255, 255, 255, 0.45) 100%
-    );
+  background: transparent;
   pointer-events: none;
 }
 
@@ -352,8 +591,7 @@ img, svg { display: block; max-width: 100%; }
   opacity: 0.85;
 }
 
-/* horizon fade — soft warm haze at the very top + a near-invisible
-   bottom band so the ticker doesn't feel attached to the map */
+/* horizon fade — soft warm haze at the very top */
 .hero__fx-horizon {
   background:
     linear-gradient(
@@ -366,7 +604,7 @@ img, svg { display: block; max-width: 100%; }
 }
 
 /* hero is the parallax + clipping host */
-.hero { position: relative; isolation: isolate; }
+.hero { isolation: isolate; }
 
 /* --- LAYER 2: glass pane on the left --- */
 /* The wrapper itself doesn't catch clicks (so the map stays interactive in
@@ -376,14 +614,15 @@ img, svg { display: block; max-width: 100%; }
   z-index: 2;
   max-width: var(--max);
   margin: 0 auto;
-  min-height: calc(100vh - var(--nav-h) - 100px);
+  /* Pane sits in the top ~97vh — the bottom 3vh is reserved for the
+     sheet peek, so we center the pane inside that reduced track. */
+  min-height: calc(97vh - var(--nav-h) - 20px);
   display: flex;
   align-items: center;
   pointer-events: none;
 }
 
-/* the glass VEIL — full strength 0-40%, smooth ramp 40-50% (still
-   ~60% at the midpoint), gentle bleed 50-62%, clean map from 66%. */
+/* VEIL — dark blur left panel dissolving into the map */
 .hero__veil {
   position: absolute;
   inset: 0;
@@ -401,38 +640,28 @@ img, svg { display: block; max-width: 100%; }
       90deg,
       rgba(11, 18, 26, 0.28) 0%,
       rgba(11, 18, 26, 0.26) 22%,
-      rgba(11, 18, 26, 0.20) 38%,
-      rgba(11, 18, 26, 0.10) 50%,
-      rgba(11, 18, 26, 0.03) 60%,
-      rgba(11, 18, 26, 0)    68%
+      rgba(11, 18, 26, 0.20) 42%,
+      rgba(11, 18, 26, 0.10) 56%,
+      rgba(11, 18, 26, 0.03) 66%,
+      rgba(11, 18, 26, 0)    73%
     );
   -webkit-mask-image: linear-gradient(
     90deg,
-    rgba(0, 0, 0, 1)    0%,
-    rgba(0, 0, 0, 1)    40%,
-    rgba(0, 0, 0, 0.88) 44%,
-    rgba(0, 0, 0, 0.72) 47%,
-    rgba(0, 0, 0, 0.58) 50%,
-    rgba(0, 0, 0, 0.42) 53%,
-    rgba(0, 0, 0, 0.27) 56%,
-    rgba(0, 0, 0, 0.14) 59%,
-    rgba(0, 0, 0, 0.05) 62%,
-    rgba(0, 0, 0, 0.01) 65%,
-    rgba(0, 0, 0, 0)    67%
+    rgba(0,0,0,1) 0%, rgba(0,0,0,1) 45%,
+    rgba(0,0,0,0.88) 50%, rgba(0,0,0,0.72) 53%,
+    rgba(0,0,0,0.58) 56%, rgba(0,0,0,0.42) 59%,
+    rgba(0,0,0,0.27) 62%, rgba(0,0,0,0.14) 65%,
+    rgba(0,0,0,0.05) 68%, rgba(0,0,0,0.01) 71%,
+    rgba(0,0,0,0) 73%
   );
   mask-image: linear-gradient(
     90deg,
-    rgba(0, 0, 0, 1)    0%,
-    rgba(0, 0, 0, 1)    40%,
-    rgba(0, 0, 0, 0.88) 44%,
-    rgba(0, 0, 0, 0.72) 47%,
-    rgba(0, 0, 0, 0.58) 50%,
-    rgba(0, 0, 0, 0.42) 53%,
-    rgba(0, 0, 0, 0.27) 56%,
-    rgba(0, 0, 0, 0.14) 59%,
-    rgba(0, 0, 0, 0.05) 62%,
-    rgba(0, 0, 0, 0.01) 65%,
-    rgba(0, 0, 0, 0)    67%
+    rgba(0,0,0,1) 0%, rgba(0,0,0,1) 45%,
+    rgba(0,0,0,0.88) 50%, rgba(0,0,0,0.72) 53%,
+    rgba(0,0,0,0.58) 56%, rgba(0,0,0,0.42) 59%,
+    rgba(0,0,0,0.27) 62%, rgba(0,0,0,0.14) 65%,
+    rgba(0,0,0,0.05) 68%, rgba(0,0,0,0.01) 71%,
+    rgba(0,0,0,0) 73%
   );
 }
 
@@ -442,9 +671,10 @@ img, svg { display: block; max-width: 100%; }
 .hero__pane {
   position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: 600px;
   pointer-events: auto;
   padding: 52px 44px 46px;
+  margin-left: 80px;
   border: 0;
   border-radius: 0;
   box-shadow: none;
@@ -507,53 +737,238 @@ img, svg { display: block; max-width: 100%; }
   color: rgba(255, 255, 255, 0.86);
   text-shadow: 0 1px 14px rgba(11, 11, 11, 0.4);
   margin: 0 0 26px;
-  max-width: 28ch;
+  max-width: 40ch;
   position: relative;
   z-index: 1;
 }
 
-/* Apply button — solid black pill, the one piece of strong contrast on the pane */
+/* Apply button — white pill on the dark hero, dark ink text */
 .hero__apply {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  padding: 11px 18px 11px 20px;
-  background: var(--ink);
-  color: #fff;
-  border: 1px solid var(--ink);
+  padding: 9px 28px;
+  background: #ffffff;
+  color: var(--ink);
+  border: none;
   border-radius: 999px;
-  font-size: 13.5px;
-  letter-spacing: 0.005em;
-  box-shadow: 0 10px 24px -14px rgba(11, 11, 11, 0.55);
-  transition: transform 200ms ease, background 200ms ease, box-shadow 200ms ease;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px -10px rgba(11, 11, 11, 0.40);
+  transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
   position: relative;
   z-index: 1;
+  text-decoration: none;
 }
 .hero__apply:hover {
+  background: #f5f4ef;
   transform: translateY(-1px);
-  background: #1a1a1a;
-  box-shadow: 0 14px 30px -14px rgba(11, 11, 11, 0.6);
+  box-shadow: 0 12px 28px -10px rgba(11, 11, 11, 0.50);
 }
 .hero__apply-arrow {
-  display: inline-grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--ink);
-  font-size: 12px;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+  color: currentColor;
   transition: transform 220ms ease;
 }
 .hero__apply:hover .hero__apply-arrow { transform: translate(3px, 0); }
 
-/* CURRENT LOCATION block — sits below the Apply pill */
-.hero__loc {
+/* Ghost variant — used when the action is a status, not a CTA
+   (Shipped!, Filled!, etc). Liquid-glass background instead of white,
+   bolder natural-case label so it reads as a state. */
+.hero__apply--ghost {
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  cursor: default;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 10px 28px -14px rgba(11, 11, 11, 0.45);
+}
+
+/* ── cohort badge above the headline ──────────────────────────────────── */
+.hero__cohort {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px 5px 8px;
+  margin-bottom: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  text-shadow: 0 1px 10px rgba(11, 11, 11, 0.3);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  position: relative;
+  z-index: 1;
+}
+.hero__cohort-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #56c771;
+  box-shadow: 0 0 0 0 rgba(86, 199, 113, 0.55);
+  animation: apps-dot-pulse 2.6s ease-in-out infinite;
+}
+.hero__cohort-sep {
+  opacity: 0.45;
+  margin: 0 2px;
+}
+.hero__cohort-status {
+  color: #ff5252;
+  text-shadow: 0 0 8px rgba(255, 82, 82, 0.45), 0 1px 10px rgba(11, 11, 11, 0.3);
+}
+
+/* ── dual-CTA row: Apply now + Explore program ─────────────────────────── */
+.hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+/* secondary ghost link */
+.hero__secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  color: rgba(255, 255, 255, 0.70);
+  text-shadow: 0 1px 10px rgba(11, 11, 11, 0.3);
+  transition: color 200ms ease;
+  text-decoration: none;
+}
+.hero__secondary:hover { color: rgba(255, 255, 255, 0.94); }
+.hero__secondary-circle {
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.52);
+  flex: 0 0 auto;
+  transition: border-color 200ms ease;
+}
+.hero__secondary:hover .hero__secondary-circle { border-color: rgba(255, 255, 255, 0.88); }
+
+/* ── programme stat strip (4 glass cards) ─────────────────────────────── */
+.hero__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 28px;
+  position: relative;
+  z-index: 1;
+}
+.hero__stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 12px 13px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.115);
+  border-radius: 12px;
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  box-shadow: 0 4px 14px -8px rgba(11, 11, 11, 0.28);
+  transition: background 200ms ease, border-color 200ms ease;
+}
+.hero__stat:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.hero__stat-icon {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.62);
+  margin-top: 2px;
+}
+.hero__stat-icon svg { width: 16px; height: 16px; }
+.hero__stat-body { flex: 1; min-width: 0; }
+.hero__stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+.hero__stat-n {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.hero__stat-l {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.82);
+}
+.hero__stat-d {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 9.5px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.50);
+  letter-spacing: 0.01em;
+}
+
+/* ── fellows globe + tagline (additions to existing fellows block) ─────── */
+.hero__fellows-globe {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.62);
+}
+.hero__fellows-globe svg { width: 15px; height: 15px; }
+.hero__fellows-tagline {
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.65);
+  text-shadow: 0 1px 10px rgba(11, 11, 11, 0.3);
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* FELLOWS preview — sits below the Apply pill, links to the fellows page */
+.hero__fellows {
+  display: block;
+  width: 100%;
   margin-top: 26px;
-  padding-top: 18px;
-  border-top: 0;
-  /* a horizontal hairline that fades at both ends, matching the
-     dissolving aesthetic of the pane itself */
+  padding: 18px 0 0;
+  border: 0;
+  text-align: left;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  background-color: transparent;
   background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
@@ -567,7 +982,7 @@ img, svg { display: block; max-width: 100%; }
   position: relative;
   z-index: 1;
 }
-.hero__loc-label {
+.hero__fellows-label {
   display: block;
   font-family: var(--mono);
   font-size: 9.5px;
@@ -575,39 +990,42 @@ img, svg { display: block; max-width: 100%; }
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.70);
   text-shadow: 0 1px 10px rgba(11, 11, 11, 0.3);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
-.hero__loc-city {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: 21px;
-  line-height: 1.1;
-  letter-spacing: -0.005em;
-  color: #fff;
-  text-shadow: 0 2px 18px rgba(11, 11, 11, 0.35);
-  margin: 0 0 12px;
-}
-.hero__loc-meta {
-  display: inline-flex;
+.hero__fellows-row {
+  display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+.hero__fellows-stack {
+  display: inline-flex;
+  align-items: center;
+}
+.hero__fellow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  box-sizing: border-box;
+  box-shadow: 0 4px 14px rgba(11, 11, 11, 0.35);
+  transition: transform 220ms ease;
+}
+.hero__fellow + .hero__fellow { margin-left: -12px; }
+.hero__fellows-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
   text-shadow: 0 1px 10px rgba(11, 11, 11, 0.3);
 }
-.hero__loc-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 16px;
-  height: 16px;
-  font-size: 13px;
-  color: #fff;
-}
-.hero__loc-temp { color: #fff; font-weight: 500; }
-.hero__loc-sep { color: rgba(255, 255, 255, 0.45); }
-.hero__loc-desc { color: rgba(255, 255, 255, 0.78); text-transform: capitalize; }
 
 /* =========================================================
    HOUSE MARKER — floating glass card anchored to Da Nang
@@ -616,7 +1034,11 @@ img, svg { display: block; max-width: 100%; }
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  /* sits above .hero__left (z 2) so the prev/next cohort buttons stay
+     reachable when they overlap the glass pane's DOM bounding box. The
+     wrapper itself is pointer-events: none, so transparent areas of the
+     marker don't steal clicks from the pane underneath. */
+  z-index: 3;
   pointer-events: none;
   /* the JS sets transform: translate3d(x, y, 0) on this element to
      position it under the projected anchor; we then visually offset
@@ -631,27 +1053,133 @@ img, svg { display: block; max-width: 100%; }
   bottom: 110px;
   /* hidden + nudged downward by default; reveals last in the sequence */
   transform: translate(-50%, -6px);
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
+  /* Grid with two rows: the always-visible row + a collapsed expand.
+     Width comes from max-content of the widest child — the expand starts
+     at width:0 so the card hugs the row by default. On hover the expand
+     grows to a fixed width and the row track opens. */
+  display: inline-grid;
+  grid-template-columns: max-content;
+  grid-template-rows: auto 0fr;
+  justify-items: start;
   padding: 11px 18px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.14);
   border: 0;
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.04);
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.04);
   box-shadow: 0 10px 28px -18px rgba(11, 11, 11, 0.5);
-  white-space: nowrap;
   color: #fff;
   opacity: 0;
+  pointer-events: auto;
   transition:
     opacity 520ms ease 1100ms,
-    transform 620ms cubic-bezier(.2, .8, .2, 1) 1100ms;
+    transform 620ms cubic-bezier(.2, .8, .2, 1) 1100ms,
+    grid-template-rows 460ms cubic-bezier(0.16, 1, 0.3, 1),
+    padding 460ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 320ms ease,
+    box-shadow 320ms ease;
 }
 .house-marker.is-landed .house-marker__card {
   opacity: 0.88;
   transform: translate(-50%, 0);
 }
+
+.house-marker__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+/* ── Expansion: photos + stats + blurb. Hidden until card hover. ───────── */
+.house-marker__expand {
+  width: 0;
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-top: 0;
+  transition:
+    width 460ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 280ms ease,
+    margin-top 460ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.house-marker__expand > * { min-height: 0; }
+
+.house-marker__card:hover {
+  grid-template-rows: auto 1fr;
+  padding-bottom: 18px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 40px -20px rgba(11, 11, 11, 0.55);
+  opacity: 1;
+}
+.house-marker__card:hover .house-marker__expand {
+  width: 360px;
+  opacity: 1;
+  margin-top: 14px;
+}
+
+.house-marker__photos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.house-marker__photos:empty { display: none; }
+.house-marker__photo {
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease;
+}
+.house-marker__photo:hover {
+  transform: scale(1.04);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.house-marker__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  margin-bottom: 10px;
+}
+.house-marker__stats:empty { display: none; }
+.house-marker__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.house-marker__stat-value {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1;
+  color: #fff;
+}
+.house-marker__stat-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.house-marker__blurb {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: normal;
+}
+.house-marker__blurb:empty { display: none; }
 .house-marker__icon {
   display: inline-grid;
   place-items: center;
@@ -679,6 +1207,82 @@ img, svg { display: block; max-width: 100%; }
   letter-spacing: 0.02em;
   color: rgba(255, 255, 255, 0.72);
   margin-top: 3px;
+}
+.house-marker__sub-status {
+  color: #8effa5;
+  font-weight: 500;
+  text-shadow: 0 0 6px rgba(142, 255, 165, 0.45);
+}
+.house-marker__loc {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.72);
+}
+.house-marker__loc-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: #56c771;
+  box-shadow: 0 0 0 2px rgba(86, 199, 113, 0.25);
+}
+.house-marker__nav {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  width: auto;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  white-space: nowrap;
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    transform 220ms cubic-bezier(.2, .8, .2, 1),
+    opacity 220ms ease;
+}
+.house-marker__nav svg {
+  width: 10px;
+  height: 10px;
+  display: block;
+  flex: 0 0 auto;
+}
+.house-marker__nav-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1;
+  display: inline-block;
+}
+.house-marker__nav:disabled .house-marker__nav-label { visibility: hidden; }
+.house-marker__nav:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: scale(1.08);
+}
+.house-marker__nav:active {
+  transform: scale(0.94);
+}
+.house-marker__nav:disabled {
+  visibility: hidden;
+  pointer-events: none;
 }
 .house-marker__beam {
   position: absolute;
@@ -795,182 +1399,41 @@ img, svg { display: block; max-width: 100%; }
   100% { transform: translate(-50%, -50%) scale(4.8); opacity: 0;    }
 }
 
-/* --- scroll hint --- */
-.hero__scroll {
-  position: absolute;
-  bottom: 24px;
-  left: var(--pad);
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.12em;
-  color: var(--ink-4);
+
+/* =========================================================
+   SHEET — iOS-style rounded surface that rises over the map.
+   Wraps every post-hero section so the seam between the map
+   and the rest of the page reads as one continuous gesture.
+   ========================================================= */
+.sheet {
+  position: relative;
   z-index: 3;
-  pointer-events: none;
-}
-.hero__scroll-line {
-  width: 40px;
-  height: 1px;
-  background: linear-gradient(90deg, var(--ink-4), transparent);
-}
-
-/* --- map pins (built with L.divIcon, styled with CSS) --- */
-.map-pin {
-  position: relative;
-  width: 14px;
-  height: 14px;
-}
-.map-pin__dot {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--ink);
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(11, 11, 11, 0.25);
-}
-.map-pin__halo {
-  position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-  border: 1px solid rgba(11, 11, 11, 0.15);
-  opacity: 0;
-}
-.map-pin--active .map-pin__dot {
-  background: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft), 0 4px 12px rgba(61, 107, 78, 0.35);
-}
-.map-pin--active .map-pin__halo {
-  border-color: var(--accent);
-  opacity: 1;
-  animation: pin-pulse 2.6s cubic-bezier(.2,.6,.2,1) infinite;
-}
-@keyframes pin-pulse {
-  0%   { transform: scale(0.9); opacity: 0.55; }
-  70%  { transform: scale(2.4); opacity: 0; }
-  100% { transform: scale(2.4); opacity: 0; }
-}
-.map-pin__label {
-  position: absolute;
-  top: 50%;
-  left: 18px;
-  transform: translateY(-50%);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-  color: var(--ink-2);
-  background: rgba(255, 255, 255, 0.85);
-  padding: 3px 7px;
-  border-radius: 4px;
-  border: 1px solid var(--rule);
-  text-transform: uppercase;
-}
-.map-pin__label--left {
-  left: auto;
-  right: 18px;
-}
-
-/* alumni dots — dim, no halo, no label */
-.map-pin--alumni {
-  width: 6px;
-  height: 6px;
-}
-.map-pin--alumni .map-pin__dot {
-  width: 5px;
-  height: 5px;
-  background: rgba(11, 11, 11, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 1px 3px rgba(11, 11, 11, 0.15);
-}
-.map-pin--alumni .map-pin__halo,
-.map-pin--alumni .map-pin__label { display: none; }
-
-/* =========================================================
-   TICKER
-   ========================================================= */
-.ticker {
-  position: relative;
-  z-index: 2;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
+  margin-top: -3vh;
+  border-radius: 28px 28px 0 0;
   background: var(--bg);
-  overflow: hidden;
-}
-.ticker__track {
-  display: inline-flex;
-  align-items: center;
-  gap: 36px;
-  padding: 14px 0;
-  white-space: nowrap;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--ink-2);
-  text-transform: lowercase;
-  animation: ticker 38s linear infinite;
-}
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  box-shadow:
+    0 -24px 60px rgba(11, 11, 11, 0.18),
+    0 -1px 0 rgba(255, 255, 255, 0.6) inset;
+  padding-top: 6px;
+  isolation: isolate;
 }
 
-/* =========================================================
-   Shared section primitives
-   ========================================================= */
-.section__head {
-  max-width: var(--max);
-  margin: 0 auto 56px;
-  padding: 0 var(--pad);
+.sheet__handle {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--ink-4);
+  opacity: 0.35;
+  margin: 10px auto 18px;
 }
-.section__head--split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: end;
-}
-@media (max-width: 800px) {
-  .section__head--split { grid-template-columns: 1fr; }
-}
-.section__kicker {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.10em;
-  text-transform: lowercase;
-  color: var(--ink-3);
-  margin-bottom: 16px;
-}
-.section__title {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: clamp(36px, 5vw, 64px);
-  line-height: 1.02;
-  letter-spacing: -0.012em;
-  color: var(--ink);
-  margin: 0 0 18px;
-  max-width: 22ch;
-}
-.section__title em { font-style: italic; }
-.section__lede,
-.section__aside {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--ink-3);
-  margin: 0;
-  max-width: 60ch;
-}
-.section__aside { max-width: 48ch; }
+
+
 
 /* =========================================================
    PAPER — the cream canvas all post-hero sections sit on.
    ========================================================= */
 :root {
-  --paper-bg:       #f4f2ec;
+  --paper-bg:       #ffffff;
   --paper-ink:      #111111;
   --paper-ink-2:    #2a2a2a;
   --paper-ink-3:    #6a6a68;
@@ -1112,21 +1575,18 @@ img, svg { display: block; max-width: 100%; }
   z-index: 0;
 }
 
-.poster--sf   { background-image:
-  linear-gradient(160deg, rgba(255,140,90,0), rgba(0,0,0,0.18)),
-  url("https://images.unsplash.com/photo-1494522855154-9297ac14b55f?auto=format&fit=crop&w=1200&q=80"); }
-.poster--tyo  { background-image:
-  linear-gradient(160deg, rgba(255,180,200,0), rgba(0,0,0,0.22)),
-  url("https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80"); }
-.poster--ber  { background-image:
-  linear-gradient(160deg, rgba(120,140,200,0), rgba(0,0,0,0.22)),
-  url("https://images.unsplash.com/photo-1587330979470-3016b6702d89?auto=format&fit=crop&w=1200&q=80"); }
-.poster--cdmx { background-image:
-  linear-gradient(160deg, rgba(255,120,90,0), rgba(0,0,0,0.22)),
-  url("https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?auto=format&fit=crop&w=1200&q=80"); }
+/* Da Nang — the next stop (Vietnam). Photo is set, copy is final.
+   Bangalore and Bali use rich gradient placeholders until real
+   photography lands — swap the background-image URL when ready. */
 .poster--dnn  { background-image:
   linear-gradient(160deg, rgba(150,200,210,0), rgba(0,0,0,0.22)),
   url("https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80"); }
+.poster--blr  { background-image:
+  linear-gradient(160deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%),
+  radial-gradient(120% 100% at 30% 20%, #f0a763 0%, #b35a2a 38%, #4a2412 100%); }
+.poster--bsa  { background-image:
+  linear-gradient(160deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.45) 100%),
+  radial-gradient(120% 100% at 65% 25%, #f7c89c 0%, #4ea88a 42%, #103141 100%); }
 
 .poster__name {
   position: absolute;
@@ -1160,73 +1620,272 @@ img, svg { display: block; max-width: 100%; }
 /* =========================================================
    EXPECT — text with floating polaroids around it
    ========================================================= */
-.expect {
+.cooking {
   padding: clamp(80px, 12vw, 140px) var(--pad) clamp(80px, 12vw, 140px);
 }
-.expect__inner {
-  position: relative;
-  max-width: 1180px;
+.cooking__inner {
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 clamp(0px, 4vw, 60px);
 }
-.expect__title {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: clamp(40px, 6.2vw, 80px);
-  line-height: 1;
-  letter-spacing: -0.012em;
-  margin: 0 0 36px;
-  color: var(--paper-ink);
+.cooking__head {
+  max-width: 720px;
+  margin: 0 auto clamp(40px, 5vw, 64px);
   text-align: center;
 }
-.expect__title em { font-style: italic; }
-.expect__body {
-  font-family: var(--sans);
-  font-size: clamp(17px, 1.45vw, 21px);
-  line-height: 1.55;
-  color: var(--paper-ink);
-  max-width: 62ch;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
+.cooking__eyebrow {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-ink-3);
+  margin-bottom: 18px;
 }
-.expect__body p { margin: 0 0 26px; }
-.expect__body p:last-child { margin-bottom: 0; }
-.expect__body em {
+.cooking__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(44px, 6.4vw, 86px);
+  line-height: 1;
+  letter-spacing: -0.014em;
+  margin: 0 0 22px;
+  color: var(--paper-ink);
+}
+.cooking__title em { font-style: italic; }
+.cooking__lede {
+  font-family: var(--sans);
+  font-size: clamp(15px, 1.2vw, 18px);
+  line-height: 1.6;
+  color: var(--paper-ink-2);
+  margin: 0;
+  max-width: 56ch;
+  margin: 0 auto;
+}
+.cooking__lede em {
   font-family: var(--serif);
   font-style: italic;
   font-weight: 400;
 }
-.expect__body strong {
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-thickness: 1.2px;
-  text-underline-offset: 3px;
+.cooking__foot {
+  margin: clamp(32px, 4vw, 52px) auto 0;
+  max-width: 60ch;
+  text-align: center;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--paper-ink-3);
+  line-height: 1.6;
 }
-.expect__heart { display: inline-block; transform: translateY(2px); }
+.cooking__foot em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--paper-ink);
+}
 
-.polaroid {
+/* ----- FOCUS CARDS — hover one, others blur and dim ----- */
+.focus-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(14px, 1.5vw, 22px);
+}
+
+.focus-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 20px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #1a1a1a;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 30px 60px -30px rgba(11, 11, 11, 0.4),
+    0 12px 28px -16px rgba(11, 11, 11, 0.22);
+  transition:
+    transform 480ms cubic-bezier(.2,.8,.2,1),
+    filter 380ms cubic-bezier(.2,.8,.2,1),
+    opacity 380ms ease,
+    box-shadow 380ms ease;
+  will-change: transform, filter;
+}
+
+/* the focus effect — sharpens the hovered one, blurs the rest */
+@media (hover: hover) and (pointer: fine) {
+  .focus-cards:hover .focus-card {
+    filter: blur(7px) saturate(0.85);
+    opacity: 0.55;
+    transform: scale(0.985);
+  }
+  .focus-cards:hover .focus-card:hover {
+    filter: none;
+    opacity: 1;
+    transform: scale(1.005) translateY(-2px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.08) inset,
+      0 40px 80px -30px rgba(11, 11, 11, 0.55),
+      0 16px 36px -18px rgba(11, 11, 11, 0.32);
+  }
+}
+
+.focus-card__media {
   position: absolute;
-  width: clamp(120px, 13vw, 180px);
-  aspect-ratio: 4 / 3;
+  inset: 0;
+  margin: 0;
   background-size: cover;
   background-position: center;
-  background-color: #ddd;
-  border: 8px solid #fff;
-  border-bottom-width: 28px;
-  border-radius: 4px;
-  box-shadow:
-    0 22px 38px -22px rgba(11, 11, 11, 0.35),
-    0 6px 16px -10px rgba(11, 11, 11, 0.18);
-  z-index: 0;
+  transform: scale(1.04);
+  transition: transform 900ms cubic-bezier(.2,.8,.2,1), filter 600ms ease;
+  filter: saturate(1.05) contrast(1.02);
+}
+.focus-card:hover .focus-card__media {
+  transform: scale(1.08);
+}
+
+.focus-card__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(11, 11, 11, 0.05) 0%,
+      rgba(11, 11, 11, 0.05) 38%,
+      rgba(11, 11, 11, 0.55) 72%,
+      rgba(11, 11, 11, 0.86) 100%);
   pointer-events: none;
 }
-.polaroid--tl { top: 60px;   left: 0%;  transform: rotate(-6deg); }
-.polaroid--tr { top: 100px;  right: 0%; transform: rotate(5deg); }
-.polaroid--bl { bottom: 20px; left: 3%;  transform: rotate(-4deg); }
-.polaroid--br { bottom: -10px; right: 1%; transform: rotate(6deg); }
-@media (max-width: 1100px) {
-  .polaroid { display: none; }
+
+.focus-card__body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(18px, 1.8vw, 26px);
+  color: #f5f4ee;
+}
+.focus-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.focus-card__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 11px 6px 9px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.focus-card__chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+}
+.focus-card__chip--past .focus-card__chip-dot { background: #c7c5b8; }
+.focus-card__chip--live .focus-card__chip-dot {
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(61, 107, 78, 0.32);
+  animation: focus-pulse 1.8s ease-in-out infinite;
+}
+.focus-card__chip--future .focus-card__chip-dot {
+  background: rgba(255, 255, 255, 0.4);
+  outline: 1px dashed rgba(255, 255, 255, 0.55);
+  outline-offset: 1px;
+}
+@keyframes focus-pulse {
+  0%, 100% { box-shadow: 0 0 0 0    rgba(61, 107, 78, 0.5); }
+  50%      { box-shadow: 0 0 0 6px  rgba(61, 107, 78, 0); }
+}
+
+.focus-card__num {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.focus-card__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.focus-card__kicker {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+.focus-card__city {
+  margin: 2px 0 4px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(32px, 3.4vw, 48px);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: #fff;
+}
+.focus-card__copy {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.86);
+  max-width: 28ch;
+}
+.focus-card__copy em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  color: #fff;
+}
+.focus-card__meta {
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-card,
+  .focus-card__media,
+  .focus-card__chip--live .focus-card__chip-dot { animation: none !important; transition: none !important; }
+}
+
+/* Tablet — 3 across feels squeezed; promote the LIVE cohort to a
+   wide hero row, with the others side by side below. */
+@media (max-width: 980px) {
+  .focus-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .focus-card { aspect-ratio: 4 / 5; }
+  .focus-card[data-cohort="01"] {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+  }
+  .focus-card[data-cohort="00"] { grid-row: 2; grid-column: 1; }
+  .focus-card[data-cohort="02"] { grid-row: 2; grid-column: 2; }
+}
+
+/* Mobile — stack, slightly shorter cards */
+@media (max-width: 640px) {
+  .focus-cards { grid-template-columns: 1fr; }
+  .focus-card { aspect-ratio: 4 / 5; }
+  .focus-card[data-cohort="01"] { aspect-ratio: 4 / 5; }
+  .focus-card__city { font-size: 36px; }
 }
 
 /* =========================================================
@@ -1244,62 +1903,171 @@ img, svg { display: block; max-width: 100%; }
   letter-spacing: -0.012em;
   text-align: center;
   color: var(--paper-ink);
-  margin: 0 0 60px;
+  margin: 0 0 48px;
 }
 .faq__title em { font-style: italic; }
-.faq__list {
-  max-width: 1000px;
+
+/* ----- TERMINAL — macOS-chrome panel that types out the FAQ ----- */
+.terminal {
+  max-width: 900px;
   margin: 0 auto;
-  padding: 0;
-  border-top: 1px solid var(--paper-rule-soft);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #14171c 0%, #0d1015 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 32px 64px -28px rgba(11, 11, 11, 0.45),
+    0 14px 32px -18px rgba(11, 11, 11, 0.32);
+  overflow: hidden;
+  font-family: var(--mono);
+  isolation: isolate;
 }
-.faq__item {
-  border-bottom: 1px solid var(--paper-rule-soft);
-}
-.faq__item summary {
+.terminal__chrome {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 28px 6px;
-  cursor: pointer;
-  list-style: none;
-  font-family: var(--sans);
-  font-weight: 400;
-  font-size: clamp(18px, 1.5vw, 22px);
-  letter-spacing: -0.005em;
-  color: var(--paper-ink);
-  transition: color 180ms ease;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px;
+  background: linear-gradient(180deg, #22262d 0%, #1a1d23 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  user-select: none;
 }
-.faq__item summary::-webkit-details-marker { display: none; }
-.faq__toggle {
-  position: relative;
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
-  color: var(--paper-ink);
-  transition: transform 240ms cubic-bezier(.2,.8,.2,1);
+.terminal__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.32);
 }
-.faq__toggle::before,
-.faq__toggle::after {
-  content: "";
+.terminal__dot--r { background: #ed6b60; }
+.terminal__dot--y { background: #f4bf4f; }
+.terminal__dot--g { background: #62c554; }
+.terminal__name {
   position: absolute;
-  inset: 0;
-  margin: auto;
-  background: currentColor;
-  border-radius: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: rgba(232, 232, 228, 0.42);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
-.faq__toggle::before { width: 16px; height: 1.5px; }
-.faq__toggle::after  { width: 1.5px; height: 16px; }
-.faq__item[open] .faq__toggle { transform: rotate(45deg); }
-.faq__body {
-  padding: 0 6px 28px;
-  font-family: var(--sans);
-  font-size: clamp(15px, 1.2vw, 17px);
-  line-height: 1.6;
-  color: var(--paper-ink-2);
-  max-width: 64ch;
+.terminal__screen {
+  padding: 22px 24px 28px;
+  min-height: 360px;
+  color: rgba(232, 232, 228, 0.92);
+  font-size: 14px;
+  line-height: 1.7;
+  font-feature-settings: "calt" 1, "liga" 0;
+  /* faint scanline / paper texture, very subtle */
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.025), transparent 55%);
 }
-.faq__body p { margin: 0; }
+.terminal__motd {
+  margin: 0 0 18px;
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+}
+.t-dim  { color: rgba(232, 232, 228, 0.42); }
+.t-acc  { color: #9dc1a4; }
+.t-user { color: #8fb798; }
+.t-at, .t-sigil { color: rgba(232, 232, 228, 0.46); }
+.t-host { color: #c7c5b8; }
+.t-path { color: rgba(178, 193, 178, 0.78); }
+
+/* Prompt line — one row per command */
+.terminal__prompt {
+  display: block;
+  margin-top: 14px;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+.terminal__prompt .t-input {
+  color: rgba(255, 255, 255, 0.96);
+  white-space: pre;
+}
+.terminal__prompt .t-input::before { content: " "; }
+
+/* Output below a prompt */
+.terminal__out {
+  margin: 4px 0 6px;
+  color: rgba(232, 232, 228, 0.84);
+  max-width: 70ch;
+  animation: term-out-in 360ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+/* Blinking block caret */
+.t-caret {
+  display: inline-block;
+  width: 8px;
+  height: 1.05em;
+  background: rgba(255, 255, 255, 0.82);
+  vertical-align: -2px;
+  margin-left: 2px;
+  animation: term-caret 1.05s steps(1) infinite;
+}
+
+@keyframes term-out-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes term-caret {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* No-JS / pre-JS source list — styled so it still looks like a session */
+.terminal__src {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.terminal__src li { margin: 14px 0 0; }
+.terminal__src li:first-child { margin-top: 0; }
+.terminal__src .t-src-q::before {
+  content: "cracked@hackerhouse ~/faq $ cat ";
+  color: rgba(232, 232, 228, 0.55);
+}
+.terminal__src .t-src-q::after {
+  content: ".md";
+  color: rgba(232, 232, 228, 0.55);
+}
+.terminal__src .t-src-q {
+  display: block;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 14px;
+}
+.terminal__src .t-src-a {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: rgba(232, 232, 228, 0.84);
+  max-width: 70ch;
+}
+
+/* When JS takes over it hides the source list */
+.terminal.is-live .terminal__src { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal__out { animation: none; }
+  .t-caret { animation: none; opacity: 0.82; }
+}
+
+@media (max-width: 720px) {
+  .terminal {
+    border-radius: 12px;
+    margin-left: clamp(16px, 5vw, 24px);
+    margin-right: clamp(16px, 5vw, 24px);
+  }
+  .terminal__screen {
+    padding: 16px 16px 20px;
+    font-size: 12.5px;
+    min-height: 300px;
+  }
+  .terminal__name { font-size: 10.5px; }
+  .terminal__motd { font-size: 11.5px; }
+  .terminal__src .t-src-q,
+  .terminal__src .t-src-a { font-size: 12.5px; }
+}
 
 /* =========================================================
    APPLY BANNER — aurora gradient card with white pill CTA
@@ -1470,6 +2238,12 @@ img, svg { display: block; max-width: 100%; }
 }
 .foot__link:hover { opacity: 0.65; }
 .foot__link--active { text-decoration: underline; text-underline-offset: 4px; }
+.foot__link--accent {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--accent);
+}
+.foot__link--accent:hover { opacity: 0.75; }
 
 /* the giant image-filled wordmark anchoring the bottom of the page */
 .foot__wordmark {
@@ -1489,7 +2263,7 @@ img, svg { display: block; max-width: 100%; }
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  margin-bottom: -0.18em;
+  margin-bottom: -0.38em;
   user-select: none;
 }
 
@@ -1754,6 +2528,22 @@ img, svg { display: block; max-width: 100%; }
 }
 .cam-pin-row__del:hover { color: #ff8a8a; border-color: rgba(255, 138, 138, 0.55); }
 
+/* Maplibre pin dot rendered inside the map canvas */
+.cam-pin-dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #0b0b0b;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  color: #0b0b0b;
+  cursor: default;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  transform: translate(-50%, -50%);
+}
+
 /* =========================================================
    REVEAL
    ========================================================= */
@@ -1771,139 +2561,42 @@ img, svg { display: block; max-width: 100%; }
    RESPONSIVE: tablet & mobile
    ========================================================= */
 @media (max-width: 860px) {
-  :root { --nav-h: 64px; }
+  :root { --nav-h: 92px; }
 
-  /* NAV — keep all pills, shrink padding/font */
-  .nav__pills { padding: 4px; gap: 2px; }
-  .nav__pill { padding: 8px 12px; font-size: 12.5px; }
-  .nav__pill--brand { padding: 10px 16px; font-size: 14px; gap: 8px; }
-
-  /* HERO — stacked layout on mobile. The content pane sits as its own
-     block at the top (clean white page background, dark text); the map
-     becomes a separate block below it. No blur, no overlap. */
-  .hero {
-    min-height: auto;
-    overflow: visible;
-    padding: calc(var(--nav-h) + 28px) var(--pad) 0;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg);
+  /* NAV — keep all pills, shrink padding/font; hide apps badge on narrow screens.
+     Maintain the upward spear extension and the side fade room. */
+  .nav__pills {
+    margin-top: -100px;
+    padding: 124px 28px 10px;
+    gap: 3px;
   }
+  .nav__pill { padding: 12px 18px; font-size: 15px; }
+  .nav__pill--brand { padding: 14px 26px; font-size: 16px; gap: 8px; }
+  .nav__apps-status { display: none; }
 
-  /* Pane content — first block, normal flow */
-  .hero__left {
-    position: relative;
-    z-index: auto;
-    min-height: auto;
-    width: 100%;
-    margin: 0;
-    padding: 0 0 56px;
-    align-items: stretch;
-    pointer-events: auto;
-    order: 1;
-  }
-  .hero__pane {
-    max-width: 100%;
-    padding: 0;
-    color: var(--ink);
-    transform: none;
-  }
+  /* HERO — sheet composition mirrors desktop on mobile (this metaphor
+     is even more native on touch). Map fills the hero; pane sits over
+     the map; the sheet rises from the bottom 15vh. Just tune type
+     sizes for narrow widths. */
+  .hero__title { font-size: clamp(46px, 12vw, 72px); }
+  .hero__sub   { font-size: 14.5px; max-width: 38ch; }
 
-  /* Map — second block, full-bleed below the pane */
-  .hero__map {
-    position: relative;
-    inset: auto;
-    width: 100vw;
-    margin-left: calc(-1 * var(--pad));
-    margin-right: calc(-1 * var(--pad));
-    height: 58vh;
-    min-height: 380px;
-    order: 2;
-    overflow: hidden;
-  }
+  /* stats: 2×2 grid on tablet */
+  .hero__stats { grid-template-columns: repeat(2, 1fr); }
 
-  /* Hide the atmospheric layers + veil + the desktop fade-to-white
-     map mask on mobile. They were all tied to the desktop "left pane
-     over map" composition, which doesn't exist in the stacked layout. */
-  .hero__fx,
-  .hero__veil,
-  .hero__map-mask { display: none !important; }
-
-  /* Text colors flip for the light page background */
-  .hero__kicker  { color: var(--ink-3); text-shadow: none; }
-  .hero__title   { color: var(--ink);   text-shadow: none; font-size: clamp(46px, 12vw, 72px); }
-  .hero__title em{ color: var(--ink); }
-  .hero__sub     { color: var(--ink-3); text-shadow: none; font-size: 14.5px; max-width: 38ch; }
-
-  /* Location block uses the page's standard hairline now */
-  .hero__loc {
-    border-top: 1px solid var(--rule);
-    background-image: none;
-  }
-  .hero__loc-label { color: var(--ink-4); text-shadow: none; }
-  .hero__loc-city  { color: var(--ink);   text-shadow: none; font-size: 22px; }
-  .hero__loc-meta  { color: var(--ink-3); text-shadow: none; }
-  .hero__loc-icon  { color: var(--ink-2); }
-  .hero__loc-temp  { color: var(--ink); }
-  .hero__loc-sep   { color: var(--ink-4); }
-  .hero__loc-desc  { color: var(--ink-3); }
-
-  /* House marker is positioned relative to .hero, which on mobile
-     starts at the top of the page — the projected coords drift as
-     you scroll. Hide it; the clean map view stands on its own. */
-  .house-marker { display: none !important; }
-
-  /* Scroll hint not needed — natural scroll is obvious */
-  .hero__scroll { display: none; }
+  /* fellows tagline wraps below on narrow screens */
+  .hero__fellows-tagline { font-size: 11px; }
 
   /* SECTIONS — tighter vertical rhythm */
-  .concept { padding: 80px 0 64px; }
-  .houses  { padding: 64px 0 72px; }
-  .day     { padding: 64px 0 72px; }
-  .cohort  { padding: 72px 0 80px; }
   .apply   { padding: 80px var(--pad); }
   .faq     { padding: 80px 0 90px; }
 
-  .section__head { margin-bottom: 36px; }
-  .section__head--split { gap: 24px; }
-
-  /* DAY schedule — narrower time col */
-  .day__schedule li {
-    grid-template-columns: 76px 1fr;
-    gap: 4px 18px;
-    padding: 18px 0;
-  }
-  .day__time  { font-size: 11px; }
-  .day__title { font-size: 19px; line-height: 1.3; }
-  .day__note  { font-size: 13.5px; }
-
-  /* APPLY — stack rows, smaller title */
+  /* APPLY — smaller title */
   .apply__title { font-size: clamp(34px, 8.5vw, 52px); margin-bottom: 22px; }
   .apply__lede { font-size: 14.5px; margin-bottom: 32px; }
-  .apply__row {
-    grid-template-columns: 1fr;
-    gap: 4px;
-    padding: 14px 0;
-  }
-  .apply__dt { font-size: 10.5px; }
-  .apply__dd { font-size: 16px; }
-  .apply__actions { gap: 12px; }
-  .btn { padding: 12px 18px; font-size: 13.5px; }
 
-  /* FAQ */
-  .faq__item summary { font-size: 18px; padding: 20px 0; gap: 16px; }
-  .faq__body { font-size: 13.5px; padding-bottom: 18px; }
-
-  /* HOUSES */
-  .house__body { padding: 20px 22px 24px; }
-  .house__name { font-size: 26px; }
-
-  /* CONCEPT */
-  .concept__card { padding: 32px 26px 36px; }
-  .concept__name { font-size: 28px; }
-
-  /* COHORT */
-  .resident { padding: 22px 22px 24px; }
+  /* FAQ terminal — tighter on tablet */
+  .faq__title { margin-bottom: 36px; }
 
   /* FOOTER */
   .foot { padding: 60px var(--pad) 28px; }
@@ -1926,26 +2619,1140 @@ img, svg { display: block; max-width: 100%; }
 @media (max-width: 480px) {
   :root { --pad: 18px; }
 
-  /* NAV — drop side pills on the smallest screens, keep brand mark */
+  /* NAV — drop side pills on the smallest screens, keep brand mark only */
   .nav__pill:not(.nav__pill--brand) { display: none; }
 
   /* HERO */
   .hero__title { font-size: clamp(42px, 13vw, 56px); }
   .hero__kicker { font-size: 10px; }
-
-  /* Section titles */
-  .section__title { font-size: clamp(30px, 8vw, 46px); }
-
-  /* HOUSES — tighter image aspect on phones */
-  .house__photo { aspect-ratio: 16 / 11; }
-
-  /* APPLY actions stack on tight screens */
-  .apply__actions { flex-direction: column; align-items: flex-start; }
-  .btn { width: 100%; justify-content: space-between; }
+  .hero__pane { margin-left: 20px; padding: 36px 24px 32px; }
+  .hero__stats { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 20px; }
+  .hero__fellows-tagline { display: none; }
+  .hero__fellows-globe { display: none; }
 
   /* Footer cols — single col on tiny screens */
   .foot__cols { grid-template-columns: 1fr; gap: 22px; }
 }
+
+/* =========================================================
+   STANDALONE PAGES — applied to body.page--houses, etc.
+
+   Pages without the dark hero (currently: /houses) reuse the same
+   nav and footer but sit on a clean white canvas. The nav is given
+   `is-scrolled` by script.js on hero-less pages so colors swap to
+   ink-on-white automatically; here we only need page chrome.
+   ========================================================= */
+.page {
+  /* clear the fixed nav */
+  padding-top: var(--nav-h);
+  background: var(--bg);
+}
+
+/* page hero block — editorial header for a non-landing page */
+.page-hero {
+  padding: clamp(56px, 9vw, 120px) var(--pad) clamp(36px, 5vw, 60px);
+  background: var(--bg);
+}
+.page-hero__inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 clamp(0px, 4vw, 60px);
+}
+.page-hero__eyebrow {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 22px;
+}
+.page-hero__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0 0 28px;
+  max-width: 16ch;
+}
+.page-hero__title em { font-style: italic; }
+.page-hero__body {
+  font-family: var(--sans);
+  font-size: clamp(15px, 1.3vw, 18px);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 60ch;
+}
+.page-hero__body p { margin: 0 0 18px; }
+.page-hero__body p:last-child { margin: 0; }
+
+/* houses page: turn the horizontal poster rail into a responsive
+   grid that takes advantage of the full canvas. The base .homes
+   styles stay unchanged so the section can still render as a rail
+   if/when it returns to the landing. */
+.homes--page {
+  padding: clamp(20px, 3vw, 40px) 0 clamp(60px, 8vw, 100px);
+}
+.homes__rail--page {
+  overflow: visible;
+  mask-image: none;
+  -webkit-mask-image: none;
+  padding: 0;
+}
+.homes__track--page {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: clamp(18px, 2vw, 28px);
+  padding: 0 calc(var(--pad) + clamp(0px, 4vw, 60px));
+  /* override the .homes__track inline-flex baseline */
+}
+.homes__track--page .poster {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+}
+
+/* current-page nav pill — subtle indicator */
+.nav__pill--current { color: var(--ink); }
+.nav.is-scrolled .nav__pill--current { color: var(--ink); }
+
+@media (max-width: 860px) {
+  .page-hero__title { font-size: clamp(40px, 10vw, 64px); }
+  .homes__track--page {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+/* =========================================================
+   FELLOWS PAGE — passport stack, viewer, stamps
+
+   The fellows roster is built around one core artefact: a small leather-
+   covered passport book. Each fellow has one. They sit in a loose,
+   slightly-fanned stack on a neutral page; the top one is grabbable
+   with the mouse / finger and can be flicked aside to reveal the next.
+   A short tap on a passport opens it into a full-screen "viewer" that
+   renders the book at desk-scale with a creamy security-pattern paper
+   inside, fields like a real passport, and a second spread of inked
+   visa stamps for every house that fellow has lived in.
+
+   The visual goal is "real passport, very expensive boutique edition" —
+   deep moss-green cover (matched to the brand accent), cream foil for
+   the wordmark, lots of paper texture, no plastic.
+   ========================================================= */
+
+/* fellows palette + dimensions — local to this page, kept here so the
+   site palette in :root above stays untouched. Also applied to
+   body.page--single so the deck works inside the one-pager panel. */
+.page--fellows,
+.page--single {
+  --pp-w:       278px;   /* base passport width  */
+  --pp-h:       394px;   /* base passport height — A6-ish, real ratio */
+  --pp-r:       10px;    /* corner radius        */
+  --pp-cover:   #0a1f3d; /* deep diplomatic navy */
+  --pp-cover-2: #050d1c; /* deeper navy shadow   */
+  --pp-cover-hi:#173256; /* navy highlight       */
+  --pp-foil:    #cbb986; /* warm gold foil       */
+  --pp-foil-2:  #ecdba8; /* foil highlight       */
+  --pp-foil-3:  #8e7842; /* foil shadow          */
+  --pp-paper:   #ffffff; /* clean white paper    */
+  --pp-paper-2: #f5f8fc; /* very faint blue tint */
+  --pp-ink:     #0e1a2c; /* deep navy ink        */
+  --pp-ink-2:   #3a4a62; /* secondary navy text  */
+  --pp-ink-3:   #6c7a91; /* tertiary navy        */
+  --pp-watermark: rgba(14, 26, 44, 0.07); /* fine guilloché line */
+  --pp-stamp-blr: #1f4a8a;
+  --pp-stamp-vnm: #b32028;
+  --pp-stamp-arg: #8a8a86;
+}
+.page--fellows-main { background: var(--bg); }
+
+/* page hero on the fellows page sits much tighter so the desk of
+   passports is the focal point — the deck is the feature here, not
+   the editorial intro. */
+.page-hero--fellows {
+  padding-top: clamp(28px, 4vw, 60px);
+  padding-bottom: clamp(8px, 1.5vw, 18px);
+}
+.page-hero--fellows .page-hero__title {
+  font-size: clamp(40px, 5.4vw, 72px);
+}
+.page-hero--fellows .page-hero__body { max-width: 56ch; }
+.page-hero--fellows .page-hero__eyebrow { margin-bottom: 14px; }
+.page-hero__caption {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  margin-top: 10px;
+}
+.page-hero__caption-key {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  margin-right: 2px;
+}
+
+/* =========================================================
+   FELLOWS STAGE — the area that holds the draggable deck
+   ========================================================= */
+.fellows-stage {
+  position: relative;
+  width: 100%;
+  min-height: clamp(560px, 78vh, 720px);
+  padding: clamp(12px, 2vw, 28px) var(--pad) clamp(60px, 9vw, 120px);
+  background: var(--bg);
+  background-image:
+    radial-gradient(
+      ellipse 60% 50% at 50% 42%,
+      rgba(11, 11, 11, 0.05) 0%,
+      transparent 70%
+    );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  /* horizontal drags on a passport must not scroll the page */
+  touch-action: pan-y;
+}
+
+/* the wide canvas that holds the scattered deck. cards are absolutely
+   positioned inside it; we set min-height generously so the cards have
+   room to be dragged in any direction without clipping. */
+.passport-deck {
+  position: relative;
+  width: min(1100px, 100%);
+  height: clamp(440px, 56vh, 580px);
+  margin: 0 auto;
+  perspective: 2200px;
+}
+
+.fellows-stage__hint {
+  margin: clamp(24px, 4vw, 44px) 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  user-select: none;
+}
+.fellows-stage__hint-arrow {
+  font-size: 16px;
+  color: var(--ink-3);
+  animation: fellows-hint-pulse 2.6s ease-in-out infinite;
+}
+.fellows-stage__hint-arrow:last-child { animation-delay: 1.3s; }
+@keyframes fellows-hint-pulse {
+  0%, 100% { transform: translateX(0); opacity: 0.55; }
+  50%      { transform: translateX(4px); opacity: 1; }
+}
+.fellows-stage__hint-arrow:first-child {
+  animation-name: fellows-hint-pulse-left;
+}
+@keyframes fellows-hint-pulse-left {
+  0%, 100% { transform: translateX(0); opacity: 0.55; }
+  50%      { transform: translateX(-4px); opacity: 1; }
+}
+
+/* =========================================================
+   THE PASSPORT — closed cover
+   ========================================================= */
+.passport {
+  position: absolute;
+  width: var(--pp-w);
+  height: var(--pp-h);
+  border-radius: var(--pp-r);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  will-change: transform;
+  /* deep navy buckram. layered so foil reads as foil, not paint. */
+  background:
+    radial-gradient(
+      ellipse 130% 90% at 50% -10%,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 130% 90% at 50% 110%,
+      rgba(0, 0, 0, 0.55) 0%,
+      transparent 55%
+    ),
+    linear-gradient(160deg, var(--pp-cover-hi) 0%, var(--pp-cover) 45%, var(--pp-cover-2) 100%);
+  box-shadow:
+    0  1px  0 rgba(255, 255, 255, 0.06) inset,
+    0 -2px  3px rgba(0, 0, 0, 0.4) inset,
+    0  22px 44px -20px rgba(0, 0, 0, 0.6),
+    0  6px 14px -8px   rgba(0, 0, 0, 0.42);
+  color: var(--pp-foil);
+  background-clip: padding-box;
+  transition:
+    transform 480ms cubic-bezier(0.18, 0.9, 0.2, 1.05),
+    box-shadow 260ms ease;
+}
+.passport:active { cursor: grabbing; }
+.passport.is-dragging {
+  transition: none;
+  box-shadow:
+    0  1px  0 rgba(255, 255, 255, 0.08) inset,
+    0 -2px  3px rgba(0, 0, 0, 0.4) inset,
+    0  36px 70px -22px rgba(0, 0, 0, 0.7),
+    0  10px 22px -8px  rgba(0, 0, 0, 0.5);
+}
+
+/* fine linen / buckram weave — two near-invisible cross-hatch passes */
+.passport::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--pp-r);
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.022) 0 1px,
+      transparent 1px 3px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015) 0 1px,
+      transparent 1px 3px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(0, 0, 0, 0.06) 0 1px,
+      transparent 1px 4px
+    );
+  mix-blend-mode: overlay;
+  opacity: 0.85;
+}
+
+/* a single thin foil rule inside the cover — the gold border on real
+   passports, kept tight so it doesn't read as a frame */
+.passport::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: calc(var(--pp-r) - 4px);
+  pointer-events: none;
+  border: 0.5px solid rgba(203, 185, 134, 0.34);
+}
+
+/* cover content — emblem + wordmark + id, restrained. real passports
+   are sparse: a coat of arms, country name, the word PASSPORT, a chip
+   icon, that's it. we follow the same restraint. */
+.passport__cover-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 38px 28px 30px;
+  text-align: center;
+  color: var(--pp-foil);
+}
+
+.passport__cover-arc {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  opacity: 0.78;
+  margin: 0 0 4px;
+}
+
+.passport__cover-emblem {
+  width: 116px;
+  height: 116px;
+  margin: 28px 0 32px;
+  color: var(--pp-foil);
+  filter: drop-shadow(0 0 8px rgba(203, 185, 134, 0.14));
+}
+
+/* the foil-stamped title — gold-leaf gradient + a tiny inner shadow.
+   set in caps with wide tracking, the way real passport covers do. */
+.passport__cover-title {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.56em;
+  text-transform: uppercase;
+  padding-left: 0.56em; /* compensate tracking for visual centering */
+  background: linear-gradient(180deg, var(--pp-foil-2) 0%, var(--pp-foil) 55%, var(--pp-foil-3) 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  text-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.35);
+  margin: 0;
+}
+
+.passport__cover-base {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+/* the biometric-chip glyph at the bottom — a real passport tell */
+.passport__cover-chip-icon {
+  width: 26px;
+  height: 18px;
+  border: 0.6px solid var(--pp-foil);
+  border-radius: 3px;
+  opacity: 0.62;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.passport__cover-chip-icon::before,
+.passport__cover-chip-icon::after {
+  content: "";
+  position: absolute;
+  border: 0.5px solid var(--pp-foil);
+  border-radius: 50%;
+}
+.passport__cover-chip-icon::before { inset: 3px; }
+.passport__cover-chip-icon::after  { inset: 6px; opacity: 0.7; }
+
+.passport__cover-base-id {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.32em;
+  opacity: 0.5;
+}
+
+/* =========================================================
+   PASSPORT VIEWER — full-screen open spread
+   ========================================================= */
+.passport-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 4vw, 60px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 360ms ease;
+}
+.passport-viewer[hidden] { display: none; }
+.passport-viewer.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.passport-viewer__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 50% 40%,
+      rgba(11, 11, 11, 0.62) 0%,
+      rgba(11, 11, 11, 0.86) 100%
+    );
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+}
+
+.passport-viewer__close {
+  position: absolute;
+  top: clamp(18px, 3vw, 36px);
+  right: clamp(18px, 3vw, 36px);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 4;
+  transition: transform 220ms ease, background 220ms ease;
+}
+.passport-viewer__close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(90deg);
+}
+
+.passport-viewer__caption {
+  position: absolute;
+  bottom: clamp(22px, 4vw, 44px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  z-index: 3;
+}
+.passport-viewer__caption-sep { margin: 0 10px; opacity: 0.5; }
+
+/* THE OPENED BOOK — two pages side by side, with the cover folded
+   behind the left page like a real opened passport. on open, JS
+   choreographs a 3-stage entrance: closed cover scales in centered,
+   cover rotates -180 around the spine, inside spread fades in. */
+.passport-viewer__book {
+  --book-page-w: clamp(280px, 32vw, 440px);
+  --book-page-h: clamp(396px, 45vw, 620px);
+  position: relative;
+  width: calc(var(--book-page-w) * 2);
+  height: var(--book-page-h);
+  z-index: 2;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  border-radius: 6px;
+  perspective: 2400px;
+  transform-style: preserve-3d;
+  filter:
+    drop-shadow(0 24px 50px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
+  /* the JS open-orchestrator drives transform + opacity from a
+     closed-pose (shifted left, slightly scaled down) to the open
+     resting pose (centred, scale 1). */
+}
+
+/* the cover-flipper holds a clone of the tapped card's cover graphics
+   and lives over the right page area (where the cover sits when the
+   book is closed). rotates -180deg around its left edge — the spine —
+   to swing open. backface-visibility hides it after passing 90deg. */
+.passport-book__cover-flipper {
+  position: absolute;
+  top: 0;
+  left: var(--book-page-w);
+  width: var(--book-page-w);
+  height: var(--book-page-h);
+  border-radius: 4px 8px 8px 4px;
+  background:
+    radial-gradient(
+      ellipse 130% 90% at 50% -10%,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 130% 90% at 50% 110%,
+      rgba(0, 0, 0, 0.55) 0%,
+      transparent 55%
+    ),
+    linear-gradient(160deg, var(--pp-cover-hi) 0%, var(--pp-cover) 45%, var(--pp-cover-2) 100%);
+  color: var(--pp-foil);
+  box-shadow:
+    0  1px  0 rgba(255, 255, 255, 0.06) inset,
+    0 -2px  3px rgba(0, 0, 0, 0.4) inset,
+   -18px 18px 38px -14px rgba(0, 0, 0, 0.55),
+    0  8px 18px -10px rgba(0, 0, 0, 0.42);
+  transform-origin: 0 50%;
+  transform: rotateY(0deg);
+  z-index: 20;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.passport-book__cover-flipper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.022) 0 1px,
+      transparent 1px 3px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015) 0 1px,
+      transparent 1px 3px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(0, 0, 0, 0.06) 0 1px,
+      transparent 1px 4px
+    );
+  mix-blend-mode: overlay;
+  opacity: 0.85;
+}
+.passport-book__cover-flipper::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  border: 0.5px solid rgba(203, 185, 134, 0.34);
+}
+/* the cloned cover-inner from the tapped passport fits the flipper */
+.passport-book__cover-flipper .passport__cover-inner {
+  position: absolute;
+  inset: 0;
+}
+
+/* the folded cover renders behind the open spread on the far left,
+   giving the visual cue "this is the inside of a passport." */
+.passport-book__cover {
+  position: absolute;
+  top: -10px;
+  bottom: -10px;
+  right: 50%;
+  width: calc(var(--book-page-w) + 22px);
+  margin-right: 4px;
+  border-radius: 6px 3px 3px 6px;
+  background:
+    radial-gradient(
+      ellipse 130% 90% at 50% -10%,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 50%
+    ),
+    linear-gradient(160deg, var(--pp-cover-hi) 0%, var(--pp-cover) 45%, var(--pp-cover-2) 100%);
+  box-shadow:
+    0 0 0 0.5px rgba(203, 185, 134, 0.22) inset,
+    -8px 0 20px -10px rgba(0, 0, 0, 0.55);
+  transform: rotateY(-2deg);
+  transform-origin: right center;
+  z-index: 0;
+}
+
+.passport-book__spine {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.18) 40%,
+      rgba(0, 0, 0, 0.18) 60%,
+      rgba(0, 0, 0, 0.45) 100%
+    );
+  z-index: 3;
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+/* the two spreads layered on top of each other; .is-on is the active page */
+.passport-book__spread {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 320ms ease;
+}
+.passport-book__spread.is-on {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.passport-book__page {
+  position: relative;
+  width: var(--book-page-w);
+  height: var(--book-page-h);
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, var(--pp-paper) 0%, var(--pp-paper-2) 100%);
+  color: var(--pp-ink);
+}
+.passport-book__page--left {
+  border-radius: 3px 1px 1px 3px;
+  box-shadow:
+    inset -22px 0 30px -24px rgba(14, 26, 44, 0.35),
+    inset   6px 0 12px -10px rgba(14, 26, 44, 0.10);
+}
+.passport-book__page--right {
+  border-radius: 1px 3px 3px 1px;
+  box-shadow:
+    inset  22px 0 30px -24px rgba(14, 26, 44, 0.35),
+    inset  -6px 0 12px -10px rgba(14, 26, 44, 0.10);
+}
+
+/* security paper — fine blue guilloché on white, the way real
+   US/UK passport pages read. layered: cross-hatch + tight wave-like
+   ellipse repeats for the watermark feel. */
+.passport-book__paper {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.85;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      var(--pp-watermark) 0 0.6px,
+      transparent 0.6px 5px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(14, 26, 44, 0.05) 0 0.6px,
+      transparent 0.6px 5px
+    ),
+    radial-gradient(
+      ellipse 120% 90% at 50% 50%,
+      transparent 70%,
+      rgba(14, 26, 44, 0.06) 100%
+    );
+}
+/* a soft elliptical watermark seal centred on each page */
+.passport-book__paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(14, 26, 44, 0.04) 0%,
+      rgba(14, 26, 44, 0.025) 28%,
+      transparent 42%
+    );
+}
+/* fine wavy hairlines — adds the "engraved" feel without going busy */
+.passport-book__paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-radial-gradient(
+      ellipse 14px 0.6px at 0 0,
+      rgba(14, 26, 44, 0.07) 0 0.5px,
+      transparent 0.5px 14px
+    );
+  background-size: 16px 7px;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+/* ----- BIO SPREAD ---------------------------------------------------- */
+
+/* left page — photo (no extra trinkets: real data-pages aren't busy) */
+.passport-book__photo-frame {
+  position: absolute;
+  top: 14%;
+  left: 12%;
+  width: 60%;
+  aspect-ratio: 35 / 45;
+  background: #ffffff;
+  padding: 0;
+  box-shadow:
+    0 0 0 0.5px rgba(14, 26, 44, 0.18) inset,
+    0 14px 28px -16px rgba(14, 26, 44, 0.3);
+  transform: rotate(0);
+  overflow: hidden;
+}
+.passport-book__photo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center 28%;
+  filter: grayscale(0.18) contrast(1.04);
+}
+/* PASSPORT FILM — the iridescent security overlay you see on the
+   data-page of a modern biometric passport. a tight diagonal sheen +
+   a fine line pattern, both screen-blended over the photo. */
+.passport-book__photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      108deg,
+      transparent 22%,
+      rgba(160, 220, 255, 0.22) 38%,
+      rgba(225, 200, 240, 0.18) 48%,
+      rgba(200, 240, 220, 0.20) 58%,
+      transparent 78%
+    );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.passport-book__photo::after {
+  /* hologram hairlines + a faint repeating "CHH" microtext stripe */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.10) 0 1px,
+      transparent 1px 4px
+    ),
+    repeating-linear-gradient(
+      25deg,
+      rgba(255, 255, 255, 0.06) 0 1px,
+      transparent 1px 7px
+    );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.7;
+}
+/* the corner crops on the data-page — kept very subtle */
+.passport-book__photo-corner {
+  position: absolute;
+  top: 14%;
+  left: 12%;
+  width: calc(60% * 1.0);
+  aspect-ratio: 35 / 45;
+  pointer-events: none;
+}
+.passport-book__photo-corner::before,
+.passport-book__photo-corner::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--pp-ink-2);
+  opacity: 0.42;
+}
+.passport-book__photo-corner::before {
+  top: -7px;
+  left: -7px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.passport-book__photo-corner::after {
+  bottom: -7px;
+  right: -7px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.passport-book__photo-stamp { display: none; }
+
+/* the small foil arc-seal sits in the bottom corner like the chip
+   icon on a real data-page — quiet, brand-correct. */
+.passport-book__seal {
+  position: absolute;
+  bottom: 7%;
+  right: 7%;
+  width: 78px;
+  height: 78px;
+  color: rgba(14, 26, 44, 0.34);
+  transform: none;
+  opacity: 0.55;
+}
+
+/* right page — fields. ink is navy, labels are mono micro-caps so the
+   spread reads like a real biometric data-page. */
+.passport-book__header {
+  padding: 22px 28px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 0.5px solid rgba(14, 26, 44, 0.18);
+}
+.passport-book__country {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--pp-ink);
+}
+.passport-book__type {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--pp-ink-3);
+}
+
+.passport-book__fields {
+  padding: 18px 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.passport-book__field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.passport-book__field--two {
+  flex-direction: row;
+  gap: 32px;
+}
+.passport-book__field--two > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+.passport-book__field-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pp-ink-3);
+}
+.passport-book__field-value {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 1.1;
+  color: var(--pp-ink);
+  letter-spacing: -0.005em;
+}
+.passport-book__field-value--mono {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+}
+.passport-book__field-value--small {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.passport-book__field-value--bio {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--pp-ink-2);
+  letter-spacing: 0;
+}
+
+.passport-book__mrz {
+  position: absolute;
+  bottom: 16px;
+  left: 24px;
+  right: 24px;
+  border-top: 0.5px solid rgba(14, 26, 44, 0.18);
+  padding-top: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--pp-ink);
+  line-height: 1.45;
+  word-break: break-all;
+}
+.passport-book__mrz-line + .passport-book__mrz-line { margin-top: 2px; }
+
+/* page-turn nav — quiet, lives in the bottom corner of the spread */
+.passport-book__page-nav {
+  position: absolute;
+  bottom: 60px;
+  right: 24px;
+  background: transparent;
+  border: 0.5px solid rgba(14, 26, 44, 0.3);
+  color: var(--pp-ink);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 220ms ease, transform 220ms ease, border-color 220ms ease;
+}
+.passport-book__page-nav:hover {
+  background: rgba(14, 26, 44, 0.05);
+  border-color: rgba(14, 26, 44, 0.55);
+  transform: translateX(2px);
+}
+.passport-book__page-nav--prev {
+  left: 24px;
+  right: auto;
+}
+.passport-book__page-nav--prev:hover { transform: translateX(-2px); }
+
+/* ----- STAMPS SPREAD ------------------------------------------------- */
+.passport-book__page--stamps {
+  padding: 26px;
+}
+.passport-book__stamps-eyebrow {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--pp-ink-3);
+  margin-bottom: 6px;
+}
+.passport-book__stamps-note {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--pp-ink-2);
+  margin: 0 0 20px;
+  max-width: 28ch;
+}
+
+/* the inked stamps. each is a SVG sized via CSS, rotated freely, with
+   a slight gaussian-blur to mimic ink-bleed into the paper. */
+.stamp {
+  position: absolute;
+  width: 178px;
+  height: 110px;
+  opacity: 0;
+  transition: opacity 320ms ease, transform 320ms ease;
+  filter: blur(0.4px) contrast(1.05);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.stamp svg { width: 100%; height: 100%; }
+
+.stamp--blr {
+  top: 38%;
+  left: 6%;
+  color: var(--pp-stamp-blr);
+  transform: rotate(-9deg) scale(0.96);
+}
+.stamp--vnm {
+  top: 12%;
+  right: 6%;
+  color: var(--pp-stamp-vnm);
+  transform: rotate(7deg);
+}
+.stamp--arg {
+  bottom: 6%;
+  right: 8%;
+  color: var(--pp-stamp-arg);
+  transform: rotate(-3deg) scale(0.88);
+  opacity: 0;
+}
+
+/* stamps fade in when the spread becomes active for an extra beat
+   of theatre — the user opens the page, then the stamps settle in. */
+.passport-book__spread--stamps.is-on .stamp--blr.is-on,
+.passport-book__spread--stamps.is-on .stamp--vnm.is-on {
+  opacity: 0.84;
+  transform: rotate(var(--rot, 0deg)) scale(1.02);
+}
+.passport-book__spread--stamps.is-on .stamp--blr.is-on { --rot: -9deg; transition-delay: 220ms; }
+.passport-book__spread--stamps.is-on .stamp--vnm.is-on { --rot: 7deg;  transition-delay: 380ms; }
+.passport-book__spread--stamps.is-on .stamp--ghost {
+  opacity: 0.32;
+  transition-delay: 520ms;
+}
+
+/* legend page (right) */
+.passport-book__legend {
+  padding: 22px 26px 0;
+}
+.passport-book__legend-title {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--pp-ink-3);
+  margin-bottom: 14px;
+}
+.passport-book__legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.passport-book__legend-item {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--pp-ink);
+}
+.passport-book__legend-item--ghost {
+  color: var(--pp-ink-3);
+  font-weight: 400;
+}
+.passport-book__legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  transform: translateY(-1px);
+}
+.passport-book__legend-dot--blr { background: var(--pp-stamp-blr); }
+.passport-book__legend-dot--vnm { background: var(--pp-stamp-vnm); }
+.passport-book__legend-dot--arg {
+  background: transparent;
+  border: 1.2px dashed var(--pp-stamp-arg);
+}
+.passport-book__legend-meta {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--pp-ink-3);
+  text-transform: uppercase;
+  margin-left: 4px;
+}
+.passport-book__legend-note {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--pp-ink-2);
+  margin: 22px 0 0;
+  max-width: 30ch;
+}
+.passport-book__legend-note em { font-style: italic; }
+
+.passport-book__signature {
+  position: absolute;
+  bottom: 70px;
+  left: 26px;
+  right: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.passport-book__signature-line {
+  height: 0;
+  border-bottom: 0.5px solid rgba(14, 26, 44, 0.3);
+}
+.passport-book__signature-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pp-ink-3);
+}
+
+/* =========================================================
+   responsive — fellows page
+   ========================================================= */
+@media (max-width: 860px) {
+  .page--fellows {
+    --pp-w: 280px;
+    --pp-h: 400px;
+  }
+  .passport__cover-inner { padding: 40px 26px 28px; }
+  .passport__cover-emblem { width: 100px; height: 100px; margin: 18px 0 22px; }
+  .passport__cover-title { font-size: 34px; }
+  .passport-viewer__book {
+    --book-page-w: 86vw;
+    --book-page-h: 110vw;
+    width: var(--book-page-w);
+    flex-direction: column;
+  }
+  .passport-viewer__book .passport-book__page { width: 100%; height: 55vw; }
+  .passport-book__cover { display: none; }
+  .passport-book__spine { display: none; }
+}
+
+/* =========================================================
+   STANDALONE PAGES (extended) — also apply to fellows page
+   ========================================================= */
+body.page--fellows .nav.is-scrolled { /* identical chrome to houses */ }
 
 /* =========================================================
    MOTION PREFERENCES
@@ -1956,3 +3763,778 @@ img, svg { display: block; max-width: 100%; }
     transition-duration: 0s !important;
   }
 }
+
+/* =========================================================
+   ONE-PAGER SHELL — body.page--single
+   ---
+   The site has been folded down into a single screen. The old nav is
+   gone; navigation lives in a vertical rail of pills on the right that
+   expand on hover. Four panels stack in the same viewport and the
+   active one is faded in. Nothing scrolls.
+   ========================================================= */
+body.page--single {
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;            /* lock vertical scroll — one-pager */
+  /* a hairline neutral tone so the panels read as floating over paper */
+  background: var(--bg);
+}
+
+/* on the main panel the viewport is dark (map + atmospheric layers);
+   on every other panel it's light. JS toggles data-active-panel on body
+   so the rail/brand/dock can switch their chrome between dark + light. */
+body.page--single[data-active-panel="main"] { background: #000; }
+
+/* The page vignette already exists; nudge it above panels but below the
+   floating chrome (brand, rail, dock, viewer). */
+.page--single .page-vignette { z-index: 12; }
+
+/* ---------- STAGE ---------- */
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* ---------- PANELS ---------- */
+.panel {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 460ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 620ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 460ms ease;
+  transform: translateY(14px) scale(0.992);
+  filter: blur(6px);
+  /* default panel background: warm paper. Main overrides to transparent
+     so the map shows through. */
+  background: var(--bg);
+  overflow: hidden;
+}
+.panel.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  filter: none;
+  /* keep the active panel on top of the leaving one mid-transition */
+  z-index: 2;
+}
+.panel--main { background: transparent; }
+
+/* shared inner column for non-hero panels */
+.panel__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding:
+    clamp(64px, 9vh, 110px)   /* top — leaves room for the brand */
+    var(--pad)
+    clamp(60px, 8vh, 100px);  /* bottom — leaves room for the dock */
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 3vh, 36px);
+}
+
+.panel__head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 760px;
+}
+.panel__eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.panel__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  margin: 0;
+  font-size: clamp(40px, 6.4vh, 78px);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.panel__title em {
+  font-style: italic;
+  color: var(--accent);
+}
+.panel__lede {
+  font-family: var(--sans);
+  font-size: clamp(15px, 1.6vh, 17px);
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 620px;
+}
+.panel__lede-key {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(11, 11, 11, 0.06);
+  color: var(--ink-2);
+}
+
+/* ---------- PANEL · ABOUT ---------- */
+.panel--about .panel__inner--about {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  max-width: 880px;
+}
+.panel__title--about { font-size: clamp(48px, 8vh, 96px); }
+.panel--about .panel__body--about {
+  font-family: var(--serif);
+  font-size: clamp(20px, 2.4vh, 28px);
+  line-height: 1.45;
+  color: var(--ink-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  max-width: 680px;
+}
+.panel--about .panel__body--about p { margin: 0; }
+.panel--about .panel__body--about em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* ---------- PANEL · COHORTS · the journey ---------- */
+.panel--cohorts .panel__inner--cohorts {
+  justify-content: flex-start;
+  gap: clamp(28px, 4vh, 48px);
+}
+.panel__head--cohorts { max-width: 820px; }
+
+.journey {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 1.6vw, 28px);
+  padding-top: 26px; /* room for the status thread above the cards */
+}
+
+.journey__node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.4vh, 16px);
+  padding: clamp(20px, 2.4vh, 28px) clamp(18px, 1.8vw, 22px) clamp(22px, 2.6vh, 30px);
+  border-radius: 14px;
+  background: rgba(11, 11, 11, 0.025);
+  border: 1px solid rgba(11, 11, 11, 0.07);
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), background 220ms ease, border-color 220ms ease;
+}
+.journey__node:hover {
+  transform: translateY(-3px);
+  background: rgba(11, 11, 11, 0.04);
+  border-color: rgba(11, 11, 11, 0.12);
+}
+
+/* the connecting status thread — a thin dashed line from each card up
+   to a status dot, plus a horizontal segment to the next card. */
+.journey__rail {
+  position: absolute;
+  top: -14px;
+  left: 0;
+  right: -1 * var(--journey-gap, 18px);
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    rgba(11, 11, 11, 0.18) 0%,
+    rgba(11, 11, 11, 0.18) 100%
+  );
+  background-size: 6px 1px;
+  background-repeat: repeat-x;
+  pointer-events: none;
+}
+.journey__node:last-child .journey__rail { display: none; }
+.journey__rail-dot {
+  position: absolute;
+  top: -18px;
+  left: clamp(18px, 1.8vw, 22px);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 0 0 4px var(--bg, #f4f3ee);
+}
+
+.journey__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.journey__index {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: clamp(28px, 4vh, 40px);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  line-height: 1;
+}
+.journey__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(11, 11, 11, 0.05);
+  white-space: nowrap;
+}
+.journey__status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.journey__city {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(26px, 3.4vh, 36px);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.journey__city small {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.journey__meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+}
+.journey__meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.journey__meta dt {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.journey__meta dd {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+
+.journey__note {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(14px, 1.6vh, 16px);
+  line-height: 1.45;
+  color: var(--ink-2);
+  padding-top: clamp(6px, 0.8vh, 10px);
+  border-top: 1px solid rgba(11, 11, 11, 0.06);
+}
+
+/* ── state: shipped ─────────────────────────────────────────────────────── */
+.journey__node--shipped .journey__rail-dot {
+  background: var(--ink);
+  opacity: 0.55;
+}
+.journey__node--shipped .journey__index { color: var(--ink-3); }
+.journey__node--shipped .journey__status { color: var(--ink-3); }
+
+/* ── state: live / boarding — the standout card ─────────────────────────── */
+.journey__node--live {
+  background: rgba(142, 255, 165, 0.07);
+  border-color: rgba(142, 255, 165, 0.28);
+}
+.journey__node--live:hover {
+  background: rgba(142, 255, 165, 0.10);
+  border-color: rgba(142, 255, 165, 0.42);
+}
+.journey__node--live .journey__rail-dot {
+  background: #6cc285;
+  box-shadow:
+    0 0 0 4px var(--bg, #f4f3ee),
+    0 0 10px 2px rgba(142, 255, 165, 0.55),
+    0 0 22px 4px rgba(142, 255, 165, 0.28);
+  animation: journey-dot-glow 2.4s ease-in-out infinite;
+}
+@keyframes journey-dot-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 4px var(--bg, #f4f3ee),
+      0 0 10px 2px rgba(142, 255, 165, 0.55),
+      0 0 22px 4px rgba(142, 255, 165, 0.28);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px var(--bg, #f4f3ee),
+      0 0 14px 3px rgba(142, 255, 165, 0.72),
+      0 0 30px 6px rgba(142, 255, 165, 0.38);
+  }
+}
+.journey__node--live .journey__status {
+  color: #2e7a47;
+  background: rgba(142, 255, 165, 0.16);
+}
+.journey__node--live .journey__index { color: var(--ink); }
+
+/* ── state: planning ────────────────────────────────────────────────────── */
+.journey__node--planning .journey__rail-dot {
+  background: transparent;
+  border: 1.5px solid rgba(11, 11, 11, 0.45);
+  box-shadow: 0 0 0 4px var(--bg, #f4f3ee);
+  width: 9px;
+  height: 9px;
+}
+
+/* ── state: unknown — the open-ended future ─────────────────────────────── */
+.journey__node--unknown {
+  background: transparent;
+  border-style: dashed;
+  border-color: rgba(11, 11, 11, 0.18);
+}
+.journey__node--unknown:hover {
+  border-color: rgba(11, 11, 11, 0.30);
+  background: rgba(11, 11, 11, 0.02);
+}
+.journey__node--unknown .journey__index,
+.journey__node--unknown .journey__city,
+.journey__node--unknown .journey__meta dd {
+  color: var(--ink-3);
+}
+.journey__node--unknown .journey__rail-dot {
+  background: transparent;
+  border: 1.5px dashed rgba(11, 11, 11, 0.35);
+  box-shadow: 0 0 0 4px var(--bg, #f4f3ee);
+}
+
+/* responsive — collapse to 2 columns on tablet, 1 on mobile */
+@media (max-width: 1100px) {
+  .journey { grid-template-columns: repeat(2, 1fr); }
+  .journey__node:nth-child(2) .journey__rail { display: none; }
+}
+@media (max-width: 640px) {
+  .journey {
+    grid-template-columns: 1fr;
+    padding-top: 0;
+  }
+  .journey__rail,
+  .journey__rail-dot { display: none; }
+}
+
+/* ---------- PANEL · FELLOWS ---------- */
+.panel--fellows .panel__inner--fellows {
+  padding-bottom: 0; /* deck floats to the bottom */
+}
+.panel--fellows .panel__head--fellows {
+  text-align: center;
+  align-self: center;
+  align-items: center;
+}
+.fellows-stage--in-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 0 clamp(60px, 8vh, 100px);
+  background: transparent;
+}
+.fellows-stage--in-panel .passport-deck {
+  height: 100%;
+  width: min(1100px, 100%);
+}
+
+/* ---------- PANEL · MAIN (hero overrides) ---------- */
+/* The original .hero was a sticky 100vh section with nav-h top padding.
+   Inside a panel we don't need the nav offset; the brand and dock provide
+   their own breathing room. */
+.panel--main .hero {
+  position: relative;
+  height: 100%;
+  padding-top: clamp(72px, 11vh, 120px);
+  padding-bottom: clamp(64px, 9vh, 100px);
+}
+
+/* ---------- BRAND (top center) ---------- */
+/* Pure wordmark — no pill, no border, no background. Just the letters. */
+.brand {
+  position: fixed;
+  top: clamp(18px, 3.2vh, 30px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(20px, 3vh, 28px);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  transition: color 280ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.brand:hover { transform: translateX(-50%) translateY(-1px); }
+.brand__dot { color: var(--accent); opacity: 0.95; }
+
+/* on the dark hero, flip to cream ink */
+body.page--single[data-active-panel="main"] .brand {
+  color: #f4f3ee;
+}
+
+/* ---------- BOTTOM BLUR FADE ---------- */
+/* A soft frosted strip sitting at the very bottom of every panel, fading
+   smoothly upward into clarity. Sits below the dock chrome (z 80) so the
+   apply pill + status read as floating ON the blur, not under it. */
+body.page--single::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(120px, 18vh, 200px);
+  pointer-events: none;
+  z-index: 70;
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  -webkit-mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.92) 35%,
+    rgba(0, 0, 0, 0.6) 65%,
+    rgba(0, 0, 0, 0) 100%
+  );
+          mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.92) 35%,
+    rgba(0, 0, 0, 0.6) 65%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* ---------- RAIL (right vertical pills) ---------- */
+.rail {
+  position: fixed;
+  top: 50%;
+  right: clamp(14px, 2.4vw, 26px);
+  transform: translateY(-50%);
+  z-index: 80;
+}
+.rail__list {
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  border: 0.5px solid rgba(11, 11, 11, 0.05);
+  box-shadow:
+    0 18px 40px -22px rgba(11, 11, 11, 0.18),
+    0 4px 14px -10px rgba(11, 11, 11, 0.10);
+  transition: background 280ms ease, border-color 280ms ease;
+}
+
+body.page--single[data-active-panel="main"] .rail__list {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Each pill — fixed-size, no grow-on-hover. Labels always readable. */
+.rail__pill {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  margin: 0;
+  padding: 0 16px 0 14px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--ink-3);
+  opacity: 0.62;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  transition: color 220ms ease, opacity 220ms ease, background 220ms ease;
+}
+.rail__pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.55;
+  flex: none;
+  transition: opacity 220ms ease, background 220ms ease;
+}
+.rail__pill-label {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  opacity: 1;
+}
+
+/* individual pill hover — just a tone shift, no size change */
+.rail__pill:hover {
+  color: var(--ink);
+  opacity: 1;
+  background: rgba(11, 11, 11, 0.06);
+}
+.rail__pill:hover .rail__pill-dot { opacity: 1; }
+
+/* active pill — filled accent dot, slight emphasis */
+.rail__pill.is-active {
+  color: var(--ink);
+  opacity: 1;
+  background: rgba(11, 11, 11, 0.05);
+}
+.rail__pill.is-active .rail__pill-dot {
+  background: #8effa5;
+  opacity: 1;
+  box-shadow:
+    0 0 0 3px rgba(142, 255, 165, 0.18),
+    0 0 10px 2px rgba(142, 255, 165, 0.55),
+    0 0 20px 4px rgba(142, 255, 165, 0.28);
+  animation: rail-dot-glow 2.4s ease-in-out infinite;
+}
+@keyframes rail-dot-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px rgba(142, 255, 165, 0.18),
+      0 0 10px 2px rgba(142, 255, 165, 0.55),
+      0 0 20px 4px rgba(142, 255, 165, 0.28);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(142, 255, 165, 0.24),
+      0 0 14px 3px rgba(142, 255, 165, 0.70),
+      0 0 26px 6px rgba(142, 255, 165, 0.38);
+  }
+}
+
+/* dark variant on main */
+body.page--single[data-active-panel="main"] .rail__pill {
+  color: #f4f3ee;
+  opacity: 0.5;
+}
+body.page--single[data-active-panel="main"] .rail__pill:hover {
+  color: #ffffff;
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.10);
+}
+body.page--single[data-active-panel="main"] .rail__pill.is-active {
+  color: #ffffff;
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* keyboard focus ring */
+.rail__pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- DOCK (bottom thin strip) ---------- */
+/* No background / blur / border — the dock is just floating elements
+   over whichever panel is showing. Dead space lets clicks pass through
+   to the content beneath. */
+.dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  height: clamp(46px, 6vh, 56px);
+  padding: 0 clamp(16px, 3vw, 36px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  background: transparent;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition: color 280ms ease;
+}
+.dock > * { pointer-events: auto; }
+body.page--single[data-active-panel="main"] .dock {
+  color: rgba(244, 243, 238, 0.82);
+}
+
+.dock__left {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+/* Dock dot — color reflects the active cohort's applications state.
+   Driven by body[data-apps-status]: filled → red, open → green,
+   closed → grey. The pulse halo channels come from the same custom
+   property so they stay in sync without per-status keyframes. */
+body { --apps-dot: #d23a3a; --apps-dot-rgb: 210, 58, 58; }
+body[data-apps-status="open"]   { --apps-dot: #3d9152; --apps-dot-rgb: 61, 145, 82; }
+body[data-apps-status="filled"] { --apps-dot: #d23a3a; --apps-dot-rgb: 210, 58, 58; }
+body[data-apps-status="closed"] { --apps-dot: #8b8b88; --apps-dot-rgb: 139, 139, 136; }
+
+.dock__apps-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--apps-dot);
+  box-shadow: 0 0 0 3px rgba(var(--apps-dot-rgb), 0.20);
+  animation: dock-pulse 2.4s ease-in-out infinite;
+  flex: none;
+  transition: background 280ms ease;
+}
+@keyframes dock-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(var(--apps-dot-rgb), 0.20); }
+  50%      { box-shadow: 0 0 0 5px rgba(var(--apps-dot-rgb), 0.06); }
+}
+.dock__apps-label { color: var(--ink-2); }
+.dock__apps-range {
+  color: var(--ink-3);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  border-left: 1px solid rgba(11, 11, 11, 0.12);
+  padding-left: 10px;
+  margin-left: 4px;
+}
+body.page--single[data-active-panel="main"] .dock__apps-label { color: rgba(244, 243, 238, 0.92); }
+body.page--single[data-active-panel="main"] .dock__apps-range {
+  color: rgba(244, 243, 238, 0.62);
+  border-left-color: rgba(255, 255, 255, 0.16);
+}
+
+.dock__center { display: flex; justify-content: center; }
+.dock__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), background 220ms ease;
+}
+.dock__cta:hover {
+  transform: translateY(-1px);
+  background: #1f1f1f;
+}
+.dock__cta-arrow { font-size: 14px; line-height: 1; }
+body.page--single[data-active-panel="main"] .dock__cta {
+  background: #f4f3ee;
+  color: #0b0b0b;
+}
+body.page--single[data-active-panel="main"] .dock__cta:hover { background: #ffffff; }
+
+.dock__right {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+.dock__socials {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.dock__icon {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--ink-2);
+  transition: color 220ms ease, background 220ms ease, transform 180ms ease;
+}
+.dock__icon:hover {
+  color: var(--ink);
+  background: rgba(11, 11, 11, 0.06);
+  transform: translateY(-1px);
+}
+body.page--single[data-active-panel="main"] .dock__icon { color: rgba(244, 243, 238, 0.75); }
+body.page--single[data-active-panel="main"] .dock__icon:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.10);
+}
+/* mobile: collapse the dock cleanly, stack the rail */
+@media (max-width: 720px) {
+  .dock {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "left cta"
+      "right right";
+    height: auto;
+    padding: 8px clamp(14px, 4vw, 22px);
+    gap: 8px 14px;
+  }
+  .dock__left   { grid-area: left; }
+  .dock__center { grid-area: cta; justify-self: end; }
+  .dock__right  { grid-area: right; justify-content: space-between; }
+  .dock__apps-range { display: none; }
+
+  .rail { right: 10px; }
+  .rail__list { padding: 6px; gap: 4px; }
+  .rail__pill { height: 26px; padding: 0 10px; font-size: 10px; }
+}
+
+/* hide the original fellows page hint inside the panel (panel header
+   already carries the drag/tap message) */
+.panel--fellows .fellows-stage__hint { display: none; }
+

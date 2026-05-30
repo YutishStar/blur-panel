@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Houses — Cracked Hackerhouse</title>
+  <meta name="description" content="Where the cracked have lived, where we&rsquo;re heading next. Bangalore. Vietnam. Argentina. The cities we set up shop in, one cohort at a time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--houses">
+  <!-- Nav re-rendered identical to the landing for continuity.
+       `is-scrolled` is applied inline so the nav reads ink-on-white from
+       the first paint (no flash). script.js keeps it pinned for any page
+       that has no `.hero` element. -->
+  <header class="nav is-scrolled">
+    <nav class="nav__pills" aria-label="Primary">
+      <a class="nav__pill" href="index.html">main</a>
+      <a class="nav__pill nav__pill--current" href="houses.html" aria-current="page">houses</a>
+      <a class="nav__wordmark-link" href="index.html" aria-label="CrackedHQ — home">CrackedHQ<span class="nav__wordmark-dot">.</span></a>
+      <a class="nav__pill" href="index.html#about">about us</a>
+      <a class="nav__pill" href="fellows.html">fellows</a>
+    </nav>
+
+    <div class="nav__right">
+      <div class="nav__apps-status">
+        <span class="nav__apps-dot" aria-hidden="true"></span>
+        <span class="nav__apps-label">applications filled!</span>
+        <span class="nav__apps-range">The house starts 1st July</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="page">
+    <!-- ============ PAGE HERO ============ -->
+    <section class="page-hero">
+      <div class="page-hero__inner">
+        <span class="page-hero__eyebrow">the houses</span>
+        <h1 class="page-hero__title">live and build with <em>the cracked</em></h1>
+        <div class="page-hero__body">
+          <p>
+            we started in <em>bangalore</em> &mdash; cohort zero, a small house, the first
+            one ever. the next house is in <em>vietnam</em>, and it might just be the
+            biggest hackerhouse in the country.
+          </p>
+          <p>
+            after that, <em>argentina</em>. we pick cities that are friendly to visiting
+            builders and full of cracked people doing real work &mdash; then we set up shop
+            and fill the kitchen.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOUSES — poster grid ============ -->
+    <section class="homes homes--page">
+      <div class="homes__rail homes__rail--page" role="region" aria-label="Houses">
+        <div class="homes__track homes__track--page">
+          <article class="poster poster--blr">
+            <span class="poster__chip poster__chip--tl">cohort 00 · the first one</span>
+            <span class="poster__chip poster__chip--tr">bangalore</span>
+            <h3 class="poster__name">indira<br/><em>nagar</em></h3>
+            <span class="poster__chip poster__chip--bl">shipped &middot; archived</span>
+          </article>
+
+          <article class="poster poster--dnn">
+            <span class="poster__chip poster__chip--tl">cohort 01 · next stop</span>
+            <span class="poster__chip poster__chip--tr">đà nẵng &middot; vietnam</span>
+            <h3 class="poster__name">my<br/><em>khe</em></h3>
+            <span class="poster__chip poster__chip--bl">might be the biggest in vietnam</span>
+          </article>
+
+          <article class="poster poster--bsa">
+            <span class="poster__chip poster__chip--tl">cohort 02 · in planning</span>
+            <span class="poster__chip poster__chip--tr">buenos aires</span>
+            <h3 class="poster__name">pal<em>ermo</em></h3>
+            <span class="poster__chip poster__chip--bl">coming soon</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ APPLY BANNER ============ -->
+    <section id="apply" class="apply">
+      <div class="apply__card">
+        <div class="apply__aurora" aria-hidden="true"></div>
+        <div class="apply__grain" aria-hidden="true"></div>
+
+        <div class="apply__content">
+          <h2 class="apply__title">
+            want a <em>seat</em>?
+          </h2>
+          <p class="apply__lede">
+            applications for the <strong>vietnam</strong> cohort are open. apply now to
+            live and ship from the next cracked house.
+          </p>
+          <a href="index.html#apply" class="apply__btn">apply now</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="foot">
+      <div class="foot__top">
+        <div class="foot__brand-col">
+          <div class="foot__brand">
+            <span class="foot__mark" aria-hidden="true">✦</span>
+            <span class="foot__word">cracked hackerhouse</span>
+          </div>
+          <p class="foot__tag">a home for <strong>cracked people, wherever we go next.</strong></p>
+
+          <div class="foot__social" aria-label="Social">
+            <a href="#" aria-label="X / Twitter" class="foot__icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.675l-5.227-6.838L4.96 21.75H1.648l7.73-8.835L1.255 2.25h6.844l4.726 6.243z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="LinkedIn" class="foot__icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.86-3.04-1.86 0-2.15 1.45-2.15 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.9 1.63-1.86 3.35-1.86 3.58 0 4.25 2.36 4.25 5.42v6.33zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zm-1.78 13.02h3.56V9H3.56v11.45z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="Instagram" class="foot__icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor"/>
+              </svg>
+            </a>
+          </div>
+
+          <p class="foot__copy">© 2026 — made with love by the cracked, for the cracked</p>
+        </div>
+
+        <nav class="foot__cols" aria-label="Footer">
+          <a href="index.html" class="foot__link">main</a>
+          <a href="index.html#about" class="foot__link">about us</a>
+          <a href="#" class="foot__link">donate</a>
+          <a href="houses.html" class="foot__link foot__link--active">houses</a>
+          <a href="#" class="foot__link">for investors</a>
+          <a href="mailto:hello@crackedhacker.house" class="foot__link">contact us</a>
+          <a href="#" class="foot__link">brand kit</a>
+          <a href="#" class="foot__link">keep updated</a>
+        </nav>
+      </div>
+
+      <div class="foot__wordmark" aria-hidden="true">Crackedhq</div>
+    </footer>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
