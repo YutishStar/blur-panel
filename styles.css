@@ -53,6 +53,7 @@ html {
 body {
   background: var(--bg);
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
 }
 
@@ -470,6 +471,7 @@ img, svg { display: block; max-width: 100%; }
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100dvh;
   z-index: 1;
   padding: calc(var(--nav-h) + 20px) var(--pad) 80px;
   overflow: hidden;
@@ -3848,7 +3850,9 @@ body.page--fellows .nav.is-scrolled { /* identical chrome to houses */ }
    ========================================================= */
 body.page--single {
   height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;            /* lock vertical scroll — one-pager */
   /* a hairline neutral tone so the panels read as floating over paper */
   background: var(--bg);
@@ -4671,8 +4675,11 @@ body.page--single[data-active-panel="main"] .dock__icon:hover {
    responsive breakpoint. Sits above every other layer (loader, dock,
    passport viewer) so nothing leaks through.
    ========================================================= */
-.mobile-gate { display: none; }
+/* Gate is currently OFF so the real site is testable on mobile.
+   To re-enable: uncomment the @media block below. */
+.mobile-gate { display: none !important; }
 
+/*
 @media (max-width: 820px) {
   body { overflow: hidden !important; }
   .mobile-gate {
@@ -4691,6 +4698,7 @@ body.page--single[data-active-panel="main"] .dock__icon:hover {
     overflow: hidden;
   }
 }
+*/
 
 .mobile-gate__inner {
   display: flex;
