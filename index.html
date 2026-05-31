@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="/analytics.js"></script>
   <title>Cracked Hackerhouse — for cracked people, wherever we go next</title>
   <meta name="description" content="Cracked Hackerhouse — a community of cracked people living, traveling, and building together. Cohort zero in Bangalore. Next stop, Vietnam." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,6 +14,22 @@
   />
   <link rel="stylesheet" href="styles.css?v=33" />
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
+  <!-- phone-test harness — only active at /phone-test (private staging route).
+       Drops the mobile gate and loads the in-progress mobile styles. Completely
+       inert on the live site, where this condition is never true. -->
+  <script>
+    (function () {
+      if (!/^\/phone-test(\/|$)/.test(location.pathname)) return;
+      document.documentElement.classList.add('phone-test');
+      var hide = document.createElement('style');
+      hide.textContent = '.mobile-gate{display:none!important}body{overflow:auto!important}';
+      document.head.appendChild(hide);
+      var css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = '/phone-test.css?v=1';
+      document.head.appendChild(css);
+    })();
+  </script>
 </head>
 <body class="page--single" data-apps-status="filled">
   <!-- Mobile gate — overlays everything on narrow viewports until the

@@ -1,0 +1,26 @@
+{
+  "rewrites": [
+    { "source": "/phone-test", "destination": "/index.html" },
+    { "source": "/phone-test/", "destination": "/index.html" },
+    { "source": "/analytics", "destination": "/analytics.html" },
+    { "source": "/analytics/", "destination": "/analytics.html" }
+  ],
+  "headers": [
+    {
+      "source": "/phone-test",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    },
+    {
+      "source": "/phone-test/",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    },
+    {
+      "source": "/analytics",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    },
+    {
+      "source": "/analytics/",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    }
+  ]
+}
