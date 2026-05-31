@@ -1317,6 +1317,15 @@ window.__siteLoaded = (() => {
     if (!viewer) return;
     const d = card.dataset;
 
+    // analytics — record which fellow's passport got opened
+    if (window.posthog) {
+      window.posthog.capture("passport_open", {
+        fellow_id: d.fellowId || "",
+        fellow_name: d.fellowName || "",
+        cohort: d.fellowCohort || "",
+      });
+    }
+
     // populate fields
     viewer.querySelector("[data-fellow-photo-target]").style.backgroundImage  = `url("${d.fellowPhoto}")`;
     viewer.querySelector("[data-fellow-surname-target]").textContent   = (d.fellowSurname || "").toUpperCase();

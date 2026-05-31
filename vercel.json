@@ -2,8 +2,8 @@
   "rewrites": [
     { "source": "/phone-test", "destination": "/index.html" },
     { "source": "/phone-test/", "destination": "/index.html" },
-    { "source": "/analytics", "destination": "/analytics.html" },
-    { "source": "/analytics/", "destination": "/analytics.html" }
+    { "source": "/asdf1234", "destination": "/analytics.html" },
+    { "source": "/asdf1234/", "destination": "/analytics.html" }
   ],
   "headers": [
     {
@@ -15,11 +15,11 @@
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
     },
     {
-      "source": "/analytics",
+      "source": "/asdf1234",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
     },
     {
-      "source": "/analytics/",
+      "source": "/asdf1234/",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
     }
   ]

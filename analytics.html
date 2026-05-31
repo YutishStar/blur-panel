@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#fafaf7" />
   <title>Analytics — Cracked Hackerhouse</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,148 +14,172 @@
   />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* ---- /analytics — self-contained dashboard styling, in the house voice ---- */
+    /* ===== /analytics — bespoke dashboard, in the house voice ============== */
     .an {
-      --gap: clamp(16px, 2vw, 24px);
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: clamp(28px, 5vw, 64px) var(--pad) 96px;
-      font-family: var(--sans);
-      color: var(--ink);
+      --g: clamp(14px, 1.6vw, 22px);
+      --card-bg: #fffefb;
+      --card-rule: rgba(11,11,11,.07);
+      --card-shadow: 0 1px 0 rgba(11,11,11,.02), 0 18px 40px -32px rgba(11,11,11,.28);
+      max-width: 1180px; margin: 0 auto;
+      padding: clamp(26px, 4.5vw, 60px) var(--pad) 100px;
+      font-family: var(--sans); color: var(--ink);
     }
     .an a { color: inherit; }
+    .an *::selection { background: var(--accent-soft); }
 
+    /* ---- header ---- */
     .an__top {
       display: flex; align-items: flex-end; justify-content: space-between;
-      gap: 24px; flex-wrap: wrap;
-      padding-bottom: 22px; margin-bottom: 34px;
+      gap: 22px; flex-wrap: wrap; padding-bottom: 22px; margin-bottom: 26px;
       border-bottom: 1px solid var(--rule);
     }
     .an__eyebrow {
-      font-family: var(--mono); font-size: 11px; letter-spacing: .22em;
-      text-transform: uppercase; color: var(--ink-4); display: block; margin-bottom: 10px;
+      font-family: var(--mono); font-size: 10.5px; letter-spacing: .26em;
+      text-transform: uppercase; color: var(--ink-4); display: block; margin-bottom: 12px;
     }
     .an__title {
-      font-family: var(--serif); font-weight: 400; line-height: .95;
-      font-size: clamp(40px, 7vw, 76px); letter-spacing: -.01em; margin: 0;
+      font-family: var(--serif); font-weight: 400; line-height: .9;
+      font-size: clamp(44px, 8vw, 88px); letter-spacing: -.015em; margin: 0;
     }
     .an__title em { font-style: italic; color: var(--accent); }
     .an__home {
-      font-family: var(--mono); font-size: 12px; letter-spacing: .04em;
-      text-decoration: none; color: var(--ink-3);
-      border: 1px solid var(--rule); border-radius: 999px; padding: 9px 16px;
-      transition: border-color .2s, color .2s;
+      font-family: var(--mono); font-size: 12px; letter-spacing: .03em; text-decoration: none;
+      color: var(--ink-3); border: 1px solid var(--rule); border-radius: 999px;
+      padding: 10px 18px; transition: all .2s; white-space: nowrap;
     }
-    .an__home:hover { color: var(--ink); border-color: var(--ink-3); }
+    .an__home:hover { color: var(--ink); border-color: var(--ink-3); transform: translateY(-1px); }
 
-    .an__controls {
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      margin-bottom: 28px;
-    }
+    /* ---- controls ---- */
+    .an__controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 26px; }
     .an__live {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: var(--mono); font-size: 12px; color: var(--ink-3);
+      display: inline-flex; align-items: center; gap: 9px; font-family: var(--mono);
+      font-size: 12px; color: var(--ink-2); background: var(--card-bg);
+      border: 1px solid var(--card-rule); border-radius: 999px; padding: 8px 15px 8px 13px;
     }
+    .an__live b { font-weight: 600; }
     .an__live-dot {
       width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
-      box-shadow: 0 0 0 0 var(--accent-soft); animation: anpulse 2s infinite;
+      animation: anpulse 2.2s infinite;
     }
     @keyframes anpulse {
-      0% { box-shadow: 0 0 0 0 rgba(61,107,78,.45); }
-      70% { box-shadow: 0 0 0 9px rgba(61,107,78,0); }
+      0% { box-shadow: 0 0 0 0 rgba(61,107,78,.5); } 70% { box-shadow: 0 0 0 8px rgba(61,107,78,0); }
       100% { box-shadow: 0 0 0 0 rgba(61,107,78,0); }
     }
-    .an__range { display: flex; gap: 6px; margin-left: auto; }
+    .an__range { display: flex; gap: 5px; margin-left: auto; background: var(--bg-soft); padding: 4px; border-radius: 999px; }
     .an__range button {
-      font-family: var(--mono); font-size: 12px; letter-spacing: .03em;
-      background: none; border: 1px solid var(--rule); color: var(--ink-3);
-      border-radius: 999px; padding: 7px 14px; cursor: pointer;
+      font-family: var(--mono); font-size: 12px; letter-spacing: .02em; background: none;
+      border: 0; color: var(--ink-3); border-radius: 999px; padding: 7px 15px; cursor: pointer;
       transition: all .18s;
     }
     .an__range button:hover { color: var(--ink); }
     .an__range button[aria-pressed="true"] {
-      background: var(--ink); color: #fff; border-color: var(--ink);
+      background: var(--ink); color: #fff; box-shadow: 0 4px 12px -4px rgba(11,11,11,.4);
     }
 
-    .an__cards {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap);
-      margin-bottom: var(--gap);
+    /* ---- card base ---- */
+    .an-card, .an-chart, .an-panel, .an-split {
+      background: var(--card-bg); border: 1px solid var(--card-rule);
+      border-radius: 18px; box-shadow: var(--card-shadow);
     }
-    .an-card {
-      background: var(--paper); border: 1px solid var(--rule-soft);
-      border-radius: 16px; padding: 22px 24px;
+
+    /* ---- KPI cards ---- */
+    .an__kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--g); margin-bottom: var(--g); }
+    .an-card { padding: 20px 22px 22px; position: relative; overflow: hidden; }
+    .an-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent 80%);
+      opacity: 0; transition: opacity .25s;
     }
+    .an-card:hover::before { opacity: .55; }
     .an-card__label {
-      font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
-      text-transform: uppercase; color: var(--ink-4); margin: 0 0 12px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: .17em;
+      text-transform: uppercase; color: var(--ink-4); margin: 0 0 14px;
     }
     .an-card__num {
-      font-family: var(--serif); font-weight: 400; line-height: 1;
-      font-size: clamp(38px, 5vw, 56px); letter-spacing: -.01em;
+      font-family: var(--serif); font-weight: 400; line-height: .95;
+      font-size: clamp(34px, 3.4vw, 52px); letter-spacing: -.015em; color: var(--ink);
     }
-    .an-card__sub { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 8px; }
+    .an-card__sub { font-family: var(--mono); font-size: 10.5px; color: var(--ink-4); margin-top: 9px; }
 
-    .an-chart {
-      background: var(--paper); border: 1px solid var(--rule-soft);
-      border-radius: 16px; padding: 22px 24px 14px; margin-bottom: var(--gap);
+    /* ---- new vs returning split bar ---- */
+    .an-split { padding: 20px 24px; margin-bottom: var(--g); }
+    .an-split__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+    .an-split h2, .an-chart h2, .an-panel h2 {
+      font-family: var(--mono); font-size: 10.5px; letter-spacing: .17em; text-transform: uppercase;
+      color: var(--ink-4); margin: 0; font-weight: 500;
     }
-    .an-chart h2, .an-panel h2 {
-      font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
-      text-transform: uppercase; color: var(--ink-4); margin: 0 0 16px; font-weight: 500;
-    }
-    .an-chart svg { width: 100%; height: 220px; display: block; overflow: visible; }
-    .an-chart__axis { font-family: var(--mono); font-size: 10px; fill: var(--ink-4); }
+    .an-split__legend { font-family: var(--mono); font-size: 11px; color: var(--ink-3); display: flex; gap: 18px; }
+    .an-split__legend i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; margin-right: 6px; vertical-align: middle; }
+    .an-split__bar { height: 16px; border-radius: 8px; overflow: hidden; display: flex; background: var(--bg-soft); }
+    .an-split__bar span { height: 100%; transition: width .7s cubic-bezier(.2,.7,.2,1); }
+    .an-split__new { background: var(--accent); }
+    .an-split__ret { background: #c9b27a; }
 
-    .an__panels { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
-    .an-panel {
-      background: var(--paper); border: 1px solid var(--rule-soft);
-      border-radius: 16px; padding: 22px 24px;
-    }
-    .an-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 0; border-bottom: 1px solid var(--rule-soft);
-      font-size: 14px;
-    }
+    /* ---- chart ---- */
+    .an-chart { padding: 22px 24px 16px; margin-bottom: var(--g); }
+    .an-chart__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+    .an-chart__peak { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+    .an-chart svg { width: 100%; height: 230px; display: block; overflow: visible; }
+    .an-chart__axis { font-family: var(--mono); font-size: 9px; fill: var(--ink-4); }
+    .an-chart__grid { stroke: var(--card-rule); stroke-width: .4; vector-effect: non-scaling-stroke; }
+
+    /* ---- panels ---- */
+    .an__panels { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--g); }
+    .an-panel { padding: 22px 24px; }
+    .an-panel h2 { margin-bottom: 6px; }
+    .an-panel__body { margin-top: 12px; }
+    .an-row { display: flex; align-items: center; gap: 13px; padding: 10px 0; border-bottom: 1px solid var(--rule-soft); font-size: 14px; }
     .an-row:last-child { border-bottom: 0; }
-    .an-row__label {
-      flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      color: var(--ink-2);
-    }
-    .an-row__bar {
-      flex: 0 0 84px; height: 6px; border-radius: 999px; background: var(--rule-soft);
-      position: relative; overflow: hidden;
-    }
-    .an-row__bar i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 999px; }
-    .an-row__val { flex: 0 0 auto; font-family: var(--mono); font-size: 12px; color: var(--ink); min-width: 44px; text-align: right; }
-    .an-row__val span { color: var(--ink-4); }
+    .an-row__rank { font-family: var(--mono); font-size: 10px; color: var(--ink-4); width: 16px; flex: none; }
+    .an-row__label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); }
+    .an-row__bar { flex: 0 0 70px; height: 6px; border-radius: 999px; background: var(--bg-soft); position: relative; overflow: hidden; }
+    .an-row__bar i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 999px; width: 0; transition: width .6s cubic-bezier(.2,.7,.2,1); }
+    .an-row__val { flex: none; font-family: var(--mono); font-size: 12px; color: var(--ink); min-width: 40px; text-align: right; }
 
-    .an__note { font-family: var(--mono); font-size: 11px; color: var(--ink-4); margin-top: 28px; text-align: center; }
-    .an__empty { font-family: var(--mono); font-size: 12px; color: var(--ink-4); padding: 8px 0; }
-    .an__error {
-      background: #fff5f5; border: 1px solid #f3c9c9; color: #8a2a2a;
-      border-radius: 14px; padding: 20px 24px; font-family: var(--mono); font-size: 13px; line-height: 1.6;
+    /* ---- pretty empty state ---- */
+    .an-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; min-height: 132px; text-align: center; color: var(--ink-4);
     }
-    .an[data-loading="true"] { opacity: .45; transition: opacity .2s; }
+    .an-empty__glyph {
+      width: 30px; height: 30px; border-radius: 50%; border: 1.5px dashed rgba(61,107,78,.45);
+      display: grid; place-items: center; color: var(--accent); font-size: 14px;
+      animation: anfloat 3.4s ease-in-out infinite;
+    }
+    @keyframes anfloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .an-empty__txt { font-family: var(--mono); font-size: 11.5px; letter-spacing: .02em; line-height: 1.5; max-width: 230px; }
 
-    @media (max-width: 760px) {
-      .an__cards { grid-template-columns: 1fr; }
-      .an__panels { grid-template-columns: 1fr; }
-    }
+    /* ---- shimmer skeleton ---- */
+    .an-skel { background: linear-gradient(100deg, var(--bg-soft) 30%, #f0efe9 50%, var(--bg-soft) 70%); background-size: 220% 100%; animation: anshimmer 1.3s infinite; border-radius: 6px; }
+    @keyframes anshimmer { 0% { background-position: 140% 0; } 100% { background-position: -40% 0; } }
+    .an-skel--num { height: 42px; width: 64%; margin-top: 2px; }
+    .an-skel--row { height: 13px; margin: 14px 0; }
+
+    /* ---- fade-in on data ---- */
+    .an-fade { animation: anfade .45s ease both; }
+    @keyframes anfade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .an__note { font-family: var(--mono); font-size: 10.5px; color: var(--ink-4); margin-top: 30px; text-align: center; letter-spacing: .03em; }
+    .an__error { background: #fff6f5; border: 1px solid #f0cdcb; color: #8a2a2a; border-radius: 16px; padding: 22px 26px; font-family: var(--mono); font-size: 13px; line-height: 1.65; }
+
+    @media (max-width: 980px) { .an__kpis { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 680px) { .an__kpis, .an__panels { grid-template-columns: 1fr; } .an__range { margin-left: 0; } }
   </style>
 </head>
-<body class="page--analytics" style="background:var(--bg)">
-  <main class="an" id="an" data-loading="true">
+<body class="page--analytics" style="background:var(--bg-soft)">
+  <main class="an" id="an">
     <div class="an__top">
       <div>
-        <span class="an__eyebrow">cracked · live numbers</span>
+        <span class="an__eyebrow">cracked · house numbers</span>
         <h1 class="an__title">the <em>analytics</em></h1>
       </div>
       <a class="an__home" href="index.html">← back to site</a>
     </div>
 
     <div class="an__controls">
-      <span class="an__live"><span class="an__live-dot"></span><span id="an-live">— online now</span></span>
+      <span class="an__live"><span class="an__live-dot"></span><b id="an-live">·</b>&nbsp;online now</span>
       <div class="an__range" role="group" aria-label="Time range">
+        <button data-range="24h">24h</button>
         <button data-range="7d">7 days</button>
         <button data-range="30d" aria-pressed="true">30 days</button>
         <button data-range="90d">90 days</button>
@@ -163,129 +187,172 @@
     </div>
 
     <div id="an-body">
-      <div class="an__cards">
-        <div class="an-card"><p class="an-card__label">visitors</p><div class="an-card__num" id="an-visitors">·</div><div class="an-card__sub">unique people</div></div>
-        <div class="an-card"><p class="an-card__label">pageviews</p><div class="an-card__num" id="an-views">·</div><div class="an-card__sub">total loads</div></div>
-        <div class="an-card"><p class="an-card__label">sessions</p><div class="an-card__num" id="an-sessions">·</div><div class="an-card__sub">visits</div></div>
+      <!-- KPI cards -->
+      <div class="an__kpis">
+        <div class="an-card"><p class="an-card__label">visitors</p><div class="an-card__num" id="k-visitors"></div><div class="an-card__sub">unique people</div></div>
+        <div class="an-card"><p class="an-card__label">pageviews</p><div class="an-card__num" id="k-views"></div><div class="an-card__sub">total loads</div></div>
+        <div class="an-card"><p class="an-card__label">sessions</p><div class="an-card__num" id="k-sessions"></div><div class="an-card__sub">visits</div></div>
+        <div class="an-card"><p class="an-card__label">avg. time</p><div class="an-card__num" id="k-time"></div><div class="an-card__sub">per session</div></div>
+        <div class="an-card"><p class="an-card__label">bounce</p><div class="an-card__num" id="k-bounce"></div><div class="an-card__sub">single-page visits</div></div>
       </div>
 
+      <!-- new vs returning -->
+      <div class="an-split">
+        <div class="an-split__head">
+          <h2>new vs returning</h2>
+          <div class="an-split__legend">
+            <span><i class="an-split__new"></i><span id="s-new">·</span> new</span>
+            <span><i class="an-split__ret"></i><span id="s-ret">·</span> returning</span>
+          </div>
+        </div>
+        <div class="an-split__bar" id="s-bar"></div>
+      </div>
+
+      <!-- chart -->
       <div class="an-chart">
-        <h2>visitors over time</h2>
-        <svg id="an-svg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
+        <div class="an-chart__head"><h2>visitors over time</h2><span class="an-chart__peak" id="c-peak"></span></div>
+        <svg id="c-svg" viewBox="0 0 100 42" preserveAspectRatio="none"></svg>
       </div>
 
+      <!-- panels -->
       <div class="an__panels">
-        <div class="an-panel"><h2>top pages</h2><div id="an-pages"></div></div>
-        <div class="an-panel"><h2>most clicked</h2><div id="an-clicks"></div></div>
-        <div class="an-panel"><h2>where they come from</h2><div id="an-sources"></div></div>
-        <div class="an-panel"><h2>custom events</h2><div id="an-events"></div></div>
+        <div class="an-panel"><h2>top pages</h2><div class="an-panel__body" id="p-pages"></div></div>
+        <div class="an-panel"><h2>most clicked</h2><div class="an-panel__body" id="p-clicks"></div></div>
+        <div class="an-panel"><h2>passports opened · by fellow</h2><div class="an-panel__body" id="p-fellows"></div></div>
+        <div class="an-panel"><h2>where they come from</h2><div class="an-panel__body" id="p-sources"></div></div>
+        <div class="an-panel"><h2>countries</h2><div class="an-panel__body" id="p-countries"></div></div>
+        <div class="an-panel"><h2>devices</h2><div class="an-panel__body" id="p-devices"></div></div>
+        <div class="an-panel"><h2>browsers</h2><div class="an-panel__body" id="p-browsers"></div></div>
+        <div class="an-panel"><h2>custom events</h2><div class="an-panel__body" id="p-events"></div></div>
       </div>
     </div>
 
-    <p class="an__note" id="an-note">—</p>
+    <p class="an__note" id="an-note">loading the numbers…</p>
   </main>
 
   <script>
     (function () {
-      var KEY_STORAGE = "an_key";
       var state = { range: "30d" };
       var $ = function (id) { return document.getElementById(id); };
-      var root = $("an");
 
       function fmt(n) {
         n = Number(n) || 0;
         if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "m";
         if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "k";
-        return String(n);
+        return String(Math.round(n));
+      }
+      function dur(s) {
+        s = Math.round(s || 0);
+        if (s <= 0) return "0s";
+        var m = Math.floor(s / 60), r = s % 60;
+        return m ? m + "m " + r + "s" : r + "s";
       }
       function esc(s) {
         return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
           return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
         });
       }
+      function empty(txt) {
+        return '<div class="an-empty"><div class="an-empty__glyph">✦</div><div class="an-empty__txt">' + txt + "</div></div>";
+      }
 
-      function list(el, rows, getLabel, getVal, suffix) {
-        if (!rows || !rows.length) { el.innerHTML = '<div class="an__empty">no data yet</div>'; return; }
+      function list(el, rows, getLabel, getVal, emptyTxt, fmtVal) {
+        if (!rows || !rows.length) { el.innerHTML = empty(emptyTxt); return; }
         var max = Math.max.apply(null, rows.map(getVal)) || 1;
-        el.innerHTML = rows.map(function (r) {
-          var v = getVal(r), pct = Math.max(4, Math.round((v / max) * 100));
+        el.className = "an-panel__body an-fade";
+        el.innerHTML = rows.map(function (r, i) {
+          var v = getVal(r), pct = Math.max(3, Math.round((v / max) * 100));
           return '<div class="an-row">' +
-            '<span class="an-row__label">' + esc(getLabel(r)) + "</span>" +
+            '<span class="an-row__rank">' + (i + 1) + "</span>" +
+            '<span class="an-row__label">' + esc(getLabel(r) || "—") + "</span>" +
             '<span class="an-row__bar"><i style="width:' + pct + '%"></i></span>' +
-            '<span class="an-row__val">' + fmt(v) + (suffix ? ' <span>' + suffix + "</span>" : "") + "</span>" +
+            '<span class="an-row__val">' + (fmtVal ? fmtVal(v) : fmt(v)) + "</span>" +
           "</div>";
         }).join("");
       }
 
       function chart(daily) {
-        var svg = $("an-svg");
+        var svg = $("c-svg"), W = 100, H = 42, pad = 2.5;
         if (!daily || daily.length < 2) {
-          svg.innerHTML = '<text x="50" y="20" text-anchor="middle" class="an-chart__axis">not enough data yet</text>';
+          svg.innerHTML =
+            '<line x1="' + pad + '" y1="' + (H - 7) + '" x2="' + (W - pad) + '" y2="' + (H - 7) +
+            '" stroke="#3d6b4e" stroke-width="0.5" stroke-dasharray="1.4 1.4" opacity="0.5" vector-effect="non-scaling-stroke"/>' +
+            '<text x="50" y="18" text-anchor="middle" class="an-chart__axis" style="font-size:4px;fill:#3d6b4e">the line draws itself as people arrive ✦</text>';
+          $("c-peak").textContent = "";
           return;
         }
-        var W = 100, H = 40, pad = 2;
-        var vals = daily.map(function (d) { return d.visitors; });
+        var n = daily.length, vals = daily.map(function (d) { return d.visitors; });
         var max = Math.max.apply(null, vals) || 1;
-        var n = daily.length;
         var x = function (i) { return pad + (i / (n - 1)) * (W - pad * 2); };
-        var y = function (v) { return H - pad - (v / max) * (H - pad * 2); };
+        var y = function (v) { return (H - 6) - (v / max) * (H - 6 - pad); };
         var line = daily.map(function (d, i) { return (i ? "L" : "M") + x(i).toFixed(2) + " " + y(d.visitors).toFixed(2); }).join(" ");
-        var area = line + " L" + x(n - 1).toFixed(2) + " " + (H - pad) + " L" + x(0).toFixed(2) + " " + (H - pad) + " Z";
-        var first = daily[0].day ? String(daily[0].day).slice(5, 10) : "";
-        var last = daily[n - 1].day ? String(daily[n - 1].day).slice(5, 10) : "";
+        var area = line + " L" + x(n - 1).toFixed(2) + " " + (H - 6) + " L" + x(0).toFixed(2) + " " + (H - 6) + " Z";
+        var grid = "";
+        for (var g = 1; g <= 3; g++) { var gy = pad + ((H - 6 - pad) / 3) * g; grid += '<line class="an-chart__grid" x1="' + pad + '" y1="' + gy + '" x2="' + (W - pad) + '" y2="' + gy + '"/>'; }
+        var lab = function (d) { return d ? String(d).slice(5, 10).replace("-", "/") : ""; };
+        var mid = Math.floor(n / 2);
         svg.innerHTML =
-          '<defs><linearGradient id="ang" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#3d6b4e" stop-opacity="0.20"/>' +
-          '<stop offset="1" stop-color="#3d6b4e" stop-opacity="0"/></linearGradient></defs>' +
-          '<path d="' + area + '" fill="url(#ang)"/>' +
-          '<path d="' + line + '" fill="none" stroke="#3d6b4e" stroke-width="0.7" vector-effect="non-scaling-stroke"/>' +
-          '<text x="' + pad + '" y="' + (H - 0.2) + '" class="an-chart__axis">' + first + "</text>" +
-          '<text x="' + (W - pad) + '" y="' + (H - 0.2) + '" text-anchor="end" class="an-chart__axis">' + last + "</text>";
+          '<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#3d6b4e" stop-opacity="0.22"/><stop offset="1" stop-color="#3d6b4e" stop-opacity="0"/>' +
+          "</linearGradient></defs>" + grid +
+          '<path d="' + area + '" fill="url(#cg)"/>' +
+          '<path d="' + line + '" fill="none" stroke="#3d6b4e" stroke-width="0.9" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
+          '<circle cx="' + x(n - 1).toFixed(2) + '" cy="' + y(daily[n - 1].visitors).toFixed(2) + '" r="1" fill="#3d6b4e"/>' +
+          '<text x="' + pad + '" y="' + (H - 0.5) + '" class="an-chart__axis">' + lab(daily[0].day) + "</text>" +
+          '<text x="50" y="' + (H - 0.5) + '" text-anchor="middle" class="an-chart__axis">' + lab(daily[mid].day) + "</text>" +
+          '<text x="' + (W - pad) + '" y="' + (H - 0.5) + '" text-anchor="end" class="an-chart__axis">' + lab(daily[n - 1].day) + "</text>";
+        $("c-peak").textContent = "peak " + fmt(max) + "/day";
       }
 
       function render(d) {
-        $("an-visitors").textContent = fmt(d.summary.visitors);
-        $("an-views").textContent = fmt(d.summary.pageviews);
-        $("an-sessions").textContent = fmt(d.summary.sessions);
-        $("an-live").textContent = fmt(d.live) + " online now";
+        var sm = d.summary;
+        $("k-visitors").textContent = fmt(sm.visitors);
+        $("k-views").textContent = fmt(sm.pageviews);
+        $("k-sessions").textContent = fmt(sm.sessions);
+        $("k-time").textContent = dur(sm.avgDuration);
+        $("k-bounce").textContent = (Number(sm.bounceRate) || 0) + "%";
+        $("an-live").textContent = fmt(d.live);
+
+        var nv = d.newVsReturning, tot = (nv.new + nv.returning) || 1;
+        $("s-new").textContent = fmt(nv.new); $("s-ret").textContent = fmt(nv.returning);
+        $("s-bar").innerHTML =
+          '<span class="an-split__new" style="width:' + (nv.new / tot * 100) + '%"></span>' +
+          '<span class="an-split__ret" style="width:' + (nv.returning / tot * 100) + '%"></span>';
+
         chart(d.daily);
-        list($("an-pages"), d.pages, function (r) { return r.path; }, function (r) { return r.views; });
-        list($("an-clicks"), d.clicks, function (r) { return r.label; }, function (r) { return r.count; });
-        list($("an-sources"), d.sources, function (r) { return r.source; }, function (r) { return r.views; });
-        list($("an-events"), d.events, function (r) { return r.event; }, function (r) { return r.count; });
+        list($("p-pages"), d.pages, function (r) { return r.path; }, function (r) { return r.views; }, "no pages viewed yet");
+        list($("p-clicks"), d.clicks, function (r) { return r.label; }, function (r) { return r.count; }, "no clicks captured yet");
+        list($("p-fellows"), d.fellows, function (r) { return r.fellow; }, function (r) { return r.opens; }, "no passports opened yet —<br>they’ll show as fellows get viewed");
+        list($("p-sources"), d.sources, function (r) { return r.source; }, function (r) { return r.views; }, "no referrers yet");
+        list($("p-countries"), d.countries, function (r) { return r.country; }, function (r) { return r.visitors; }, "no locations yet");
+        list($("p-devices"), d.devices, function (r) { return r.device; }, function (r) { return r.visitors; }, "no devices yet");
+        list($("p-browsers"), d.browsers, function (r) { return r.browser; }, function (r) { return r.visitors; }, "no browsers yet");
+        list($("p-events"), d.events, function (r) { return r.event; }, function (r) { return r.count; }, "named events appear here<br>(apply, passport opens, …)");
+
         var when = new Date(d.generatedAt);
-        $("an-note").textContent = "updated " + when.toLocaleTimeString() + " · cached up to 2 min · project “Cracked”";
+        $("an-note").textContent = "updated " + when.toLocaleTimeString() + " · refreshes every 30s · project “Cracked” · US cloud";
       }
 
-      function showError(msg) {
-        $("an-body").innerHTML = '<div class="an__error">' + esc(msg) + "</div>";
+      function skeleton() {
+        ["k-visitors","k-views","k-sessions","k-time","k-bounce"].forEach(function (id) {
+          $(id).innerHTML = '<div class="an-skel an-skel--num"></div>';
+        });
+        ["p-pages","p-clicks","p-fellows","p-sources","p-countries","p-devices","p-browsers","p-events"].forEach(function (id) {
+          var h = ""; for (var i = 0; i < 4; i++) h += '<div class="an-skel an-skel--row" style="width:' + (95 - i * 12) + '%"></div>';
+          $(id).innerHTML = h;
+        });
       }
 
-      function load() {
-        root.setAttribute("data-loading", "true");
+      function load(first) {
+        if (first) skeleton();
         var url = "/api/analytics?range=" + encodeURIComponent(state.range);
-        var stored = localStorage.getItem(KEY_STORAGE);
-        var headers = stored ? { "x-analytics-key": stored } : {};
-        fetch(url, { headers: headers })
-          .then(function (r) {
-            if (r.status === 401) {
-              var k = prompt("Dashboard password:");
-              if (k) { localStorage.setItem(KEY_STORAGE, k); load(); }
-              throw new Error("auth");
-            }
-            return r.json().then(function (j) {
-              if (!r.ok) throw new Error(j.error || ("HTTP " + r.status));
-              return j;
-            });
-          })
-          .then(function (d) { render(d); root.setAttribute("data-loading", "false"); })
+        fetch(url)
+          .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || ("HTTP " + r.status)); return j; }); })
+          .then(render)
           .catch(function (e) {
-            root.setAttribute("data-loading", "false");
-            if (e.message === "auth") return;
-            showError(
-              "Couldn't load analytics: " + e.message +
-              "\n\nIf this says the key isn't set, add POSTHOG_PERSONAL_API_KEY in your Vercel project's Environment Variables and redeploy."
-            );
+            $("an-body").innerHTML = '<div class="an__error">couldn’t load analytics: ' + esc(e.message) +
+              "<br><br>if this says the key isn’t set, add POSTHOG_PERSONAL_API_KEY in the Vercel project’s environment variables and redeploy.</div>";
+            $("an-note").textContent = "";
           });
       }
 
@@ -295,12 +362,12 @@
           Array.prototype.forEach.call(document.querySelectorAll(".an__range button"), function (b) {
             b.setAttribute("aria-pressed", b === btn ? "true" : "false");
           });
-          load();
+          load(true);
         });
       });
 
-      load();
-      setInterval(load, 60000); // refresh every minute
+      load(true);
+      setInterval(function () { load(false); }, 30000);
     })();
   </script>
 </body>
