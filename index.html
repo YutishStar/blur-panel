@@ -3,6 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <!-- Installable home-screen web app — launches chrome-less (no Safari UI)
+       in standalone mode for a native fullscreen feel on iOS/Android. -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="CrackedHQ" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
   <script src="/analytics.js"></script>
   <title>Cracked Hackerhouse — for cracked people, wherever we go next</title>
   <meta name="description" content="Cracked Hackerhouse — a community of cracked people living, traveling, and building together. Cohort zero in Bangalore. Next stop, Vietnam." />
@@ -37,7 +45,7 @@
       var css = document.createElement('link');
       css.rel = 'stylesheet';
       // Cache normally in production; bust per-load only during local dev.
-      css.href = '/phone-test.css?v=' + (isLocal ? Date.now() : '19');
+      css.href = '/phone-test.css?v=' + (isLocal ? Date.now() : '20');
       document.head.appendChild(css);
       // Tell mobile Safari this is a dark site so it tints its toolbar/safe
       // areas dark (no white strip). Scoped here so desktop is untouched.

@@ -1,0 +1,14 @@
+{
+  "name": "Cracked Hackerhouse",
+  "short_name": "CrackedHQ",
+  "description": "A community of cracked people living, traveling, and building together.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080c12",
+  "theme_color": "#080c12",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

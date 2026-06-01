@@ -69,7 +69,13 @@ html.phone-test .mobile-gate { display: none !important; }
     height: auto;
     min-height: 100vh;         /* iOS: 100vh = large viewport (fills behind toolbar) */
     min-height: 100lvh;        /* explicit large viewport, no gap when toolbar hides */
-    padding: calc(var(--nav-h) + 14px) var(--pad) 104px;
+    /* Respect the notch (top) and home indicator (bottom) — matters in
+       standalone/home-screen mode where content runs fully edge-to-edge.
+       env() is 0 in normal browsing, so the look there is unchanged. */
+    padding:
+      calc(env(safe-area-inset-top, 0px) + var(--nav-h) + 14px)
+      var(--pad)
+      calc(env(safe-area-inset-bottom, 0px) + 104px);
     overflow: visible;
     /* Column layout so we can reorder: house card on top, copy below. */
     display: flex;
@@ -285,7 +291,7 @@ html.phone-test .mobile-gate { display: none !important; }
      (absolute, not fixed) so it doesn't hover over the content on scroll. */
   html.phone-test .brand {
     position: absolute;
-    top: clamp(12px, 2.2vh, 20px);
+    top: calc(env(safe-area-inset-top, 0px) + clamp(12px, 2.2vh, 20px));
     font-size: 23px;
   }
 
