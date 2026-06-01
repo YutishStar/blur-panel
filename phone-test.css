@@ -32,6 +32,9 @@ html.phone-test .mobile-gate { display: none !important; }
        treat it as the scroller, which disables the toolbar-collapse and
        re-creates the black gap at the bottom. clip keeps native page scroll. */
     overflow-x: clip;
+    /* Dark root so the iOS safe areas, overscroll bounce, and the area behind
+       the Safari toolbar never flash white — the page reads full-screen. */
+    background: #080c12;
   }
 
   /* Desktop runs a FIXED full-screen app-shell (.stage fixed, panels
@@ -283,7 +286,7 @@ html.phone-test .mobile-gate { display: none !important; }
   html.phone-test .brand {
     position: absolute;
     top: clamp(12px, 2.2vh, 20px);
-    font-size: 19px;
+    font-size: 23px;
   }
 
   /* Rail: the vertical pill nav is non-functional here (every panel but

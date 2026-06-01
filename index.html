@@ -37,8 +37,14 @@
       var css = document.createElement('link');
       css.rel = 'stylesheet';
       // Cache normally in production; bust per-load only during local dev.
-      css.href = '/phone-test.css?v=' + (isLocal ? Date.now() : '16');
+      css.href = '/phone-test.css?v=' + (isLocal ? Date.now() : '19');
       document.head.appendChild(css);
+      // Tell mobile Safari this is a dark site so it tints its toolbar/safe
+      // areas dark (no white strip). Scoped here so desktop is untouched.
+      var tc = document.createElement('meta');
+      tc.name = 'theme-color';
+      tc.content = '#080c12';
+      document.head.appendChild(tc);
     })();
   </script>
 </head>
