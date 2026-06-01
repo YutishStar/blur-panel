@@ -145,7 +145,10 @@ window.__siteLoaded = (() => {
         { label: "Apply C2", variant: "primary", arrow: true, href: "https://tally.so/r/A7yDE0" },
       ],
       sponsors: [],
-      photos: ["villas/cohort-02/01.png", "villas/cohort-02/02.png", "villas/cohort-02/03.png", "villas/cohort-02/04.png"],
+      photos: [
+        "villas/cohort-02/01.png", "villas/cohort-02/02.png", "villas/cohort-02/03.png", "villas/cohort-02/04.png",
+        "villas/cohort-02/05.png", "villas/cohort-02/06.png", "villas/cohort-02/07.png", "villas/cohort-02/08.png",
+      ],
       stats: [
         { value: "10", label: "builders" },
         { value: "30", label: "days" },
