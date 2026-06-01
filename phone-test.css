@@ -87,18 +87,22 @@ html.phone-test .mobile-gate { display: none !important; }
      bottom where the copy needs contrast. The glass card keeps its own
      localized blur, which is the intentional frosted-glass look. */
   html.phone-test .hero__veil {
-    -webkit-mask-image: none;
-            mask-image: none;
+    /* Frost + darken ONLY the lower region where the copy sits, fading in
+       smoothly via the mask so the open map (and the pointer) above stays
+       sharp. This mirrors the desktop veil (sharp map, frosted behind text).
+       The mask applies to both the blur and the scrim, so the top is fully
+       clear and the bottom is fully frosted, with a soft transition. */
     background:
       linear-gradient(
         180deg,
-        rgba(8, 12, 18, 0.10) 0%,
-        rgba(8, 12, 18, 0.10) 26%,
-        rgba(8, 12, 18, 0.42) 54%,
-        rgba(8, 12, 18, 0.78) 100%
+        rgba(8, 12, 18, 0) 0%,
+        rgba(8, 12, 18, 0.28) 50%,
+        rgba(8, 12, 18, 0.62) 100%
       );
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    backdrop-filter: blur(14px) saturate(118%);
+    -webkit-backdrop-filter: blur(14px) saturate(118%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 42%, #000 56%, #000 100%);
+            mask-image: linear-gradient(180deg, transparent 0%, transparent 42%, #000 56%, #000 100%);
   }
 
   /* Copy block sits BELOW the house card and is pushed into the bottom
@@ -280,11 +284,13 @@ html.phone-test .mobile-gate { display: none !important; }
      ======================================================= */
 
   /* Brand sits at the top of the page and scrolls away with the document
-     (absolute, not fixed) so it doesn't hover over the content on scroll. */
+     (absolute, not fixed) so it doesn't hover over the content on scroll.
+     Bigger now, with a soft shadow so it reads over the sharp map. */
   html.phone-test .brand {
     position: absolute;
-    top: clamp(12px, 2.2vh, 20px);
-    font-size: 19px;
+    top: clamp(14px, 2.6vh, 24px);
+    font-size: 24px;
+    text-shadow: 0 1px 18px rgba(8, 12, 18, 0.55);
   }
 
   /* Rail: the vertical pill nav is non-functional here (every panel but
@@ -309,16 +315,16 @@ html.phone-test .mobile-gate { display: none !important; }
   html.phone-test .dock__right  { display: none; }      /* socials hidden on mobile */
   html.phone-test .dock__apps-range { display: none; }  /* keep status to one line */
 
-  /* Behind the fixed dock, swap the desktop frosted-blur strip for a plain
-     dark gradient — keeps the dock legible over a bright map without blurring
-     the map itself. */
+  /* Banner behind the fixed dock — a frosted strip that fades up smoothly so
+     the dock stays readable at any scroll position, with a soft (not hard)
+     edge. The mask gives the smooth fade. */
   html.phone-test body.page--single::after {
-    height: 120px;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    -webkit-mask-image: none;
-            mask-image: none;
-    background: linear-gradient(to top, rgba(8, 12, 18, 0.72) 0%, rgba(8, 12, 18, 0) 100%);
+    height: 140px;
+    backdrop-filter: blur(16px) saturate(115%);
+    -webkit-backdrop-filter: blur(16px) saturate(115%);
+    background: linear-gradient(to top, rgba(8, 12, 18, 0.45) 0%, rgba(8, 12, 18, 0) 100%);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 35%, rgba(0,0,0,0.55) 68%, transparent 100%);
+            mask-image: linear-gradient(to top, #000 0%, #000 35%, rgba(0,0,0,0.55) 68%, transparent 100%);
   }
 
   /* =======================================================
