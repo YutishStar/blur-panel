@@ -1,27 +1,312 @@
 /* =========================================================
    phone-test.css — mobile staging stylesheet
    ---------------------------------------------------------
-   Loaded ONLY on the /phone-test route (see the harness in
-   index.html). Nothing here touches the live site: production
-   keeps the mobile gate and never loads this file.
+   Loaded ONLY on the /phone-test route (or ?phone-test).
+   See the harness in index.html. Nothing here touches the
+   live site: production keeps the mobile gate and never
+   loads this file.
 
-   All rules are scoped under `html.phone-test` so they can
-   only ever apply on the staging route. Build the mobile
-   version here. When it's ready, we "connect to production"
-   by folding these rules into styles.css and removing the
-   gate — but not until you say so.
+   Everything is scoped under `html.phone-test` AND wrapped
+   in a max-width media query, so it can only ever apply on
+   the staging route at phone widths. Build the mobile
+   version here; "connect to production" later by folding
+   these rules into styles.css and dropping the gate.
    ========================================================= */
 
-/* The inline bootstrap in index.html already hides the gate and
-   restores scroll; mirror it here so the stylesheet is self-contained. */
+/* The inline bootstrap already hides the gate + restores scroll;
+   mirror it here so the stylesheet is self-contained. */
 html.phone-test .mobile-gate { display: none !important; }
 html.phone-test body { overflow: auto !important; }
 
-/* =========================================================
-   Mobile layout — work in progress.
-   Add responsive overrides below, e.g.:
 
-   @media (max-width: 820px) {
-     html.phone-test .some-section { ... }
-   }
+/* =========================================================
+   MOBILE — phones & small tablets (≤ 820px)
    ========================================================= */
+@media (max-width: 820px) {
+
+  /* ---- Global rhythm: tighter chrome + page gutter ---- */
+  html.phone-test { --nav-h: 60px; --pad: 20px; }
+
+  html.phone-test body {
+    overflow-x: hidden !important;
+  }
+
+  /* The shell is normally a fixed, non-scrolling full-screen app.
+     On mobile we let the ACTIVE panel be the scroll container so the
+     stacked hero content is reachable. Inactive panels stay hidden,
+     so only one thing ever scrolls. */
+  html.phone-test .panel.is-active {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* =======================================================
+     HERO (main panel) — reflow the left-pinned 560px pane
+     into a full-width vertical stack.
+     ======================================================= */
+  html.phone-test .hero {
+    position: relative;        /* was sticky */
+    height: auto;
+    min-height: 100%;          /* fill the viewport, grow with content */
+    padding: calc(var(--nav-h) + 14px) var(--pad) 104px;
+    overflow: visible;
+    /* Column layout so we can reorder: house card on top, copy below. */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Map becomes a darkened, NON-interactive backdrop so touch
+     gestures scroll the page instead of panning the map. */
+  html.phone-test .hero__map { pointer-events: none; }
+
+  /* Veil normally only frosts the left ~73% via a horizontal mask.
+     Full-width pane needs legibility edge-to-edge, so drop the mask
+     and lay down a soft top-to-bottom scrim. */
+  html.phone-test .hero__veil {
+    -webkit-mask-image: none;
+            mask-image: none;
+    /* Light at the top so the map reads through behind the glass card,
+       deepening toward the bottom where the copy needs contrast. */
+    background:
+      linear-gradient(
+        180deg,
+        rgba(8, 12, 18, 0.16) 0%,
+        rgba(8, 12, 18, 0.12) 30%,
+        rgba(8, 12, 18, 0.46) 56%,
+        rgba(8, 12, 18, 0.82) 100%
+      );
+    backdrop-filter: blur(5px) saturate(120%);
+    -webkit-backdrop-filter: blur(5px) saturate(120%);
+  }
+
+  /* Copy block sits BELOW the house card and is pushed into the bottom
+     half: `margin-top: auto` eats the free space when the page is taller
+     than the content, and collapses to 0 (normal scroll) when it isn't. */
+  html.phone-test .hero__left {
+    order: 0;
+    min-height: 0;
+    align-items: flex-start;
+    margin-top: auto;
+  }
+
+  /* Pane: full bleed within the gutter, no left margin, no parallax. */
+  html.phone-test .hero__pane {
+    max-width: 100%;
+    margin-left: 0;
+    padding: 0;
+    transform: none;
+  }
+
+  html.phone-test .hero__cohort {
+    margin-bottom: 14px;
+    font-size: 7.5px;
+    letter-spacing: 0.12em;
+    padding: 4px 10px 4px 7px;
+    gap: 6px;
+  }
+
+  html.phone-test .hero__title {
+    font-size: clamp(30px, 8.5vw, 44px);
+    margin-bottom: 12px;
+  }
+
+  html.phone-test .hero__sub {
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: none;
+    margin-bottom: 20px;
+  }
+
+  /* CTAs: compact auto-width pills in a wrapping row, not full-width
+     blocks — they were eating too much vertical space. */
+  html.phone-test .hero__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  html.phone-test .hero__apply {
+    width: auto;
+    padding: 9px 18px;
+    font-size: 12.5px;
+    gap: 7px;
+  }
+  html.phone-test .hero__apply--ghost { padding: 8px 16px; font-size: 12px; }
+  html.phone-test .hero__apply-arrow { font-size: 12.5px; }
+
+  /* Fellows + sponsors: tighter, smaller type. */
+  html.phone-test .hero__fellows { margin-top: 22px; }
+  html.phone-test .hero__fellow { width: 30px; height: 30px; }
+  html.phone-test .hero__fellow + .hero__fellow { margin-left: -10px; }
+  html.phone-test .hero__fellows-count { font-size: 11px; }
+  html.phone-test .hero__fellows-tagline {
+    flex: 1 1 100%;
+    margin-top: 2px;
+    font-size: 11px;
+  }
+  html.phone-test .hero__sponsors { margin-top: 20px; }
+  html.phone-test .hero__sponsors-tagline {
+    font-size: 12px;
+    color: #fff;
+    text-shadow: 0 1px 12px rgba(11, 11, 11, 0.55);
+  }
+  html.phone-test .hero__sponsor-logo { height: 24px; }
+  html.phone-test .hero__sponsor-logo--sm { height: 20px; }
+  html.phone-test .hero__sponsor-logo--lg { height: 42px; }
+
+  /* =======================================================
+     HOUSE INFO CARD
+     On desktop this floats over the map and reveals its detail
+     (villa photos + stats + blurb) on hover. Mobile has no hover
+     and no room to float, so we pull it OUT of its JS-positioned
+     float and into the page flow as a static, always-open card
+     right beneath the copy — and surface the cohort prev/next
+     nav as real tappable buttons.
+
+     JS keeps writing an inline `transform` + toggling `hidden`
+     every frame; stylesheet `!important` overrides both, so no
+     script changes are needed. */
+  html.phone-test .house-marker,
+  html.phone-test .house-marker[hidden] {
+    display: block !important;
+    position: relative !important;   /* anchor the pointer below the card */
+    transform: none !important;
+    order: -1;                 /* top of the hero, above the copy */
+    margin: 0 auto;            /* centered "top middle" */
+    width: 100%;
+    max-width: 340px;          /* keep the card compact */
+    padding-bottom: 58px;      /* room for the downward pointer */
+    pointer-events: auto;
+  }
+
+  /* Card: compact, static, always expanded, desktop-style glass. The
+     desktop backdrop-filter (blur 40 / saturate 180) still applies; we
+     only tune the tint so the map reads through like on desktop. */
+  html.phone-test .house-marker__card {
+    position: static !important;
+    transform: none !important;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    width: 100%;
+    max-width: 100%;
+    padding: 13px 13px 15px;
+    background: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 18px 44px -22px rgba(11, 11, 11, 0.6);
+    transition: none !important;
+  }
+  /* Resting state: card visible + open. */
+  html.phone-test .house-marker .house-marker__card { opacity: 1; }
+
+  /* On cohort switch, JS re-adds `.is-switching` to the marker. The WHOLE
+     marker (card + beam + dot pointer) stays hidden while the map flies for
+     ~1.4s, then fades + de-blurs in together — echoing the desktop reveal.
+     We animate opacity/filter, not transform: the marker's `transform` is
+     pinned with !important to defeat the JS per-frame positioning. */
+  @keyframes ph-marker-appear {
+    0%   { opacity: 0; filter: blur(5px); }
+    100% { opacity: 1; filter: blur(0); }
+  }
+  html.phone-test .house-marker.is-switching {
+    animation: ph-marker-appear 760ms cubic-bezier(0.16, 1, 0.3, 1) 3000ms both;
+  }
+
+  /* Force the expand (photos / stats / blurb) open. */
+  html.phone-test .house-marker__expand {
+    width: auto !important;
+    opacity: 1 !important;
+    margin-top: 11px !important;
+    overflow: visible !important;
+    transition: none !important;
+  }
+
+  /* Smaller card internals. */
+  html.phone-test .house-marker__title { font-size: 10px; letter-spacing: 0.14em; }
+  html.phone-test .house-marker__sub { font-size: 10px; margin-top: 2px; }
+  html.phone-test .house-marker__loc { font-size: 9.5px; margin-top: 4px; }
+  html.phone-test .house-marker__photos { gap: 5px; margin-bottom: 10px; }
+  html.phone-test .house-marker__photo { border-radius: 7px; }
+  html.phone-test .house-marker__stats { padding: 8px 0; margin-bottom: 8px; gap: 8px; }
+  html.phone-test .house-marker__stat-value { font-size: 17px; }
+  html.phone-test .house-marker__stat-label { font-size: 7.5px; }
+  html.phone-test .house-marker__blurb { font-size: 11px; line-height: 1.45; }
+
+  /* Top row spans the card; prev/next arrows sit at the ends. */
+  html.phone-test .house-marker__row {
+    width: 100%;
+    gap: 10px;
+    white-space: normal;
+  }
+  html.phone-test .house-marker__text { flex: 1; min-width: 0; }
+  html.phone-test .house-marker__nav { height: 28px; padding: 0 10px; }
+
+  /* Pointer: bring back the beam + dot, now anchored to the card box and
+     pointing DOWN into the map below. */
+  html.phone-test .house-marker__beam {
+    display: block !important;
+    height: 40px;
+    bottom: 14px;
+  }
+  html.phone-test .house-marker__dot {
+    display: block !important;
+    bottom: 6px;
+  }
+
+  /* =======================================================
+     CHROME — brand, rail, dock
+     ======================================================= */
+
+  /* Brand stays top-center, a little smaller. */
+  html.phone-test .brand {
+    top: clamp(12px, 2.2vh, 20px);
+    font-size: 19px;
+  }
+
+  /* Rail: the vertical pill nav is non-functional here (every panel but
+     "main" is disabled) and overlaps the full-width pane — hide it on
+     mobile for now. Revisit with a real mobile nav when panels ship. */
+  html.phone-test .rail { display: none; }
+
+  /* Dock: the 3-column desktop strip is too wide. Collapse to a two-cell
+     bar — applications status on the left, the persistent Apply CTA on the
+     right — and drop the social icons (they're reachable elsewhere). */
+  html.phone-test .dock {
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    height: auto;
+    padding: 10px var(--pad);
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    font-size: 9.5px;
+  }
+  html.phone-test .dock__cta { font-size: 12px; padding: 8px 16px; }
+  html.phone-test .dock__left   { grid-column: 1; }
+  html.phone-test .dock__center { grid-column: 2; justify-content: flex-end; }
+  html.phone-test .dock__right  { display: none; }      /* socials hidden on mobile */
+  html.phone-test .dock__apps-range { display: none; }  /* keep status to one line */
+
+  /* =======================================================
+     SECONDARY PANELS — light pass so they're not broken if
+     reached (cohorts / about / fellows). The deep passport
+     + journey work comes next.
+     ======================================================= */
+  html.phone-test .panel__inner {
+    height: auto;
+    min-height: 100%;
+    padding:
+      calc(var(--nav-h) + 24px)
+      var(--pad)
+      120px;
+    gap: 24px;
+  }
+  html.phone-test .panel__title { font-size: clamp(34px, 9vw, 52px); }
+  html.phone-test .panel__lede { font-size: 15px; }
+
+  /* Cohort journey: single column instead of the desktop row. */
+  html.phone-test .journey {
+    grid-template-columns: 1fr !important;
+    gap: 18px;
+  }
+}

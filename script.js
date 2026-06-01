@@ -62,12 +62,12 @@ window.__siteLoaded = (() => {
       title: "CRACKED HACKER HOUSE",
       sub:   'Cohort C0 · <span class="house-marker__sub-status">Shipped!</span>',
       loc:   "Bangalore, India",
-      cam:    { lon: 77.67948, lat: 12.9662, zoom: 12.8, pitch: 45, bearing: 118.7 },
+      cam:    { lon: 77.6716, lat: 12.9833, zoom: 12.8, pitch: 45, bearing: 118.7 },
       // anchor = where the house dot pins to the earth. Independent of `cam`,
       // so dragging the camera (D → free-look) slides the dot across the
       // frame without moving it geographically. Tweak this to reposition the
       // dot; tweak `cam` to reframe the satellite view.
-      anchor: { lon: 77.64905, lat: 12.95481 },
+      anchor: { lon: 77.6412, lat: 12.9719 },
       apps:  { label: "applications closed", range: "Cohort 0 · shipped", status: "closed" },
       heroTitle: { a: "Where it",   b: "<em>all started.</em>" },
       heroDesc:  "After my tweet on X, I got on a call with over 50+ people and found the 10 most cracked builders. Got a sponsor for Diet Coke (super important). Made a WhatsApp group, added them all, found and booked the villa in Bangalore — 4 bedrooms, no AC, a big stage, a big lawn, and an awesome sunroof. After 30 days, 2 new co-founding startups came out, a Diet Coke tower that reached the ceiling, and someone raised $1.5M. Sleepless nights, unlimited fun, unforgettable friends, and insane progress.",
@@ -100,8 +100,9 @@ window.__siteLoaded = (() => {
       title: "CRACKED HACKER HOUSE",
       sub:   "Cohort 01 · next stop",
       loc:   "Da Nang, Vietnam",
-      cam:    { lon: 108.2557, lat: 16.07573, zoom: 12.8, pitch: 45, bearing: 118 },
-      anchor: { lon: 108.23098, lat: 16.06304 },
+      cam:       { lon: 108.26627, lat: 16.07186, zoom: 12.8, pitch: 45, bearing: 119.7 },
+      camMobile: { lon: 108.2348,  lat: 16.0548,  zoom: 12.8, pitch: 45, bearing: 118 },
+      anchor:    { lon: 108.2405,  lat: 16.0560 },
       apps:  { label: "applications filled!", range: "The house starts 1st July", status: "filled" },
       heroTitle: { a: "Are you",   b: "<em>Cracked</em> enough?" },
       heroDesc:  "A house full of builders, creators, hackers, and ambitious misfits living together for thirty days.",
@@ -132,8 +133,9 @@ window.__siteLoaded = (() => {
       title: "CRACKED HACKER HOUSE",
       sub:   "Cohort 02 · Starts 15th Aug!",
       loc:   "Canggu, Bali",
-      cam:    { lon: 115.18879, lat: -8.65997, zoom: 12.8, pitch: 45, bearing: 131.2 },
-      anchor: { lon: 115.15130, lat: -8.67235 },
+      cam:       { lon: 115.16274, lat: -8.65019, zoom: 12.8, pitch: 45, bearing: 136.2 },
+      camMobile: { lon: 115.1310,  lat: -8.6575,  zoom: 12.8, pitch: 45, bearing: 135.9 },
+      anchor:    { lon: 115.1285,  lat: -8.6573 },
       apps:  { label: "applications open", range: "1st June – 20th June", status: "open" },
       ctaLabel: "Apply C2",
       heroTitle: { a: "30 days.", b: "10 cracked fellows.", c: "<em>Bali.</em>" },
@@ -152,6 +154,17 @@ window.__siteLoaded = (() => {
     },
   ];
   let cohortIdx = 1; // default landing cohort: Da Nang, Vietnam (01)
+
+  // Desktop and mobile want different camera framings for the SAME anchor:
+  // on desktop the glass pane covers the left, so `cam` composes the city to
+  // the right (often out over water at center); a centered mobile view of
+  // that same cam lands on open ocean. Cohorts may declare an optional
+  // `camMobile` used only at mobile widths — anchors stay shared, so the pin
+  // never moves. Matches the 820px CSS breakpoint.
+  const mqMobile = window.matchMedia("(max-width: 820px)");
+  function camFor(c) {
+    return (mqMobile.matches && c.camMobile) ? c.camMobile : c.cam;
+  }
 
   /* ---------- map init ---------- */
   const mapEl = document.getElementById("map");
@@ -180,7 +193,7 @@ window.__siteLoaded = (() => {
 
     // FINAL is the target view — derived from the landing cohort's recorded
     // camera. Use D → "Record view" to recapture and update COHORTS[].cam.
-    const FINAL = { ...COHORTS[cohortIdx].cam };
+    const FINAL = { ...camFor(COHORTS[cohortIdx]) };
     const START = { lon: place.lon, lat: place.lat, zoom: 10.0, pitch: 5,  bearing: 95  };
 
     const map = new maplibregl.Map({
@@ -450,6 +463,16 @@ window.__siteLoaded = (() => {
       pane.classList.add("is-switching");
     }
 
+    // Same re-trigger for the house card. Desktop ignores this class; on
+    // mobile (phone-test.css) it drives an appear+expand that fires after
+    // the map flyTo, since the card lives in the flow there.
+    const hm = document.getElementById("house-marker");
+    if (hm) {
+      hm.classList.remove("is-switching");
+      void hm.offsetWidth;
+      hm.classList.add("is-switching");
+    }
+
     // move the dot anchor so the marker rides along with the new city.
     // Uses the cohort's fixed `anchor` (not the camera center) so the dot
     // lands in the same composed spot it was authored at.
@@ -463,11 +486,12 @@ window.__siteLoaded = (() => {
     // pause the slow orbit so it stops fighting the flyTo bearing
     inspector.flying = true;
 
+    const cam = camFor(c);
     inspector.map.flyTo({
-      center:  [c.cam.lon, c.cam.lat],
-      zoom:    c.cam.zoom,
-      pitch:   c.cam.pitch,
-      bearing: c.cam.bearing,
+      center:  [cam.lon, cam.lat],
+      zoom:    cam.zoom,
+      pitch:   cam.pitch,
+      bearing: cam.bearing,
       duration: 4200,
       essential: true,
       easing: (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
@@ -475,7 +499,7 @@ window.__siteLoaded = (() => {
 
     inspector.map.once("moveend", () => {
       inspector.flying = false;
-      inspector.orbitBearing = c.cam.bearing;
+      inspector.orbitBearing = cam.bearing;
     });
 
     updateNavButtons();

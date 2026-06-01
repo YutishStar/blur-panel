@@ -19,14 +19,21 @@
        inert on the live site, where this condition is never true. -->
   <script>
     (function () {
-      if (!/^\/phone-test(\/|$)/.test(location.pathname)) return;
+      // Active on the /phone-test route (Vercel rewrite), via ?phone-test
+      // query, OR on any local server — so local dev always shows the real
+      // site + mobile styles with no gate. Production (crackedhq.com) keeps
+      // the gate, since none of these conditions match there.
+      var h = location.hostname;
+      var isLocal = h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '[::1]' || h === '' || h.slice(-6) === '.local';
+      if (!isLocal && !/^\/phone-test(\/|$)/.test(location.pathname) && !/(^|[?&])phone-test(=|&|$)/.test(location.search)) return;
       document.documentElement.classList.add('phone-test');
       var hide = document.createElement('style');
       hide.textContent = '.mobile-gate{display:none!important}body{overflow:auto!important}';
       document.head.appendChild(hide);
       var css = document.createElement('link');
       css.rel = 'stylesheet';
-      css.href = '/phone-test.css?v=1';
+      // Cache-bust per load so local edits always show without a hard refresh.
+      css.href = '/phone-test.css?v=' + Date.now();
       document.head.appendChild(css);
     })();
   </script>
@@ -715,6 +722,6 @@
 
   <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
   <script src="config.js?v=1"></script>
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=11"></script>
 </body>
 </html>
