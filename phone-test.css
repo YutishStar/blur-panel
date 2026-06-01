@@ -43,7 +43,7 @@ html.phone-test .mobile-gate { display: none !important; }
     overflow: visible !important;  /* unlock the gate's scroll-lock */
     height: auto !important;
     min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100lvh;
   }
   html.phone-test .stage {
     position: static !important;
@@ -64,8 +64,8 @@ html.phone-test .mobile-gate { display: none !important; }
   html.phone-test .hero {
     position: relative;        /* was sticky */
     height: auto;
-    min-height: 100vh;         /* fill the viewport, grow with content */
-    min-height: 100dvh;
+    min-height: 100vh;         /* iOS: 100vh = large viewport (fills behind toolbar) */
+    min-height: 100lvh;        /* explicit large viewport, no gap when toolbar hides */
     padding: calc(var(--nav-h) + 14px) var(--pad) 104px;
     overflow: visible;
     /* Column layout so we can reorder: house card on top, copy below. */
@@ -73,18 +73,11 @@ html.phone-test .mobile-gate { display: none !important; }
     flex-direction: column;
   }
 
-  /* Pin the map + scrim to the VIEWPORT (position: fixed) as a full-screen
-     backdrop. On iOS a fixed inset:0 element fills the whole screen — including
-     behind the Safari toolbar (it uses the large viewport) — so no black gap
-     can appear no matter the scroll position or toolbar state. The copy + card
-     scroll normally over this fixed backdrop. Map stays non-interactive so
-     touch scrolls the page instead of panning. */
-  html.phone-test .hero__map,
-  html.phone-test .hero__veil {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-  }
+  /* Map + scrim stay absolute (base styles), so they SCROLL WITH the hero —
+     the satellite view and its pinned location move together with the copy.
+     The hero is sized to the large viewport (see below) so the map still fills
+     behind the iOS toolbar when it collapses — no black gap. Map stays
+     non-interactive so touch scrolls the page instead of panning the map. */
   html.phone-test .hero__map { pointer-events: none; }
 
   /* Veil normally only frosts the left ~73% via a horizontal mask.

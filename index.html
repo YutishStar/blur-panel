@@ -37,7 +37,7 @@
       var css = document.createElement('link');
       css.rel = 'stylesheet';
       // Cache normally in production; bust per-load only during local dev.
-      css.href = '/phone-test.css?v=' + (isLocal ? Date.now() : '15');
+      css.href = '/phone-test.css?v=' + (isLocal ? Date.now() : '16');
       document.head.appendChild(css);
     })();
   </script>
@@ -726,6 +726,6 @@
 
   <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
   <script src="config.js?v=1"></script>
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

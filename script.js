@@ -62,7 +62,8 @@ window.__siteLoaded = (() => {
       title: "CRACKED HACKER HOUSE",
       sub:   'Cohort C0 · <span class="house-marker__sub-status">Shipped!</span>',
       loc:   "Bangalore, India",
-      cam:    { lon: 77.6716, lat: 12.9833, zoom: 12.8, pitch: 45, bearing: 118.7 },
+      cam:       { lon: 77.6716, lat: 12.9833, zoom: 12.8, pitch: 45, bearing: 118.7 },
+      camMobile: { lon: 77.6405, lat: 12.9700, zoom: 12.8, pitch: 45, bearing: 118.7 },
       // anchor = where the house dot pins to the earth. Independent of `cam`,
       // so dragging the camera (D → free-look) slides the dot across the
       // frame without moving it geographically. Tweak this to reposition the
