@@ -27,7 +27,11 @@ html.phone-test .mobile-gate { display: none !important; }
   html.phone-test {
     --nav-h: 60px;
     --pad: 20px;
-    overflow-x: hidden;            /* the root is the document scroller */
+    /* `clip` (NOT `hidden`) stops horizontal scroll without turning the root
+       into a scroll container. `overflow:hidden` on <html> makes iOS Safari
+       treat it as the scroller, which disables the toolbar-collapse and
+       re-creates the black gap at the bottom. clip keeps native page scroll. */
+    overflow-x: clip;
   }
 
   /* Desktop runs a FIXED full-screen app-shell (.stage fixed, panels
@@ -300,6 +304,14 @@ html.phone-test .mobile-gate { display: none !important; }
   html.phone-test .dock__center { grid-column: 2; justify-content: flex-end; }
   html.phone-test .dock__right  { display: none; }      /* socials hidden on mobile */
   html.phone-test .dock__apps-range { display: none; }  /* keep status to one line */
+
+  /* The desktop bottom blur strip is tall + heavy over the dark mobile map,
+     reading as a dark band stacked above the dock. Shrink + soften it. */
+  html.phone-test body.page--single::after {
+    height: 84px;
+    backdrop-filter: blur(10px) saturate(115%);
+    -webkit-backdrop-filter: blur(10px) saturate(115%);
+  }
 
   /* =======================================================
      SECONDARY PANELS — light pass so they're not broken if
