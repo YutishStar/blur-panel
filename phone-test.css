@@ -80,29 +80,24 @@ html.phone-test .mobile-gate { display: none !important; }
      non-interactive so touch scrolls the page instead of panning the map. */
   html.phone-test .hero__map { pointer-events: none; }
 
-  /* Veil normally only frosts the left ~73% via a horizontal mask + a heavy
-     backdrop blur. On mobile we want the satellite map SHARP, so we drop the
-     blur entirely and keep only a soft top→bottom gradient scrim — light at
-     the top (map reads through behind the glass card), deepening toward the
-     bottom where the copy needs contrast. The glass card keeps its own
-     localized blur, which is the intentional frosted-glass look. */
+  /* Veil normally only frosts the left ~73% via a horizontal mask.
+     Full-width pane needs legibility edge-to-edge, so drop the mask
+     and lay down a soft top-to-bottom scrim. */
   html.phone-test .hero__veil {
-    /* Frost + darken ONLY the lower region where the copy sits, fading in
-       smoothly via the mask so the open map (and the pointer) above stays
-       sharp. This mirrors the desktop veil (sharp map, frosted behind text).
-       The mask applies to both the blur and the scrim, so the top is fully
-       clear and the bottom is fully frosted, with a soft transition. */
+    -webkit-mask-image: none;
+            mask-image: none;
+    /* Light at the top so the map reads through behind the glass card,
+       deepening toward the bottom where the copy needs contrast. */
     background:
       linear-gradient(
         180deg,
-        rgba(8, 12, 18, 0) 0%,
-        rgba(8, 12, 18, 0.28) 50%,
-        rgba(8, 12, 18, 0.62) 100%
+        rgba(8, 12, 18, 0.16) 0%,
+        rgba(8, 12, 18, 0.12) 30%,
+        rgba(8, 12, 18, 0.46) 56%,
+        rgba(8, 12, 18, 0.82) 100%
       );
-    backdrop-filter: blur(14px) saturate(118%);
-    -webkit-backdrop-filter: blur(14px) saturate(118%);
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 42%, #000 56%, #000 100%);
-            mask-image: linear-gradient(180deg, transparent 0%, transparent 42%, #000 56%, #000 100%);
+    backdrop-filter: blur(5px) saturate(120%);
+    -webkit-backdrop-filter: blur(5px) saturate(120%);
   }
 
   /* Copy block sits BELOW the house card and is pushed into the bottom
@@ -284,13 +279,11 @@ html.phone-test .mobile-gate { display: none !important; }
      ======================================================= */
 
   /* Brand sits at the top of the page and scrolls away with the document
-     (absolute, not fixed) so it doesn't hover over the content on scroll.
-     Bigger now, with a soft shadow so it reads over the sharp map. */
+     (absolute, not fixed) so it doesn't hover over the content on scroll. */
   html.phone-test .brand {
     position: absolute;
-    top: clamp(14px, 2.6vh, 24px);
-    font-size: 24px;
-    text-shadow: 0 1px 18px rgba(8, 12, 18, 0.55);
+    top: clamp(12px, 2.2vh, 20px);
+    font-size: 19px;
   }
 
   /* Rail: the vertical pill nav is non-functional here (every panel but
@@ -315,16 +308,12 @@ html.phone-test .mobile-gate { display: none !important; }
   html.phone-test .dock__right  { display: none; }      /* socials hidden on mobile */
   html.phone-test .dock__apps-range { display: none; }  /* keep status to one line */
 
-  /* Banner behind the fixed dock — a frosted strip that fades up smoothly so
-     the dock stays readable at any scroll position, with a soft (not hard)
-     edge. The mask gives the smooth fade. */
+  /* The desktop bottom blur strip is tall + heavy over the dark mobile map,
+     reading as a dark band stacked above the dock. Shrink + soften it. */
   html.phone-test body.page--single::after {
-    height: 140px;
-    backdrop-filter: blur(16px) saturate(115%);
-    -webkit-backdrop-filter: blur(16px) saturate(115%);
-    background: linear-gradient(to top, rgba(8, 12, 18, 0.45) 0%, rgba(8, 12, 18, 0) 100%);
-    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 35%, rgba(0,0,0,0.55) 68%, transparent 100%);
-            mask-image: linear-gradient(to top, #000 0%, #000 35%, rgba(0,0,0,0.55) 68%, transparent 100%);
+    height: 84px;
+    backdrop-filter: blur(10px) saturate(115%);
+    -webkit-backdrop-filter: blur(10px) saturate(115%);
   }
 
   /* =======================================================
