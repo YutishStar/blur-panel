@@ -4436,7 +4436,7 @@ body.page--single[data-active-panel="main"] .rail__pill[data-disabled="true"]:ho
   padding: 5px 10px;
   border-radius: 999px;
   background: rgba(11, 11, 11, 0.82);
-  color: #f4f3ee;
+  color: #ffffff;
   font-family: var(--mono);
   font-size: 9px;
   letter-spacing: 0.22em;

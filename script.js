@@ -140,7 +140,7 @@ window.__siteLoaded = (() => {
       apps:  { label: "applications open", range: "1st June – 20th June", status: "open" },
       ctaLabel: "Apply C2",
       heroTitle: { a: "30 days.", b: "10 cracked fellows.", c: "<em>Bali.</em>" },
-      heroDesc:  "Starts 15th August. $500 buys a bed, a desk, and 30 days next to nine cracked builders in a Canggu villa. Compute credits, founder dinners, sponsor intros, scooters at the gate, and demo days that end in the ocean.",
+      heroDesc:  "Starts 15th August. $600 buys a bed, a seat at the workstation, and 30 days next to nine cracked builders in a Canggu villa. Compute credits, founder dinners, sponsor intros, scooters at the gate, and demo days that end in the ocean.",
       actions: [
         { label: "Apply C2", variant: "primary", arrow: true, href: "https://tally.so/r/A7yDE0" },
       ],
@@ -152,7 +152,7 @@ window.__siteLoaded = (() => {
       stats: [
         { value: "10", label: "builders" },
         { value: "30", label: "days" },
-        { value: "6",  label: "rooms" },
+        { value: "4",  label: "rooms" },
       ],
       blurb: "Ten cracked builders living ten meters apart. Compute credits to ship faster, founder dinners on the rooftop, sponsor intros, and demo days that end in the ocean.",
     },
