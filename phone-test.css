@@ -73,8 +73,18 @@ html.phone-test .mobile-gate { display: none !important; }
     flex-direction: column;
   }
 
-  /* Map becomes a darkened, NON-interactive backdrop so touch
-     gestures scroll the page instead of panning the map. */
+  /* Pin the map + scrim to the VIEWPORT (position: fixed) as a full-screen
+     backdrop. On iOS a fixed inset:0 element fills the whole screen — including
+     behind the Safari toolbar (it uses the large viewport) — so no black gap
+     can appear no matter the scroll position or toolbar state. The copy + card
+     scroll normally over this fixed backdrop. Map stays non-interactive so
+     touch scrolls the page instead of panning. */
+  html.phone-test .hero__map,
+  html.phone-test .hero__veil {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
   html.phone-test .hero__map { pointer-events: none; }
 
   /* Veil normally only frosts the left ~73% via a horizontal mask.
