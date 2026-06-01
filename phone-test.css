@@ -16,7 +16,6 @@
 /* The inline bootstrap already hides the gate + restores scroll;
    mirror it here so the stylesheet is self-contained. */
 html.phone-test .mobile-gate { display: none !important; }
-html.phone-test body { overflow: auto !important; }
 
 
 /* =========================================================
@@ -28,6 +27,7 @@ html.phone-test body { overflow: auto !important; }
   html.phone-test { --nav-h: 60px; --pad: 20px; }
 
   html.phone-test body {
+    overflow-y: auto !important;
     overflow-x: hidden !important;
   }
 

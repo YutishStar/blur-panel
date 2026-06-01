@@ -25,15 +25,19 @@
       // the gate, since none of these conditions match there.
       var h = location.hostname;
       var isLocal = h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '[::1]' || h === '' || h.slice(-6) === '.local';
-      if (!isLocal && !/^\/phone-test(\/|$)/.test(location.pathname) && !/(^|[?&])phone-test(=|&|$)/.test(location.search)) return;
+      var isMobile = window.matchMedia('(max-width: 820px)').matches;
+      // The mobile site is live: activate for ALL mobile visitors, plus the
+      // /phone-test route, ?phone-test, and any local server. Desktop
+      // production matches none of these and is left completely untouched.
+      if (!isLocal && !isMobile && !/^\/phone-test(\/|$)/.test(location.pathname) && !/(^|[?&])phone-test(=|&|$)/.test(location.search)) return;
       document.documentElement.classList.add('phone-test');
       var hide = document.createElement('style');
-      hide.textContent = '.mobile-gate{display:none!important}body{overflow:auto!important}';
+      hide.textContent = '.mobile-gate{display:none!important}@media(max-width:820px){body{overflow:auto!important}}';
       document.head.appendChild(hide);
       var css = document.createElement('link');
       css.rel = 'stylesheet';
-      // Cache-bust per load so local edits always show without a hard refresh.
-      css.href = '/phone-test.css?v=' + Date.now();
+      // Cache normally in production; bust per-load only during local dev.
+      css.href = '/phone-test.css?v=' + (isLocal ? Date.now() : '12');
       document.head.appendChild(css);
     })();
   </script>
