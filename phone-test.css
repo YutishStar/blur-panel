@@ -24,22 +24,33 @@ html.phone-test .mobile-gate { display: none !important; }
 @media (max-width: 820px) {
 
   /* ---- Global rhythm: tighter chrome + page gutter ---- */
-  html.phone-test { --nav-h: 60px; --pad: 20px; }
-
-  html.phone-test body {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+  html.phone-test {
+    --nav-h: 60px;
+    --pad: 20px;
+    overflow-x: hidden;            /* the root is the document scroller */
   }
 
-  /* The shell is normally a fixed, non-scrolling full-screen app.
-     On mobile we let the ACTIVE panel be the scroll container so the
-     stacked hero content is reachable. Inactive panels stay hidden,
-     so only one thing ever scrolls. */
+  /* Desktop runs a FIXED full-screen app-shell (.stage fixed, panels
+     absolute, an inner element scrolls). On iOS that stops Safari from
+     collapsing its toolbar, leaving a black gap at the bottom. On mobile we
+     unwind it into a normal scrolling DOCUMENT: the body/page scrolls, so the
+     browser chrome behaves like any other site and fills edge-to-edge. */
+  html.phone-test body {
+    overflow: visible !important;  /* unlock the gate's scroll-lock */
+    height: auto !important;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  html.phone-test .stage {
+    position: static !important;
+    inset: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
   html.phone-test .panel.is-active {
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    position: relative !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 
   /* =======================================================
@@ -49,7 +60,8 @@ html.phone-test .mobile-gate { display: none !important; }
   html.phone-test .hero {
     position: relative;        /* was sticky */
     height: auto;
-    min-height: 100%;          /* fill the viewport, grow with content */
+    min-height: 100vh;         /* fill the viewport, grow with content */
+    min-height: 100dvh;
     padding: calc(var(--nav-h) + 14px) var(--pad) 104px;
     overflow: visible;
     /* Column layout so we can reorder: house card on top, copy below. */
@@ -259,8 +271,10 @@ html.phone-test .mobile-gate { display: none !important; }
      CHROME — brand, rail, dock
      ======================================================= */
 
-  /* Brand stays top-center, a little smaller. */
+  /* Brand sits at the top of the page and scrolls away with the document
+     (absolute, not fixed) so it doesn't hover over the content on scroll. */
   html.phone-test .brand {
+    position: absolute;
     top: clamp(12px, 2.2vh, 20px);
     font-size: 19px;
   }
