@@ -188,7 +188,7 @@
               </a>
             </div>
 
-            <button type="button" class="hero__fellows" data-panel-link="fellows" aria-label="Meet the cracked — open the fellows panel">
+            <div class="hero__fellows hero__fellows--static">
               <span class="hero__fellows-label">The Cracked Fellows</span>
               <span class="hero__fellows-row">
                 <span class="hero__fellows-stack" aria-hidden="true">
@@ -207,7 +207,7 @@
                 </span>
                 <span class="hero__fellows-tagline">Fellows building startups, AI tools, airbnbs, companies and weird internet ideas.</span>
               </span>
-            </button>
+            </div>
 
             <div class="hero__sponsors" data-hero-sponsors>
               <span class="hero__sponsors-label" data-hero-sponsors-label>The Sponsors</span>
@@ -318,7 +318,7 @@
           <span class="panel__eyebrow">the journey</span>
           <h2 id="panel-cohorts-title" class="panel__title">three rooms. <em>one cohort at a time.</em></h2>
           <p class="panel__lede">
-            bangalore shipped. da nang boards in july. bali is on the menu. and whoever shows up next gets the keys.
+            bangalore shipped. da nang boards in july. dubai is next, then bali. and whoever shows up after gets the keys.
           </p>
         </header>
 
@@ -363,24 +363,44 @@
             <p class="journey__note">applications filled. eighteen fellows. one beachside villa. doors open july 1.</p>
           </li>
 
-          <li class="journey__node journey__node--planning">
+          <li class="journey__node journey__node--live">
             <div class="journey__head">
               <span class="journey__index">02</span>
               <span class="journey__status">
                 <span class="journey__status-dot" aria-hidden="true"></span>
-                planning
+                applications open
+              </span>
+            </div>
+            <span class="journey__rail" aria-hidden="true"></span>
+            <span class="journey__rail-dot" aria-hidden="true"></span>
+            <h3 class="journey__city">Dubai<small>UAE</small></h3>
+            <dl class="journey__meta">
+              <div><dt>when</dt><dd>5 aug '26</dd></div>
+              <div><dt>house</dt><dd>tbd</dd></div>
+              <div><dt>fellows</dt><dd>10</dd></div>
+              <div><dt>weeks</dt><dd>4</dd></div>
+            </dl>
+            <p class="journey__note">applications open. starts 5 august. ten cracked builders, one dubai villa. (details coming soon.)</p>
+          </li>
+
+          <li class="journey__node journey__node--live">
+            <div class="journey__head">
+              <span class="journey__index">03</span>
+              <span class="journey__status">
+                <span class="journey__status-dot" aria-hidden="true"></span>
+                applications open
               </span>
             </div>
             <span class="journey__rail" aria-hidden="true"></span>
             <span class="journey__rail-dot" aria-hidden="true"></span>
             <h3 class="journey__city">Canggu<small>Bali</small></h3>
             <dl class="journey__meta">
-              <div><dt>when</dt><dd>late '26</dd></div>
+              <div><dt>when</dt><dd>1 sep '26</dd></div>
               <div><dt>house</dt><dd>canggu</dd></div>
-              <div><dt>fellows</dt><dd>tbd</dd></div>
-              <div><dt>apply</dt><dd>1 – 30 jun</dd></div>
+              <div><dt>fellows</dt><dd>10</dd></div>
+              <div><dt>apply</dt><dd>1 – 20 jun</dd></div>
             </dl>
-            <p class="journey__note">applications open 1 june – 30 june. rice-paddy wifi, sunset surf, an indo-pacific cohort.</p>
+            <p class="journey__note">applications open. starts 1 september. rice-paddy wifi, sunset surf, an indo-pacific cohort.</p>
           </li>
 
           <li class="journey__node journey__node--unknown">
@@ -394,7 +414,7 @@
             <span class="journey__rail-dot" aria-hidden="true"></span>
             <h3 class="journey__city">Wherever<small>we go next</small></h3>
             <dl class="journey__meta">
-              <div><dt>cohort</dt><dd>03</dd></div>
+              <div><dt>cohort</dt><dd>04</dd></div>
               <div><dt>when</dt><dd>2027</dd></div>
               <div><dt>house</dt><dd>tbd</dd></div>
               <div><dt>fellows</dt><dd>tbd</dd></div>
@@ -415,7 +435,7 @@
         <div class="panel__body panel__body--about">
           <p>a house full of cracked people in one city, building together.</p>
           <p>no curriculum. no schedule. <em>the people, the city, the work.</em></p>
-          <p>cohort zero ran in bangalore. next stop &mdash; <em>vietnam.</em> then <em>bali.</em> then wherever makes sense.</p>
+          <p>cohort zero ran in bangalore. next stop &mdash; <em>vietnam.</em> then <em>dubai,</em> then <em>bali.</em> then wherever makes sense.</p>
         </div>
       </div>
     </section>
@@ -653,12 +673,21 @@
                 </svg>
               </div>
 
+              <div class="stamp stamp--dxb stamp--ghost" aria-hidden="true">
+                <svg viewBox="0 0 220 140" width="100%" height="100%">
+                  <rect x="10" y="12" width="200" height="116" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 5"/>
+                  <text x="110" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4" fill="currentColor">RESERVED · DUBAI</text>
+                  <text x="110" y="88" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="26" fill="currentColor">UAE</text>
+                  <text x="110" y="108" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7.4" letter-spacing="3" fill="currentColor">COHORT · 02 · COMING SOON</text>
+                </svg>
+              </div>
+
               <div class="stamp stamp--arg stamp--ghost" aria-hidden="true">
                 <svg viewBox="0 0 220 140" width="100%" height="100%">
                   <rect x="10" y="12" width="200" height="116" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 5"/>
                   <text x="110" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4" fill="currentColor">RESERVED · CANGGU</text>
                   <text x="110" y="88" text-anchor="middle" font-family="Instrument Serif, serif" font-style="italic" font-size="26" fill="currentColor">Bali</text>
-                  <text x="110" y="108" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7.4" letter-spacing="3" fill="currentColor">COHORT · 02 · COMING SOON</text>
+                  <text x="110" y="108" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7.4" letter-spacing="3" fill="currentColor">COHORT · 03 · COMING SOON</text>
                 </svg>
               </div>
             </div>
@@ -671,7 +700,7 @@
                 <ul class="passport-book__legend-list" data-houses-list></ul>
                 <p class="passport-book__legend-note">
                   we pick cities that are friendly to visiting builders and full of cracked people doing real work. <br>
-                  next stop &mdash; <em>bali</em>.
+                  next stop &mdash; <em>dubai</em>.
                 </p>
               </div>
 

@@ -863,6 +863,11 @@ img, svg { display: block; max-width: 100%; }
   color: #ff5252;
   text-shadow: 0 0 8px rgba(255, 82, 82, 0.45), 0 1px 10px rgba(11, 11, 11, 0.3);
 }
+.hero__cohort-status--open {
+  color: #8effa5;
+  text-shadow: 0 0 8px rgba(142, 255, 165, 0.45), 0 1px 10px rgba(11, 11, 11, 0.3);
+}
+
 
 /* ── dual-CTA row: Apply now + Explore program ─────────────────────────── */
 .hero__actions {
@@ -993,7 +998,7 @@ img, svg { display: block; max-width: 100%; }
   text-align: left;
   text-decoration: none;
   color: inherit;
-  cursor: pointer;
+  cursor: default;
   background-color: transparent;
   background-image: linear-gradient(
     90deg,
@@ -1137,10 +1142,10 @@ img, svg { display: block; max-width: 100%; }
   justify-items: start;
   padding: 11px 18px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(86, 96, 88, 0.16);
   border: 0;
-  backdrop-filter: blur(40px) saturate(180%) brightness(1.04);
-  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.04);
+  backdrop-filter: blur(60px) saturate(135%) brightness(1.02);
+  -webkit-backdrop-filter: blur(60px) saturate(135%) brightness(1.02);
   box-shadow: 0 10px 28px -18px rgba(11, 11, 11, 0.5);
   color: #fff;
   opacity: 0;
@@ -1154,7 +1159,7 @@ img, svg { display: block; max-width: 100%; }
     box-shadow 320ms ease;
 }
 .house-marker.is-landed .house-marker__card {
-  opacity: 0.88;
+  opacity: 0.92;
   transform: translate(-50%, 0);
 }
 
@@ -1661,6 +1666,9 @@ img, svg { display: block; max-width: 100%; }
 .poster--bsa  { background-image:
   linear-gradient(160deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.45) 100%),
   radial-gradient(120% 100% at 65% 25%, #f7c89c 0%, #4ea88a 42%, #103141 100%); }
+.poster--dxb  { background-image:
+  linear-gradient(160deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.45) 100%),
+  radial-gradient(120% 100% at 35% 20%, #f6d9a0 0%, #d99a4e 40%, #5a2f12 100%); }
 
 .poster__name {
   position: absolute;
@@ -3701,6 +3709,13 @@ img, svg { display: block; max-width: 100%; }
   transform: rotate(-3deg) scale(0.88);
   opacity: 0;
 }
+.stamp--dxb {
+  bottom: 8%;
+  left: 7%;
+  color: var(--pp-stamp-arg);
+  transform: rotate(4deg) scale(0.84);
+  opacity: 0;
+}
 
 /* stamps fade in when the spread becomes active for an extra beat
    of theatre — the user opens the page, then the stamps settle in. */
@@ -4408,23 +4423,30 @@ body.page--single[data-active-panel="main"] .rail__list {
 /* Disabled pills — cohorts/fellows/about while those panels aren't ready.
    Inert: dimmed, not-allowed cursor, no hover tone change, no dot pop.
    On hover we surface a small "coming soon" pill to the left of the rail. */
+/* Dim disabled pills via COLOR, not opacity — the "coming soon" tooltip is a
+   ::after child, so a parent opacity:0.32 would also fade the tooltip to ~32%
+   (it looked invisible on every background). Keeping the pill at full opacity
+   lets the tooltip render at full strength. */
 .rail__pill[data-disabled="true"] {
   cursor: not-allowed;
-  opacity: 0.32;
+  opacity: 1;
+  color: rgba(244, 243, 238, 0.34);
 }
 .rail__pill[data-disabled="true"]:hover {
-  color: var(--ink-3);
+  color: rgba(244, 243, 238, 0.5);
   background: transparent;
-  opacity: 0.32;
+  opacity: 1;
 }
+.rail__pill[data-disabled="true"] .rail__pill-dot { opacity: 0.4; }
 .rail__pill[data-disabled="true"]:hover .rail__pill-dot { opacity: 0.55; }
 body.page--single[data-active-panel="main"] .rail__pill[data-disabled="true"] {
-  opacity: 0.28;
+  opacity: 1;
+  color: rgba(244, 243, 238, 0.3);
 }
 body.page--single[data-active-panel="main"] .rail__pill[data-disabled="true"]:hover {
-  color: rgba(244, 243, 238, 0.62);
+  color: rgba(244, 243, 238, 0.5);
   background: transparent;
-  opacity: 0.28;
+  opacity: 1;
 }
 
 .rail__pill[data-disabled="true"]::after {
@@ -4435,7 +4457,9 @@ body.page--single[data-active-panel="main"] .rail__pill[data-disabled="true"]:ho
   transform: translateY(-50%) translateX(4px);
   padding: 5px 10px;
   border-radius: 999px;
-  background: rgba(11, 11, 11, 0.82);
+  background: #0b0b0b;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 22px -6px rgba(0, 0, 0, 0.75);
   color: #ffffff;
   font-family: var(--mono);
   font-size: 9px;

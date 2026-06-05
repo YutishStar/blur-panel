@@ -129,30 +129,63 @@ window.__siteLoaded = (() => {
       blurb: "Sleep is optional in this house, but shipping and having fun is undeniable.",
     },
     {
+      // ---- C2 · DUBAI (NEW) — placeholder content; real copy + Dubai-specific
+      // Tally link land later. Photos reuse the Bali set as placeholders until
+      // real Dubai shots are dropped into villas/cohort-02/. -------------------
       id: "02",
-      badge: "Cohort 2, Canggu, Bali",
+      badge: 'Cohort 2, Dubai, UAE <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status hero__cohort-status--open">Applications open!</span>',
       title: "CRACKED HACKER HOUSE",
-      sub:   "Cohort 02 · Starts 15th Aug!",
+      sub:   "Cohort 02 · Starts 5th Aug!",
+      loc:   "Dubai, UAE",
+      cam:       { lon: 55.17257, lat: 25.11601, zoom: 12.8, pitch: 45, bearing: 124.2 },
+      camMobile: { lon: 55.13957, lat: 25.10801, zoom: 12.8, pitch: 45, bearing: 123.2 },
+      anchor:    { lon: 55.15536, lat: 25.09564 },
+      apps:  { label: "applications open", range: "Starts 5th August", status: "open" },
+      ctaLabel: "Apply C2",
+      tally: "https://tally.so/r/VLNzGJ",
+      heroTitle: { a: "30 days.", b: "10 cracked founders.", c: "<em>Dubai.</em>" },
+      heroDesc:  "Starts 5th August. $500 buys a bed, a seat at the workstation, and 30 days next to nine cracked builders in a Dubai apartment + pool, sauna, gym, and tennis court. Compute credits, founder dinners, sponsor intros, and demo days that end in the ocean.",
+      actions: [
+        { label: "Apply C2", variant: "primary", arrow: true, href: "https://tally.so/r/VLNzGJ" },
+      ],
+      sponsors: [],
+      photos: [
+        "villas/cohort-02/01.png?v=2", "villas/cohort-02/02.png?v=2", "villas/cohort-02/03.png?v=2", "villas/cohort-02/04.png?v=2",
+      ],
+      stats: [
+        { value: "10", label: "founders" },
+        { value: "30", label: "days" },
+        { value: "5",  label: "rooms" },
+      ],
+      blurb: "Ten cracked founders living ten meters apart in Dubai — pool, sauna, gym, and a tennis court downstairs. Compute credits to ship faster, founder dinners, sponsor intros, and demo days that end in the ocean.",
+    },
+    {
+      id: "03",
+      badge: 'Cohort 3, Canggu, Bali <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status hero__cohort-status--open">Applications open!</span>',
+      title: "CRACKED HACKER HOUSE",
+      sub:   "Cohort 03 · Starts 1st Sep!",
       loc:   "Canggu, Bali",
       cam:       { lon: 115.16274, lat: -8.65019, zoom: 12.8, pitch: 45, bearing: 136.2 },
       camMobile: { lon: 115.1310,  lat: -8.6575,  zoom: 12.8, pitch: 45, bearing: 135.9 },
       anchor:    { lon: 115.1285,  lat: -8.6573 },
       apps:  { label: "applications open", range: "1st June – 20th June", status: "open" },
-      ctaLabel: "Apply C2",
-      heroTitle: { a: "30 days.", b: "10 cracked fellows.", c: "<em>Bali.</em>" },
-      heroDesc:  "Starts 15th August. $600 buys a bed, a seat at the workstation, and 30 days next to nine cracked builders in a Canggu villa. Compute credits, founder dinners, sponsor intros, scooters at the gate, and demo days that end in the ocean.",
+      ctaLabel: "Apply C3",
+      // TODO: swap in the Bali-specific Tally link when provided.
+      tally: "https://tally.so/r/A7yDE0",
+      heroTitle: { a: "The Cracked Internet", b: "is moving to", c: "<em>Bali.</em>" },
+      heroDesc:  "Starts 1st September. $500 puts you in a Canggu villa with nine other cracked builders for thirty days — rice-paddy mornings, rooftop founder dinners, and demo days that end in the ocean. Compute credits, sponsor intros, scooters at the gate, and a cohort that ships before it surfs.",
       actions: [
-        { label: "Apply C2", variant: "primary", arrow: true, href: "https://tally.so/r/A7yDE0" },
+        { label: "Apply C3", variant: "primary", arrow: true, href: "https://tally.so/r/A7yDE0" },
       ],
       sponsors: [],
       photos: [
-        "villas/cohort-02/01.png", "villas/cohort-02/02.png", "villas/cohort-02/03.png", "villas/cohort-02/04.png",
-        "villas/cohort-02/05.png", "villas/cohort-02/06.png", "villas/cohort-02/07.png", "villas/cohort-02/08.png",
+        "villas/cohort-03/01.png", "villas/cohort-03/02.png", "villas/cohort-03/03.png", "villas/cohort-03/04.png",
+        "villas/cohort-03/05.png", "villas/cohort-03/06.png", "villas/cohort-03/07.png", "villas/cohort-03/08.png",
       ],
       stats: [
         { value: "10", label: "builders" },
         { value: "30", label: "days" },
-        { value: "4",  label: "rooms" },
+        { value: "5",  label: "rooms" },
       ],
       blurb: "Ten cracked builders living ten meters apart. Compute credits to ship faster, founder dinners on the rooftop, sponsor intros, and demo days that end in the ocean.",
     },
@@ -169,6 +202,7 @@ window.__siteLoaded = (() => {
   function camFor(c) {
     return (mqMobile.matches && c.camMobile) ? c.camMobile : c.cam;
   }
+
 
   /* ---------- map init ---------- */
   const mapEl = document.getElementById("map");
@@ -315,7 +349,7 @@ window.__siteLoaded = (() => {
 
   /* =========================================================
      COHORT NAV — left/right arrows on the marker box fly the
-     camera between Bangalore (00) → Da Nang (01) → Canggu, Bali (02)
+     camera between Bangalore (00) → Da Nang (01) → Dubai (02) → Canggu, Bali (03)
      ========================================================= */
   /* Sync all per-cohort DOM (marker box, hero title/desc/actions, badge,
      apps label/range, dock dot status, expand panel) to a cohort. Runs on
@@ -359,8 +393,8 @@ window.__siteLoaded = (() => {
     // read the pitch before applying.
     const dockCta = document.querySelector("[data-dock-cta]");
     if (dockCta) {
-      if (c.id === "02") {
-        dockCta.href   = "https://tally.so/r/A7yDE0";
+      if (c.id === "02" && c.tally) {
+        dockCta.href   = c.tally;
         dockCta.target = "_blank";
         dockCta.rel    = "noopener noreferrer";
         dockCta.removeAttribute("data-cohort-jump");
@@ -1387,7 +1421,8 @@ window.__siteLoaded = (() => {
       const all = [
         { key: "bangalore", label: "Bangalore",    meta: "cohort 00 · indira nagar", color: "blr", visited: houses.includes("bangalore") },
         { key: "vietnam",   label: "Vietnam",      meta: "cohort 01 · my khe",       color: "vnm", visited: houses.includes("vietnam") },
-        { key: "bali",      label: "Bali",         meta: "cohort 02 · canggu",       color: "arg", visited: false },
+        { key: "dubai",     label: "Dubai",        meta: "cohort 02 · uae",          color: "arg", visited: false },
+        { key: "bali",      label: "Bali",         meta: "cohort 03 · canggu",       color: "arg", visited: false },
       ];
       all.forEach((h) => {
         const li = document.createElement("li");
