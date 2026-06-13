@@ -113,7 +113,10 @@ window.__siteLoaded = (() => {
       ],
       sponsors: [
         { tagline: "Our content sponsors",   logo: "sponsors/sponsor-1.png", alt: "Team1",    size: "sm", url: "https://x.com/Team1VN" },
-        { tagline: "Our credits sponsor",    logo: "sponsors/razorpay.png",  alt: "Razorpay", size: "md", url: "https://razorpay.com/" },
+        { tagline: "Our credits sponsors", logos: [
+          { logo: "sponsors/razorpay.png",       alt: "Razorpay", size: "md", url: "https://razorpay.com/" },
+          { logo: "sponsors/boardy-favicon.png", alt: "Boardy",   size: "md", url: "https://boardy.ai/" },
+        ] },
       ],
       photos: [
         "villas/cohort-01/HIx-N74aIAAgNFg.jpeg",
@@ -445,25 +448,35 @@ window.__siteLoaded = (() => {
           const tagline = document.createElement("span");
           tagline.className = "hero__sponsors-tagline";
           tagline.innerHTML = `${s.tagline} &mdash;`;
-          const img = document.createElement("img");
-          const sizeCls = s.size === "sm" ? " hero__sponsor-logo--sm"
-                        : s.size === "lg" ? " hero__sponsor-logo--lg" : "";
-          img.className = "hero__sponsor-logo" + sizeCls;
-          img.src = s.logo;
-          img.alt = s.alt || "";
           row.appendChild(tagline);
-          if (s.url) {
-            const link = document.createElement("a");
-            link.className = "hero__sponsor-link";
-            link.href   = s.url;
-            link.target = "_blank";
-            link.rel    = "noopener noreferrer";
-            link.setAttribute("aria-label", s.alt || s.tagline);
-            link.appendChild(img);
-            row.appendChild(link);
-          } else {
-            row.appendChild(img);
-          }
+          // A row can carry one logo (logo/alt/size/url) or several (logos[]).
+          const logos = s.logos || [{ logo: s.logo, alt: s.alt, size: s.size, url: s.url }];
+          logos.forEach((l, i) => {
+            if (i > 0) {
+              const sep = document.createElement("span");
+              sep.className = "hero__sponsor-sep";
+              sep.textContent = "|";
+              row.appendChild(sep);
+            }
+            const img = document.createElement("img");
+            const sizeCls = l.size === "sm" ? " hero__sponsor-logo--sm"
+                          : l.size === "lg" ? " hero__sponsor-logo--lg" : "";
+            img.className = "hero__sponsor-logo" + sizeCls;
+            img.src = l.logo;
+            img.alt = l.alt || "";
+            if (l.url) {
+              const link = document.createElement("a");
+              link.className = "hero__sponsor-link";
+              link.href   = l.url;
+              link.target = "_blank";
+              link.rel    = "noopener noreferrer";
+              link.setAttribute("aria-label", l.alt || s.tagline);
+              link.appendChild(img);
+              row.appendChild(link);
+            } else {
+              row.appendChild(img);
+            }
+          });
           sponsorsEl.appendChild(row);
         });
       }

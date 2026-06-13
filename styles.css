@@ -1091,6 +1091,10 @@ img, svg { display: block; max-width: 100%; }
 }
 .hero__sponsor-logo--sm { height: 20px; }
 .hero__sponsor-logo--lg { height: 56px; }
+.hero__sponsor-sep {
+  opacity: 0.45;
+  margin: 0 2px;
+}
 .hero__sponsor-link {
   display: inline-flex;
   align-items: center;
