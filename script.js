@@ -138,29 +138,29 @@ window.__siteLoaded = (() => {
       id: "02",
       badge: 'Cohort 2, Dubai, UAE <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status hero__cohort-status--open">Applications open!</span>',
       title: "CRACKED HACKER HOUSE",
-      sub:   "Cohort 02 · Starts 5th Aug!",
+      sub:   "Cohort 02 · Starts 8th Aug!",
       loc:   "Dubai, UAE",
       cam:       { lon: 55.17257, lat: 25.11601, zoom: 12.8, pitch: 45, bearing: 124.2 },
       camMobile: { lon: 55.13957, lat: 25.10801, zoom: 12.8, pitch: 45, bearing: 123.2 },
       anchor:    { lon: 55.15536, lat: 25.09564 },
-      apps:  { label: "applications open", range: "Starts 5th August", status: "open" },
+      apps:  { label: "applications open", range: "Starts 8th August", status: "open" },
       ctaLabel: "Apply C2",
       tally: "https://tally.so/r/VLNzGJ",
-      heroTitle: { a: "30 days.", b: "10 cracked founders.", c: "<em>Dubai.</em>" },
-      heroDesc:  "Starts 5th August. $500 buys a bed, a seat at the workstation, and 30 days next to nine cracked builders in a Dubai apartment + pool, sauna, gym, and tennis court. Compute credits, founder dinners, sponsor intros, and demo days that end in the ocean.",
+      heroTitle: { a: "30 days.", b: "16 cracked founders.", c: "<em>Dubai.</em>" },
+      heroDesc:  "Starts 8th August. $500 buys a bed, a seat at the workstation, and 30 days next to sixteen cracked builders in a Dubai villa 10 minutes from the Burj Khalifa. Compute credits, founder dinners, sponsor intros, and demo days that end in the ocean.",
       actions: [
         { label: "Apply C2", variant: "primary", arrow: true, href: "https://tally.so/r/VLNzGJ" },
       ],
       sponsors: [],
       photos: [
-        "villas/cohort-02/01.png?v=2", "villas/cohort-02/02.png?v=2", "villas/cohort-02/03.png?v=2", "villas/cohort-02/04.png?v=2",
+        "villas/cohort-02/245A4763-HDR.JPG", "villas/cohort-02/245A4887-HDR.JPG", "villas/cohort-02/245A4896-HDR.JPG", "villas/cohort-02/245A4921-HDR.JPG",
       ],
       stats: [
-        { value: "10", label: "founders" },
+        { value: "16", label: "founders" },
         { value: "30", label: "days" },
-        { value: "5",  label: "rooms" },
+        { value: "9",  label: "beds" },
       ],
-      blurb: "Ten cracked founders living ten meters apart in Dubai — pool, sauna, gym, and a tennis court downstairs. Compute credits to ship faster, founder dinners, sponsor intros, and demo days that end in the ocean.",
+      blurb: "Sixteen cracked founders living ten meters apart in Dubai, 10 minutes from the Burj Khalifa. Compute credits to ship faster, founder dinners, sponsor intros, and demo days that end in the ocean.",
     },
     {
       id: "03",
@@ -204,6 +204,76 @@ window.__siteLoaded = (() => {
   const mqMobile = window.matchMedia("(max-width: 820px)");
   function camFor(c) {
     return (mqMobile.matches && c.camMobile) ? c.camMobile : c.cam;
+  }
+
+  /* ---------- satellite tile prefetch ----------
+     flyTo() across cohorts lands on a far-away view whose tiles aren't
+     cached yet, so the map flashes black until Esri responds. We warm the
+     browser HTTP cache with a small tile pyramid for every cohort's
+     destination view: switches then land on cached imagery, and there's
+     always a blurry low-zoom ancestor to show instead of black. */
+  const ESRI_TILE =
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+
+  function lonLatToTile(lon, lat, z) {
+    const n = Math.pow(2, z);
+    const x = Math.floor(((lon + 180) / 360) * n);
+    const latRad = (lat * Math.PI) / 180;
+    const y = Math.floor(((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2) * n);
+    return { x, y, n };
+  }
+
+  // zoom offsets (from the view's native zoom) + neighbour radius to warm.
+  // The low levels guarantee a blurry ancestor exists (no black); the top
+  // level covers the actual viewport so the landing is sharp.
+  const PREFETCH_LEVELS = [
+    { dz: 0,  r: 2 },  // ~the viewport at native zoom
+    { dz: -1, r: 1 },  // one level out
+    { dz: -4, r: 0 },  // regional ancestor
+    { dz: -7, r: 0 },  // continental ancestor
+  ];
+
+  function prefetchView(cam, seen) {
+    const base = Math.round(cam.zoom);
+    PREFETCH_LEVELS.forEach(({ dz, r }) => {
+      const z = Math.max(1, base + dz);
+      const { x, y, n } = lonLatToTile(cam.lon, cam.lat, z);
+      for (let ix = x - r; ix <= x + r; ix++) {
+        for (let iy = y - r; iy <= y + r; iy++) {
+          if (iy < 0 || iy >= n) continue;       // clamp latitude
+          const tx = ((ix % n) + n) % n;          // wrap longitude
+          const url = ESRI_TILE
+            .replace("{z}", z).replace("{x}", tx).replace("{y}", iy);
+          if (seen.has(url)) continue;
+          seen.add(url);
+          const img = new Image();
+          img.decoding = "async";
+          img.src = url;
+        }
+      }
+    });
+  }
+
+  let prefetchDone = false;
+  function prefetchAllCohorts() {
+    if (prefetchDone) return;
+    prefetchDone = true;
+    // Respect data-saver / very slow links — skip the warm-up entirely.
+    const conn = navigator.connection;
+    if (conn && (conn.saveData || /(^|-)2g/.test(conn.effectiveType || ""))) return;
+    const seen = new Set();
+    COHORTS.forEach((c, i) => {
+      if (i === cohortIdx) return;  // current view is already loading/loaded
+      prefetchView(camFor(c), seen);
+    });
+  }
+
+  function idlePrefetch() {
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(() => prefetchAllCohorts(), { timeout: 3000 });
+    } else {
+      setTimeout(prefetchAllCohorts, 1200);
+    }
   }
 
 
@@ -283,7 +353,7 @@ window.__siteLoaded = (() => {
       if (reduceMotion) {
         map.jumpTo({ center: [FINAL.lon, FINAL.lat], zoom: FINAL.zoom, pitch: FINAL.pitch, bearing: FINAL.bearing });
         document.getElementById("house-marker")?.classList.add("is-landed");
-        loaded.then(fireIris);
+        loaded.then(() => { fireIris(); idlePrefetch(); });
         return;
       }
 
@@ -305,8 +375,9 @@ window.__siteLoaded = (() => {
 
       // The loader resolves the moment its fade begins, so the iris
       // ripple starts immediately underneath it — they cross-fade
-      // instead of leaving a black header between them.
-      loaded.then(fireIris);
+      // instead of leaving a black header between them. Once revealed,
+      // warm the other cohorts' tiles on idle so switches don't flash.
+      loaded.then(() => { fireIris(); idlePrefetch(); });
     });
   }
 
@@ -604,6 +675,78 @@ window.__siteLoaded = (() => {
 
     if (blurbEl) blurbEl.textContent = c.blurb || "";
   }
+
+  // Cohorts panel — build a visual card per cohort from the COHORTS array
+  // (single source of truth). Each card jumps to the main panel and flies
+  // the satellite map to that house via the existing [data-cohort-jump]
+  // and [data-panel-link] delegated handlers. A static "?? your call"
+  // tile is appended last.
+  function renderCohortsGrid() {
+    const grid = document.querySelector("[data-cohorts-grid]");
+    if (!grid) return;
+
+    // map a cohort's application status → a human label + a color kind
+    const STATUS = {
+      closed: { label: "shipped",           kind: "shipped" },
+      filled: { label: "boarding",          kind: "boarding" },
+      open:   { label: "applications open", kind: "open" },
+    };
+
+    grid.innerHTML = "";
+
+    COHORTS.forEach((c, i) => {
+      const [city, country] = (c.loc || "").split(",").map((s) => s.trim());
+      const st = STATUS[c.apps?.status] || { label: c.apps?.label || "", kind: "open" };
+
+      const card = document.createElement("a");
+      card.className = "cohort-card cohort-card--" + st.kind;
+      card.href = "#main";
+      card.dataset.panelLink = "main";
+      card.dataset.cohortJump = String(i);
+      card.setAttribute("aria-label", `${city} — ${st.label}, view on map`);
+
+      const cover = c.photos && c.photos[0] ? c.photos[0] : "";
+      if (cover) card.style.setProperty("--cover", `url('${cover}')`);
+
+      const stats = (c.stats || [])
+        .map(
+          (s) =>
+            `<span class="cohort-card__stat"><b>${s.value}</b>${s.label}</span>`
+        )
+        .join("");
+
+      card.innerHTML = `
+        <span class="cohort-card__media" aria-hidden="true"></span>
+        <span class="cohort-card__body">
+          <span class="cohort-card__top">
+            <span class="cohort-card__index">${c.id}</span>
+            <span class="cohort-card__status"><span class="cohort-card__dot" aria-hidden="true"></span>${st.label}</span>
+          </span>
+          <span class="cohort-card__city">${city || ""}<small>${country || ""}</small></span>
+          <span class="cohort-card__stats">${stats}</span>
+          <span class="cohort-card__blurb">${c.blurb || ""}</span>
+          <span class="cohort-card__cta">view on map &rarr;</span>
+        </span>`;
+
+      grid.appendChild(card);
+    });
+
+    // Final open-ended tile — not a real cohort, not clickable.
+    const next = document.createElement("div");
+    next.className = "cohort-card cohort-card--next";
+    next.innerHTML = `
+      <span class="cohort-card__body">
+        <span class="cohort-card__top">
+          <span class="cohort-card__index">??</span>
+          <span class="cohort-card__status"><span class="cohort-card__dot" aria-hidden="true"></span>your call</span>
+        </span>
+        <span class="cohort-card__city">Wherever<small>we go next</small></span>
+        <span class="cohort-card__blurb">tokyo? lisbon? mexico city? lagos? we follow the cracked. tell us where.</span>
+      </span>`;
+    grid.appendChild(next);
+  }
+
+  renderCohortsGrid();
 
   const prevBtn = document.querySelector("[data-cohort-prev]");
   const nextBtn = document.querySelector("[data-cohort-next]");
@@ -1574,7 +1717,6 @@ window.__siteLoaded = (() => {
   if (!body.classList.contains("page--single")) return;
 
   const panels = Array.from(document.querySelectorAll(".panel[data-panel]"));
-  const links  = Array.from(document.querySelectorAll("[data-panel-link]"));
   if (!panels.length) return;
 
   // pills live inside the .rail — kept separately so we can update their
@@ -1612,19 +1754,21 @@ window.__siteLoaded = (() => {
     window.dispatchEvent(new CustomEvent("panel:change", { detail: { name } }));
   }
 
-  links.forEach((el) => {
-    el.addEventListener("click", (e) => {
-      const target = el.dataset.panelLink;
-      if (!target) return;
-      // panel links inside <a href="..."> would otherwise navigate or
-      // push a hash; intercept and swap panels in place.
-      e.preventDefault();
-      // Pills marked [data-disabled="true"] (cohorts / fellows / about
-      // while those pages are still being built) are inert — CSS shows
-      // a "coming soon" tooltip on hover; we just swallow the click here.
-      if (el.dataset.disabled === "true") return;
-      activate(target);
-    });
+  // Delegated so dynamically-injected links (e.g. the cohort cards built
+  // by renderCohortsGrid) are covered without re-binding.
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-panel-link]");
+    if (!el) return;
+    const target = el.dataset.panelLink;
+    if (!target) return;
+    // panel links inside <a href="..."> would otherwise navigate or
+    // push a hash; intercept and swap panels in place.
+    e.preventDefault();
+    // Pills marked [data-disabled="true"] (fellows / about while those
+    // pages are still being built) are inert — CSS shows a "coming soon"
+    // tooltip on hover; we just swallow the click here.
+    if (el.dataset.disabled === "true") return;
+    activate(target);
   });
 
   // Esc → back to main, unless the passport viewer is open (it has its
