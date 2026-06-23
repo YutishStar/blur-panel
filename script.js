@@ -112,11 +112,11 @@ window.__siteLoaded = (() => {
         { label: "Apply to next cohort", variant: "primary", arrow: true, cohortJump: 2 },
       ],
       sponsors: [
-        { tagline: "Our content sponsors",   logo: "sponsors/sponsor-1.png", alt: "Team1",    size: "sm", url: "https://x.com/Team1VN" },
-        { tagline: "Our credits sponsors", logos: [
-          { logo: "sponsors/razorpay.png",       alt: "Razorpay", size: "md", url: "https://razorpay.com/" },
-          { logo: "sponsors/boardy-favicon.png", alt: "Boardy",   size: "md", url: "https://boardy.ai/" },
+        { tagline: "Our content sponsors", logos: [
+          { logo: "sponsors/sponsor-1.png",      alt: "Team1",   size: "sm", url: "https://x.com/Team1VN" },
+          { logo: "sponsors/boardy-favicon.png", alt: "Boardy",  size: "md", url: "https://boardy.ai/" },
         ] },
+        { tagline: "Our credits sponsors", logo: "sponsors/razorpay.png", alt: "Razorpay", size: "md", url: "https://razorpay.com/" },
       ],
       photos: [
         "villas/cohort-01/HIx-N74aIAAgNFg.jpeg",
@@ -676,77 +676,170 @@ window.__siteLoaded = (() => {
     if (blurbEl) blurbEl.textContent = c.blurb || "";
   }
 
-  // Cohorts panel — build a visual card per cohort from the COHORTS array
-  // (single source of truth). Each card jumps to the main panel and flies
-  // the satellite map to that house via the existing [data-cohort-jump]
-  // and [data-panel-link] delegated handlers. A static "?? your call"
-  // tile is appended last.
-  function renderCohortsGrid() {
-    const grid = document.querySelector("[data-cohorts-grid]");
-    if (!grid) return;
-
-    // map a cohort's application status → a human label + a color kind
-    const STATUS = {
-      closed: { label: "shipped",           kind: "shipped" },
-      filled: { label: "boarding",          kind: "boarding" },
-      open:   { label: "applications open", kind: "open" },
+  /* =========================================================
+     COHORTS · CRACKED DEPARTURES
+     The cohorts panel as an airport. A departures board lists every
+     cohort as a flight (application status → flight state); selecting a
+     row issues a per-city portrait boarding pass (left) + a "gate"
+     details panel (right): photos, what's on board, apply. Built from
+     the COHORTS array; the main hero map is untouched.
+     ========================================================= */
+  const departures = (() => {
+    const STATE = {
+      closed: { board: "departed", stamp: "departed",      kind: "departed" },
+      filled: { board: "boarding", stamp: "now boarding",  kind: "boarding" },
+      open:   { board: "check-in", stamp: "check-in open", kind: "open" },
     };
+    const FLIGHT = {
+      "00": { iata: "BLR", depart: "JUL '25", date: "JUN 2025",    livery: "#c2563a" }, // bangalore · terracotta
+      "01": { iata: "DAD", depart: "JUL '26", date: "01 JUL 2026", livery: "#0f8a86" }, // da nang · teal
+      "02": { iata: "DXB", depart: "AUG '26", date: "08 AUG 2026", livery: "#b8902f" }, // dubai · gold
+      "03": { iata: "DPS", depart: "SEP '26", date: "01 SEP 2026", livery: "#9b4d8f" }, // bali · orchid
+    };
+    const FUTURE = { flight: "CR04", city: "wherever", iata: "????", depart: "2027", board: "scheduled" };
+    const PLANE = "✈";
 
-    grid.innerHTML = "";
+    const boardEl = document.querySelector("[data-departures-board]");
+    const passEl  = document.querySelector("[data-pass-wrap]");
+    let entered = false;
 
-    COHORTS.forEach((c, i) => {
-      const [city, country] = (c.loc || "").split(",").map((s) => s.trim());
-      const st = STATUS[c.apps?.status] || { label: c.apps?.label || "", kind: "open" };
+    const flightNo = (c) => "CR" + c.id;
+    const statusOf = (c) => STATE[c.apps?.status] || { board: c.apps?.label || "", stamp: "", kind: "open" };
+    const findStat = (c, re) => (c.stats || []).find((s) => re.test(s.label)) || null;
 
-      const card = document.createElement("a");
-      card.className = "cohort-card cohort-card--" + st.kind;
-      card.href = "#main";
-      card.dataset.panelLink = "main";
-      card.dataset.cohortJump = String(i);
-      card.setAttribute("aria-label", `${city} — ${st.label}, view on map`);
+    function buildBoard() {
+      if (!boardEl) return;
+      const head = document.createElement("div");
+      head.className = "dep-row dep-row--head";
+      head.innerHTML = `<span>flight</span><span>destination</span><span>date</span><span>status</span>`;
+      boardEl.appendChild(head);
 
-      const cover = c.photos && c.photos[0] ? c.photos[0] : "";
-      if (cover) card.style.setProperty("--cover", `url('${cover}')`);
+      COHORTS.forEach((c, i) => {
+        const [city] = (c.loc || "").split(",");
+        const st = statusOf(c);
+        const f  = FLIGHT[c.id] || {};
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = `dep-row dep-row--${st.kind}`;
+        row.dataset.idx = String(i);
+        row.style.setProperty("--i", String(i + 1));
+        row.innerHTML =
+          `<span class="dep-flight">${flightNo(c)}</span>` +
+          `<span class="dep-dest">${(city || "").trim()}<i>${f.iata || ""}</i></span>` +
+          `<span class="dep-date">${f.depart || ""}</span>` +
+          `<span class="dep-status"><span class="dep-status__dot" aria-hidden="true"></span>${st.board}</span>`;
+        row.addEventListener("click", () => select(i));
+        boardEl.appendChild(row);
+      });
 
-      const stats = (c.stats || [])
-        .map(
-          (s) =>
-            `<span class="cohort-card__stat"><b>${s.value}</b>${s.label}</span>`
-        )
-        .join("");
+      const fr = document.createElement("div");
+      fr.className = "dep-row dep-row--future";
+      fr.style.setProperty("--i", String(COHORTS.length + 1));
+      fr.innerHTML =
+        `<span class="dep-flight">${FUTURE.flight}</span>` +
+        `<span class="dep-dest">${FUTURE.city}<i>${FUTURE.iata}</i></span>` +
+        `<span class="dep-date">${FUTURE.depart}</span>` +
+        `<span class="dep-status"><span class="dep-status__dot" aria-hidden="true"></span>${FUTURE.board}</span>`;
+      boardEl.appendChild(fr);
+    }
 
-      card.innerHTML = `
-        <span class="cohort-card__media" aria-hidden="true"></span>
-        <span class="cohort-card__body">
-          <span class="cohort-card__top">
-            <span class="cohort-card__index">${c.id}</span>
-            <span class="cohort-card__status"><span class="cohort-card__dot" aria-hidden="true"></span>${st.label}</span>
-          </span>
-          <span class="cohort-card__city">${city || ""}<small>${country || ""}</small></span>
-          <span class="cohort-card__stats">${stats}</span>
-          <span class="cohort-card__blurb">${c.blurb || ""}</span>
-          <span class="cohort-card__cta">view on map &rarr;</span>
-        </span>`;
+    function passHTML(c, i) {
+      const [city] = (c.loc || "").split(",").map((s) => s.trim());
+      const st = statusOf(c);
+      const f  = FLIGHT[c.id] || {};
+      const livery = f.livery || "#5a5a58";
+      const pax  = findStat(c, /cracked|founder|builder/);
+      const days = findStat(c, /day/);
+      const prev = i > 0 ? COHORTS[i - 1] : null;
+      const origIata = prev ? (FLIGHT[prev.id]?.iata || "—") : "···";
+      const origCity = prev ? ((prev.loc || "").split(",")[0] || "").trim() : "the internet";
 
-      grid.appendChild(card);
+      return `
+        <article class="pass pass--${st.kind}" style="--livery:${livery}">
+          <div class="pass__top">
+            <span class="pass__label">boarding pass</span>
+            <span class="pass__status-chip">${st.stamp}</span>
+          </div>
+          <div class="pass__body">
+            <span class="pass__map" aria-hidden="true"></span>
+            <div class="pass__airline-row">
+              <span class="pass__airline"><span class="pass__plane">${PLANE}</span>cracked<b>air</b></span>
+              <span class="pass__flightno">${flightNo(c)}</span>
+            </div>
+            <div class="pass__route">
+              <span class="pass__leg"><b>${origIata}</b><small>${origCity}</small></span>
+              <span class="pass__plane2" aria-hidden="true">${PLANE}</span>
+              <span class="pass__leg pass__leg--to"><b>${f.iata || ""}</b><small>${city || ""}</small></span>
+            </div>
+            <div class="pass__grid">
+              <span class="pass__f"><small>passenger</small><b>the cracked</b></span>
+              <span class="pass__f"><small>seats</small><b>${pax ? pax.value : "—"}</b></span>
+              <span class="pass__f"><small>date</small><b>${f.date || ""}</b></span>
+              <span class="pass__f"><small>duration</small><b>${days ? days.value + " " + days.label : "—"}</b></span>
+              <span class="pass__f"><small>gate</small><b>the villa</b></span>
+              <span class="pass__f"><small>flight</small><b>${flightNo(c)}</b></span>
+            </div>
+          </div>
+          <div class="pass__tear" aria-hidden="true"></div>
+          <div class="pass__stub">
+            <div class="pass__stub-info">
+              <span class="pass__f"><small>seat</small><b>${pax ? pax.value : "—"}</b></span>
+              <span class="pass__f"><small>date</small><b>${f.depart || ""}</b></span>
+              <span class="pass__f"><small>gate</small><b>villa</b></span>
+            </div>
+            <span class="pass__barcode" aria-hidden="true"></span>
+          </div>
+        </article>`;
+    }
+
+    function gateHTML(c) {
+      const photos = (c.photos || []).slice(0, 4)
+        .map((src) => `<span class="gate__photo" style="background-image:url('${src}')"></span>`).join("");
+      const chips = (c.stats || []).map((s) => {
+        const win = /raised|made/.test(s.label);
+        return `<span class="gate__chip${win ? " gate__chip--win" : ""}"><b>${s.value}</b>${s.label}</span>`;
+      }).join("");
+      const apply = (c.actions || []).find((a) => a.href) || (c.tally ? { href: c.tally } : null);
+      const cta = c.apps?.status === "open" && apply
+        ? `<a class="gate__cta" href="${apply.href}" target="_blank" rel="noopener noreferrer">${c.ctaLabel || "check in"} &rarr;</a>`
+        : `<span class="gate__closed">${statusOf(c).kind === "departed" ? "this flight has departed" : "boarding closed · seats filled"}</span>`;
+      return `
+        <section class="gate">
+          ${photos ? `<div class="gate__photos">${photos}</div>` : ""}
+          ${chips ? `<div class="gate__chips">${chips}</div>` : ""}
+          <p class="gate__blurb">${c.blurb || ""}</p>
+          <div class="gate__foot">${cta}</div>
+        </section>`;
+    }
+
+    function select(i) {
+      boardEl?.querySelectorAll(".dep-row").forEach((r) =>
+        r.classList.toggle("is-active", r.dataset.idx === String(i)));
+      if (!passEl) return;
+      passEl.innerHTML = passHTML(COHORTS[i], i) + gateHTML(COHORTS[i]);
+      const card = passEl.querySelector(".pass");
+      if (card) { card.classList.remove("is-issued"); void card.offsetWidth; card.classList.add("is-issued"); }
+    }
+
+    buildBoard();
+
+    const defIdx = (() => {
+      const i = COHORTS.findIndex((c) => c.apps?.status === "filled" || c.apps?.status === "open");
+      return i >= 0 ? i : Math.max(0, COHORTS.length - 1);
+    })();
+
+    window.addEventListener("panel:change", (e) => {
+      if (e.detail?.name !== "cohorts") return;
+      if (!entered) {
+        entered = true;
+        boardEl?.classList.add("is-in");
+        select(defIdx);
+      }
     });
 
-    // Final open-ended tile — not a real cohort, not clickable.
-    const next = document.createElement("div");
-    next.className = "cohort-card cohort-card--next";
-    next.innerHTML = `
-      <span class="cohort-card__body">
-        <span class="cohort-card__top">
-          <span class="cohort-card__index">??</span>
-          <span class="cohort-card__status"><span class="cohort-card__dot" aria-hidden="true"></span>your call</span>
-        </span>
-        <span class="cohort-card__city">Wherever<small>we go next</small></span>
-        <span class="cohort-card__blurb">tokyo? lisbon? mexico city? lagos? we follow the cracked. tell us where.</span>
-      </span>`;
-    grid.appendChild(next);
-  }
-
-  renderCohortsGrid();
+    return { select };
+  })();
+  void departures;
 
   const prevBtn = document.querySelector("[data-cohort-prev]");
   const nextBtn = document.querySelector("[data-cohort-next]");
@@ -1305,401 +1398,192 @@ window.__siteLoaded = (() => {
 })();
 
 /* =========================================================
-   FELLOWS — draggable passport deck + open-viewer + page-turn
-
-   Each .passport in #passport-deck is a closed leather passport. They
-   sit stacked: depth 0 is the top, slightly larger and dead-centred;
-   deeper cards fan out behind with descending size + rotation.
-
-   Behaviours:
-   - drag horizontally → release: short drag springs back; longer
-     drag or fast flick flies the card off-screen and recycles it to
-     the back of the deck so the next fellow comes up.
-   - tap (no drag) → opens the viewer overlay; cover swings off behind
-     a two-page inside spread with bio (left) + fields (right).
-   - inside the viewer: a "stamps" button flips to the second spread,
-     where the colored ink stamps for each visited house fade in
-     one after another.
-
-   This IIFE is self-contained and bails out cleanly on any page that
-   has no #passport-deck — landing & houses pages keep working.
+   FELLOWS — open passport ID cards (3×2 grid), flip to stamps
+   Each fellow renders as the photo/data page of a passport: photo +
+   name + "why they're cracked" labeled fields + an MRZ strip, all
+   visible upfront. Tapping a card flips it to a second page of visa
+   stamps for the houses they've been in. Bails cleanly on pages with
+   no [data-fellows-grid].
    ========================================================= */
 (() => {
-  const deck = document.getElementById("passport-deck");
-  if (!deck) return;
+  const grid = document.querySelector("[data-fellows-grid]");
+  if (!grid) return;
 
-  const reduceMotion =
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // House meta → drives the visa stamps.
+  const HOUSES = {
+    bangalore: { city: "Bangalore", code: "BLR", cohort: "00", dates: "06·25 → 09·25", tint: "#b2472f" },
+    vietnam:   { city: "Da Nang",   code: "DAD", cohort: "01", dates: "07·26 → 08·26", tint: "#0f7d7a" },
+    dubai:     { city: "Dubai",     code: "DXB", cohort: "02", dates: "08·26 → 09·26", tint: "#b8902f" },
+    bali:      { city: "Canggu",    code: "DPS", cohort: "03", dates: "09·26 → 10·26", tint: "#9b4d8f" },
+  };
 
-  const passports = Array.from(deck.querySelectorAll(".passport"));
-  if (!passports.length) return;
-
-  /* ---------- one-time mount: build cover contents into each card ----------
-     real passports are sparse. arc text up top, an emblem, the word
-     PASSPORT in foil mono caps, a biometric-chip glyph, and a tiny id.
-     no italic serif, no "REPUBLIC OF ..." — that read corny. */
-  passports.forEach((card) => {
-    const id     = card.dataset.fellowId      || Math.random().toString(36).slice(2, 8);
-    const num    = card.dataset.fellowNumber  || "";
-
-    card.innerHTML = `
-      <div class="passport__cover-inner">
-        <div class="passport__cover-arc">Cracked &middot; Hackerhouse</div>
-        <div class="passport__cover-emblem" aria-hidden="true">
-          <svg viewBox="0 0 116 116" width="100%" height="100%" fill="none">
-            <defs>
-              <linearGradient id="foil-${id}" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%"  stop-color="#ecdba8"/>
-                <stop offset="55%" stop-color="#cbb986"/>
-                <stop offset="100%" stop-color="#8e7842"/>
-              </linearGradient>
-            </defs>
-            <circle cx="58" cy="58" r="48" stroke="url(#foil-${id})" stroke-width="0.7"/>
-            <circle cx="58" cy="58" r="42" stroke="url(#foil-${id})" stroke-width="0.4" stroke-dasharray="1 3"/>
-            <circle cx="58" cy="58" r="20" stroke="url(#foil-${id})" stroke-width="0.5"/>
-            <text x="58" y="68" text-anchor="middle"
-                  font-family="Instrument Serif, serif" font-style="italic"
-                  font-size="32" fill="url(#foil-${id})">✦</text>
-          </svg>
-        </div>
-        <h2 class="passport__cover-title">Passport</h2>
-        <div class="passport__cover-base">
-          <div class="passport__cover-chip-icon" aria-hidden="true"></div>
-          <div class="passport__cover-base-id">${num.replace(/&middot;/g, "·")}</div>
-        </div>
-      </div>
-    `;
-  });
-
-  /* ---------- focal scatter layout ----------
-     one big passport dead-centre is the focal point. four smaller ones
-     step outward to the sides (medium, then small). one small "back
-     peek" pokes above the focal so the silhouette reads as a curated
-     composition, not chaos. each slot defines x/y offset, scale, in-
-     plane rotation and z-index. */
-  const SCATTER = [
-    // 0: FOCAL — biggest, dead centre, on top
-    { x:    0, y: -20, s: 1.00, rot:   0, z: 16 },
-    // 1: left, medium
-    { x: -250, y:  25, s: 0.74, rot:  -8, z: 13 },
-    // 2: far-left, small
-    { x: -430, y:  55, s: 0.58, rot: -15, z: 11 },
-    // 3: right, medium
-    { x:  250, y:  25, s: 0.74, rot:   8, z: 14 },
-    // 4: far-right, small
-    { x:  430, y:  55, s: 0.58, rot:  15, z: 12 },
-    // 5: back peek — small, lifted up so its top edge pokes above the focal
-    { x:  -40, y:-170, s: 0.48, rot:  -3, z: 10 },
+  // ⚠ PLACEHOLDER fellows — swap in the 6 real "most cracked" here.
+  // creds = the labeled "why cracked" fields (k = label, v = value).
+  const FELLOWS = [
+    { id: "vagdev", name: "Vagdev", surname: "Korrapati", handle: "@vagdev",
+      number: "CRK · 00 · 0001", houses: ["bangalore"], photo: "fellows/BHEWwnjs_400x400.jpg",
+      creds: [ { k: "builds", v: "payment rails for emerging markets" },
+               { k: "shipped", v: "ex-Stripe payments infra" },
+               { k: "known for", v: "the dosa-fuelled all-nighter" } ] },
+    { id: "riza", name: "Riza", surname: "Aydin", handle: "@rzaydn",
+      number: "CRK · 00 · 0002", houses: ["bangalore", "vietnam"], photo: "fellows/UfGyY5_j_400x400.jpg",
+      creds: [ { k: "builds", v: "small models that actually think" },
+               { k: "shipped", v: "3 open-source eval frameworks" },
+               { k: "known for", v: "running the Vietnam kitchen" } ] },
+    { id: "ashrith", name: "Ashrith", surname: "Reddy", handle: "@ashr1th",
+      number: "CRK · 00 · 0003", houses: ["bangalore"], photo: "fellows/yDrxSxQu_400x400.jpg",
+      creds: [ { k: "builds", v: "cold-chain sensors for vaccines" },
+               { k: "shipped", v: "first investor at the table" },
+               { k: "known for", v: "hardware in a software house" } ] },
+    { id: "kalash", name: "Kalash", surname: "Mehta", handle: "@kalashm",
+      number: "CRK · 01 · 0004", houses: ["vietnam"], photo: "fellows/90960705.jpeg",
+      creds: [ { k: "builds", v: "compilers · WASM & Rust" },
+               { k: "shipped", v: "a working JIT in two weekends" },
+               { k: "known for", v: "a keyboard in checked luggage" } ] },
+    { id: "karthik", name: "Karthik", surname: "Nair", handle: "@karthikn",
+      number: "CRK · 00 · 0005", houses: ["bangalore", "vietnam"],
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85",
+      creds: [ { k: "builds", v: "dev tools for AI agents" },
+               { k: "shipped", v: "10k GitHub stars in a month" },
+               { k: "known for", v: "never sleeping before a demo" } ] },
+    { id: "tanish", name: "Tanish", surname: "Jain", handle: "@tanishj",
+      number: "CRK · 01 · 0006", houses: ["vietnam"],
+      photo: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85",
+      creds: [ { k: "builds", v: "weird consumer social apps" },
+               { k: "shipped", v: "1M views in a single week" },
+               { k: "known for", v: "the 3am idea that worked" } ] },
   ];
 
-  let topZ = 16;
-  const layout = () => {
-    passports.forEach((card, i) => {
-      const p = SCATTER[i % SCATTER.length];
-      card._restX = p.x;
-      card._restY = p.y;
-      card._restRot = p.rot;
-      card._restScale = p.s;
-      card.dataset.depth = String(i);
-      card.style.left = "50%";
-      card.style.top = "50%";
-      card.style.right = "auto";
-      card.style.bottom = "auto";
-      card.style.zIndex = String(p.z);
-      card.style.opacity = "1";
-      card.style.filter = "";
-      card.style.transform =
-        `translate3d(calc(-50% + ${p.x}px), calc(-50% + ${p.y}px), 0) rotate(${p.rot}deg) scale(${p.s})`;
-      card.classList.remove("is-dragging");
-    });
-    topZ = 17;
-  };
-  layout();
-
-  /* ---------- drag — any passport, drop where released ---------- */
-  let drag = null;
-  const VEL_FRAMES = 6;
-
-  const onPointerDown = (e) => {
-    const card = e.target.closest(".passport");
-    if (!card || !deck.contains(card)) return;
-    if (e.target.closest(".passport-viewer")) return;
-
-    // bring the grabbed card to the top of the desk
-    topZ += 1;
-    card.style.zIndex = String(topZ);
-
-    card.setPointerCapture?.(e.pointerId);
-    drag = {
-      card,
-      pointerId: e.pointerId,
-      sx: e.clientX,
-      sy: e.clientY,
-      baseX: card._restX || 0,
-      baseY: card._restY || 0,
-      baseRot: card._restRot || 0,
-      baseScale: card._restScale || 1,
-      dx: 0,
-      dy: 0,
-      moved: false,
-      t0: performance.now(),
-      samples: [{ t: performance.now(), x: e.clientX, y: e.clientY }],
-    };
-    card.classList.add("is-dragging");
-  };
-
-  const onPointerMove = (e) => {
-    if (!drag || e.pointerId !== drag.pointerId) return;
-    const dx = e.clientX - drag.sx;
-    const dy = e.clientY - drag.sy;
-    drag.dx = dx;
-    drag.dy = dy;
-    if (!drag.moved && Math.hypot(dx, dy) > 6) drag.moved = true;
-
-    drag.samples.push({ t: performance.now(), x: e.clientX, y: e.clientY });
-    if (drag.samples.length > VEL_FRAMES) drag.samples.shift();
-
-    // tiny rotation tilt while held — feels like a card pinched between fingers
-    const tilt = Math.max(-6, Math.min(6, dx * 0.02));
-    // grabbed cards lift a touch — scale up by 4% of their resting scale
-    const liftScale = drag.baseScale * 1.04;
-    drag.card.style.transform =
-      `translate3d(calc(-50% + ${drag.baseX + dx}px), calc(-50% + ${drag.baseY + dy}px), 0) rotate(${drag.baseRot + tilt}deg) scale(${liftScale})`;
-  };
-
-  const onPointerUp = (e) => {
-    if (!drag || e.pointerId !== drag.pointerId) return;
-    const { card, dx, dy, samples, moved, t0, baseX, baseY, baseRot, baseScale } = drag;
-    drag = null;
-
-    card.classList.remove("is-dragging");
-
-    // velocity from the last samples — used for a short glide after release
-    let vx = 0, vy = 0;
-    if (samples.length >= 2) {
-      const a = samples[0];
-      const b = samples[samples.length - 1];
-      const dt = Math.max(1, b.t - a.t);
-      vx = (b.x - a.x) / dt;
-      vy = (b.y - a.y) / dt;
-    }
-    const dist = Math.hypot(dx, dy);
-
-    // tap (no real drag): open the viewer, leave the card where it was
-    if (!moved && (performance.now() - t0) < 380 && dist < 8) {
-      // restore exact resting pose (cancels any pre-tap nudge transform)
-      card.style.transform =
-        `translate3d(calc(-50% + ${baseX}px), calc(-50% + ${baseY}px), 0) rotate(${baseRot}deg) scale(${baseScale})`;
-      openViewer(card);
-      return;
-    }
-
-    // commit the new rest position. add a small momentum glide so it
-    // feels like the card has weight; clamp glide so it doesn't fly out.
-    const GLIDE = 90;             // ms-scaled
-    const MAX_GLIDE = 80;         // px
-    const gx = Math.max(-MAX_GLIDE, Math.min(MAX_GLIDE, vx * GLIDE));
-    const gy = Math.max(-MAX_GLIDE, Math.min(MAX_GLIDE, vy * GLIDE));
-    const newX = baseX + dx + gx;
-    const newY = baseY + dy + gy;
-
-    card._restX = newX;
-    card._restY = newY;
-
-    const settledTransform =
-      `translate3d(calc(-50% + ${newX}px), calc(-50% + ${newY}px), 0) rotate(${baseRot}deg) scale(${baseScale})`;
-    if (reduceMotion) {
-      card.style.transform = settledTransform;
-    } else {
-      card.style.transition = "transform 480ms cubic-bezier(0.16, 1, 0.3, 1)";
-      card.style.transform = settledTransform;
-      setTimeout(() => { card.style.transition = ""; }, 500);
-    }
-  };
-
-  deck.addEventListener("pointerdown", onPointerDown);
-  window.addEventListener("pointermove", onPointerMove, { passive: true });
-  window.addEventListener("pointerup",   onPointerUp);
-  window.addEventListener("pointercancel", onPointerUp);
-
-  /* =========================================================
-     VIEWER — open / page-turn / close
-     ========================================================= */
-  const viewer = document.getElementById("passport-viewer");
-  const book   = document.getElementById("passport-book");
-  const spreadBio    = viewer?.querySelector(".passport-book__spread--bio");
-  const spreadStamps = viewer?.querySelector(".passport-book__spread--stamps");
-  const housesList   = viewer?.querySelector("[data-houses-list]");
-
-  function openViewer(card) {
-    if (!viewer) return;
-    const d = card.dataset;
-
-    // analytics — record which fellow's passport got opened
-    if (window.posthog) {
-      window.posthog.capture("passport_open", {
-        fellow_id: d.fellowId || "",
-        fellow_name: d.fellowName || "",
-        cohort: d.fellowCohort || "",
-      });
-    }
-
-    // populate fields
-    viewer.querySelector("[data-fellow-photo-target]").style.backgroundImage  = `url("${d.fellowPhoto}")`;
-    viewer.querySelector("[data-fellow-surname-target]").textContent   = (d.fellowSurname || "").toUpperCase();
-    viewer.querySelector("[data-fellow-name-target]").textContent      = d.fellowName || "";
-    viewer.querySelector("[data-fellow-cohort-target]").textContent    = d.fellowCohort || "";
-    viewer.querySelector("[data-fellow-issued-target]").textContent    = d.fellowIssued || "";
-    viewer.querySelector("[data-fellow-role-target]").textContent      = d.fellowRole || "";
-    viewer.querySelector("[data-fellow-bio-target]").textContent       = d.fellowBio || "";
-    viewer.querySelector("[data-fellow-handle-target]").textContent    = d.fellowHandle || "";
-    viewer.querySelector("[data-fellow-handle-caption]").textContent   = d.fellowHandle || "";
-    viewer.querySelector("[data-fellow-number-caption]").textContent   = d.fellowNumber || "";
-
-    // build a synthetic MRZ line from name + number
-    const last = (d.fellowSurname || "FELLOW").toUpperCase().replace(/[^A-Z]/g, "");
-    const first = (d.fellowName || "").toUpperCase().replace(/[^A-Z]/g, "");
-    const numClean = (d.fellowNumber || "0000").replace(/[^0-9]/g, "").padEnd(9, "0");
-    const mrz1 = `P<CRK${last}<<${first}`.padEnd(44, "<");
-    const mrz2 = `${numClean}<CRK${d.fellowCohort?.replace(/[^0-9]/g, "").padStart(7, "0") || "0000000"}M${(d.fellowIssued || "").replace(/[^0-9]/g, "").padStart(7, "0")}`.padEnd(44, "<");
-    viewer.querySelector("[data-mrz-1]").textContent = mrz1.slice(0, 44);
-    viewer.querySelector("[data-mrz-2]").textContent = mrz2.slice(0, 44);
-
-    // configure visa stamps based on houses visited
-    const houses = (d.fellowHouses || "").split(",").map((s) => s.trim()).filter(Boolean);
-    viewer.querySelectorAll(".stamp").forEach((s) => s.classList.remove("is-on"));
-    if (houses.includes("bangalore")) viewer.querySelector(".stamp--blr").classList.add("is-on");
-    if (houses.includes("vietnam"))   viewer.querySelector(".stamp--vnm").classList.add("is-on");
-
-    // build the legend list
-    if (housesList) {
-      housesList.innerHTML = "";
-      const all = [
-        { key: "bangalore", label: "Bangalore",    meta: "cohort 00 · indira nagar", color: "blr", visited: houses.includes("bangalore") },
-        { key: "vietnam",   label: "Vietnam",      meta: "cohort 01 · my khe",       color: "vnm", visited: houses.includes("vietnam") },
-        { key: "dubai",     label: "Dubai",        meta: "cohort 02 · uae",          color: "arg", visited: false },
-        { key: "bali",      label: "Bali",         meta: "cohort 03 · canggu",       color: "arg", visited: false },
-      ];
-      all.forEach((h) => {
-        const li = document.createElement("li");
-        li.className = "passport-book__legend-item" + (h.visited ? "" : " passport-book__legend-item--ghost");
-        li.innerHTML = `
-          <span class="passport-book__legend-dot passport-book__legend-dot--${h.color}"></span>
-          <span>${h.label}</span>
-          <span class="passport-book__legend-meta">${h.meta}</span>
-        `;
-        housesList.appendChild(li);
-      });
-    }
-
-    // clone the tapped passport's cover into the flipper so the cover
-    // we see swinging open is visually identical to the card the user
-    // tapped (same fellow's id, same serial, same emblem).
-    const flipper = viewer.querySelector("[data-cover-flipper]");
-    const tappedCoverInner = card.querySelector(".passport__cover-inner");
-    if (flipper) {
-      flipper.innerHTML = "";
-      if (tappedCoverInner) {
-        flipper.appendChild(tappedCoverInner.cloneNode(true));
-      }
-    }
-
-    const backCover = viewer.querySelector("[data-book-cover]");
-
-    // always start on the bio spread
-    setPage("bio");
-
-    // reset everything to the CLOSED pose with no transition. the book
-    // sits shifted left so the flipper (which lives at the right half
-    // of the spread) ends up centred in the viewport; the spread is
-    // hidden underneath; the back-cover hint is hidden.
-    const setClosed = (el, css) => {
-      if (!el) return;
-      el.style.transition = "none";
-      Object.assign(el.style, css);
-    };
-    setClosed(book, {
-      transform: "translateX(calc(var(--book-page-w) * -0.5)) scale(0.9)",
-      opacity: "0",
-    });
-    setClosed(flipper, { transform: "rotateY(0deg)", opacity: "1" });
-    setClosed(spreadBio, { opacity: "0" });
-    setClosed(spreadStamps, { opacity: "0" });
-    setClosed(backCover, { opacity: "0" });
-
-    viewer.hidden = false;
-    viewer.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-
-    // force a layout pass so the closed pose is committed BEFORE the
-    // animation transitions are applied. without this, the browser
-    // batches both updates and we'd see no transition.
-    void viewer.offsetWidth;
-
-    // two rAFs to be safe across browsers, then fire the choreographed
-    // open animation.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        viewer.classList.add("is-open");
-
-        // stage 1: the book glides up to its open pose
-        book.style.transition =
-          "transform 1100ms cubic-bezier(0.34, 1.06, 0.22, 1), " +
-          "opacity 380ms ease";
-        book.style.transform = "translateX(0) scale(1)";
-        book.style.opacity = "1";
-
-        // stage 2: the cover flips around its spine (left edge),
-        // starting 260ms in so the book has scaled in a touch first.
-        flipper.style.transition =
-          "transform 1100ms cubic-bezier(0.55, 0.02, 0.18, 0.98) 260ms";
-        flipper.style.transform = "rotateY(-180deg)";
-
-        // stage 3: the inside spread fades in mid-flip — by the time
-        // the cover has rotated past 90deg (≈ 260+550 = 810ms) the
-        // spread should be ~80% visible.
-        spreadBio.style.transition = "opacity 520ms ease 720ms";
-        spreadBio.style.opacity = "1";
-
-        // the small folded-back-cover hint appears at the very end
-        backCover.style.transition = "opacity 360ms ease 1240ms";
-        backCover.style.opacity = "1";
-      });
-    });
+  function mrz(f) {
+    const last  = (f.surname || "FELLOW").toUpperCase().replace(/[^A-Z]/g, "");
+    const first = (f.name || "").toUpperCase().replace(/[^A-Z]/g, "");
+    const num   = (f.number || "0").replace(/[^0-9]/g, "").padEnd(9, "0").slice(0, 9);
+    const dest  = (f.houses[0] || "").toUpperCase().slice(0, 3).padEnd(3, "<");
+    const l1 = `P<CRK${last}<<${first}`.padEnd(44, "<").slice(0, 44);
+    const l2 = `${num}<CRK${dest}`.padEnd(44, "<").slice(0, 44);
+    return [l1, l2];
   }
 
-  function closeViewer() {
-    if (!viewer) return;
-    viewer.classList.remove("is-open");
-    viewer.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-    setTimeout(() => { viewer.hidden = true; }, 380);
+  function stampHTML(key, i) {
+    const h = HOUSES[key];
+    if (!h) return "";
+    const rot = [-8, 6, -5, 9, -4][i % 5];
+    return `
+      <span class="vstamp" style="--tint:${h.tint};--rot:${rot}deg">
+        <span class="vstamp__arc">cracked · cohort ${h.cohort}</span>
+        <span class="vstamp__city">${h.city}</span>
+        <span class="vstamp__code">${h.code}</span>
+        <span class="vstamp__date">${h.dates}</span>
+      </span>`;
   }
 
-  function setPage(page) {
-    if (!book) return;
-    book.dataset.page = page;
-    spreadBio?.classList.toggle("is-on", page === "bio");
-    spreadStamps?.classList.toggle("is-on", page === "stamps");
-    // clear any inline opacity/transition left over from the open
-    // animation so the CSS .is-on rules drive page switches normally.
-    [spreadBio, spreadStamps].forEach((el) => {
-      if (!el) return;
-      el.style.opacity = "";
-      el.style.transition = "";
-    });
+  const CRED_LABELS = {
+    "builds":    "BUILDS / CONSTRUIT",
+    "shipped":   "SHIPPED / EXPÉDIÉ",
+    "known for": "KNOWN FOR / CONNU POUR",
+  };
+
+  function cardHTML(f) {
+    const cohortPart = (f.number.match(/·\s*(\d+)\s*·/) || ["","00"])[1].padStart(2,"0");
+    const seqPart    = (f.number.match(/(\d+)\s*$/)      || ["","0001"])[1].padStart(4,"0");
+    const passNo     = `CRK${cohortPart}${seqPart}`;
+    const serialNo   = `P${f.number.replace(/[^0-9]/g,"").padStart(9,"0")}`;
+    const houseNames = (f.houses || []).map(k => HOUSES[k]?.city || k).join(" · ");
+    const n          = (f.houses || []).length;
+    const stamps     = (f.houses || []).map((k, i) => stampHTML(k, i)).join("");
+    const m          = mrz(f);
+    const credsHtml  = (f.creds || []).map(c => `
+              <div class="pid__f">
+                <span class="pid__lbl">${CRED_LABELS[c.k.toLowerCase()] || c.k.toUpperCase()}</span>
+                <span class="pid__val">${c.v}</span>
+              </div>`).join("");
+    return `
+      <article class="fellow-card" data-fellow="${f.id}">
+        <div class="fellow-card__flip">
+          <div class="fellow-card__face fellow-card__face--front">
+            <div class="pid">
+              <div class="pid__hdr">
+                <div class="pid__country">
+                  <div class="pid__emblem">C</div>
+                  <div class="pid__cnames">
+                    <span>CRACKED HACKERHOUSE</span>
+                    <span>PASSEPORT HACKERHOUSE</span>
+                    <span>HACKER HAUS AUSWEIS</span>
+                    <span>CASA CRACKED PASAPORTE</span>
+                  </div>
+                </div>
+                <div class="pid__metarow">
+                  <div class="pid__metacol"><span class="pid__mlab">TYPE</span><span class="pid__mval">PM</span></div>
+                  <div class="pid__metacol"><span class="pid__mlab">CODE</span><span class="pid__mval">CRK</span></div>
+                  <div class="pid__metacol"><span class="pid__mlab">PASSPORT NO</span><span class="pid__mval">${passNo}</span></div>
+                  <div class="pid__holo"></div>
+                </div>
+              </div>
+              <div class="pid__body">
+                <div class="pid__photo" style="background-image:url('${f.photo}')">
+                  <span class="pid__pbadge">${serialNo}</span>
+                </div>
+                <div class="pid__fields">
+                  <div class="pid__f">
+                    <span class="pid__lbl">SURNAME / NOM / APELLIDO</span>
+                    <span class="pid__val pid__val--big">${f.surname.toUpperCase()}</span>
+                  </div>
+                  <div class="pid__f pid__f--row">
+                    <div class="pid__sf">
+                      <span class="pid__lbl">GIVEN NAMES / PRÉNOMS</span>
+                      <span class="pid__val pid__val--med">${f.name}</span>
+                    </div>
+                    <div class="pid__sf">
+                      <span class="pid__lbl">HANDLE / X</span>
+                      <span class="pid__val">${f.handle || ""}</span>
+                    </div>
+                  </div>
+                  ${credsHtml}
+                  <div class="pid__f pid__f--row">
+                    <div class="pid__sf">
+                      <span class="pid__lbl">COHORT(S) / MAISONS</span>
+                      <span class="pid__val">${houseNames}</span>
+                    </div>
+                    <div class="pid__sf" style="flex:none">
+                      <span class="pid__lbl">&nbsp;</span>
+                      <span class="pid__val pid__val--flip" data-flip>${n}&nbsp;${n===1?"stamp":"stamps"}&nbsp;&#8594;</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="pid__mrz">
+                <div class="pid__mrzlines">
+                  <span>${m[0]}</span>
+                  <span>${m[1]}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="fellow-card__face fellow-card__face--back">
+            <div class="pstamps">
+              <div class="pstamps__top">
+                <span>VISAS &middot; RESIDENCIES</span>
+                <span class="pstamps__back" data-flip>&#8592; back</span>
+              </div>
+              <div class="pstamps__grid">${stamps}</div>
+              <div class="pstamps__name">${f.name} ${f.surname}</div>
+            </div>
+          </div>
+        </div>
+      </article>`;
   }
 
-  viewer?.querySelector(".passport-viewer__close")?.addEventListener("click", closeViewer);
-  viewer?.querySelector("[data-viewer-scrim]")?.addEventListener("click", closeViewer);
-  window.addEventListener("keydown", (e) => {
-    if (!viewer || viewer.hidden) return;
-    if (e.key === "Escape") closeViewer();
-    if (e.key === "ArrowRight") setPage("stamps");
-    if (e.key === "ArrowLeft")  setPage("bio");
+  grid.innerHTML = FELLOWS.map(cardHTML).join("");
+
+  // Tap a card → flip between the ID page and the stamps page.
+  grid.addEventListener("click", (e) => {
+    const card = e.target.closest(".fellow-card");
+    if (!card) return;
+    const flipped = card.classList.toggle("is-flipped");
+    if (flipped && window.posthog) {
+      try { window.posthog.capture("fellow_stamps_open", { fellow_id: card.dataset.fellow }); } catch (_) {}
+    }
   });
-  viewer?.querySelector("[data-page-next]")?.addEventListener("click", () => setPage("stamps"));
-  viewer?.querySelector("[data-page-prev]")?.addEventListener("click", () => setPage("bio"));
 })();
 
 /* =========================================================
@@ -1754,8 +1638,8 @@ window.__siteLoaded = (() => {
     window.dispatchEvent(new CustomEvent("panel:change", { detail: { name } }));
   }
 
-  // Delegated so dynamically-injected links (e.g. the cohort cards built
-  // by renderCohortsGrid) are covered without re-binding.
+  // Delegated so dynamically-injected [data-panel-link] elements are
+  // covered without re-binding.
   document.addEventListener("click", (e) => {
     const el = e.target.closest("[data-panel-link]");
     if (!el) return;

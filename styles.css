@@ -3980,230 +3980,329 @@ body.page--single[data-active-panel="main"] { background: #000; }
 }
 
 /* ---------- PANEL · ABOUT ---------- */
-.panel--about .panel__inner--about {
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  max-width: 880px;
+.panel--about {
+  background: #0b0b0b;
+  overflow: hidden;
 }
-.panel__title--about { font-size: clamp(48px, 8vh, 96px); }
-.panel--about .panel__body--about {
-  font-family: var(--serif);
-  font-size: clamp(20px, 2.4vh, 28px);
-  line-height: 1.45;
-  color: var(--ink-2);
+
+/* Full-bleed bg — the mafia photo IS the wallpaper */
+.about-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('references/mafia-bg.jpg');
+  background-size: cover;
+  background-position: center 28%;
+  opacity: 0.48;
+  filter: grayscale(18%) contrast(1.08) brightness(0.9);
+  z-index: 0;
+}
+
+/* Uniform dark veil — keeps text readable without killing the image */
+.about-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.58);
+  z-index: 1;
+}
+
+.panel--about .panel__inner--about {
+  position: relative;
+  z-index: 2;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: clamp(18px, 2.6vh, 30px);
+  max-width: 980px;
+  margin: 0 auto;
+  padding-top: clamp(58px, 7vh, 78px);
+}
+
+/* ---- masthead ---- */
+.about-masthead {
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
-  max-width: 680px;
+  gap: 10px;
+  width: 100%;
 }
-.panel--about .panel__body--about p { margin: 0; }
-.panel--about .panel__body--about em {
+
+.about-eyebrow {
+  color: rgba(255, 255, 255, 0.38) !important;
+}
+
+.about-title {
+  font-family: var(--serif);
+  font-size: clamp(52px, 6.5vw, 92px);
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.about-title em {
   font-style: italic;
   color: var(--accent);
 }
 
-/* ---------- PANEL · COHORTS · the journey ---------- */
-.panel--cohorts .panel__inner--cohorts {
-  justify-content: flex-start;
-  gap: clamp(28px, 4vh, 48px);
-}
-.panel__head--cohorts { max-width: 820px; }
-
-/* ── card grid ──────────────────────────────────────────────────────────── */
-.cohorts-grid {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
+/* ---- feature: photo column + story column ---- */
+.about-feature {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(240px, 22vw, 300px), 1fr));
-  gap: clamp(14px, 1.6vw, 24px);
-  padding: 4px 4px 8px;
-  align-content: start;
+  grid-template-columns: clamp(180px, 22vh, 240px) 1fr;
+  gap: clamp(28px, 3.5vw, 48px);
+  align-items: flex-start;
+  width: 100%;
 }
 
-/* a single cohort tile — a dark photo card that flies the map on click */
-.cohort-card {
-  position: relative;
-  isolation: isolate;
+.about-feature__photo {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  min-height: clamp(280px, 40vh, 380px);
-  padding: clamp(18px, 2vw, 24px);
-  border-radius: 16px;
-  overflow: hidden;
-  text-decoration: none;
-  color: #fff;
-  background: #14140f;
-  box-shadow: 0 1px 2px rgba(11, 11, 11, 0.06);
-  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 320ms ease;
+  gap: 12px;
 }
-.cohort-card__media {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: var(--cover);
-  background-size: cover;
-  background-position: center;
-  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-/* legibility scrim over the photo */
-.cohort-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(
-    to top,
-    rgba(8, 8, 6, 0.92) 0%,
-    rgba(8, 8, 6, 0.62) 38%,
-    rgba(8, 8, 6, 0.12) 72%,
-    rgba(8, 8, 6, 0.05) 100%
-  );
-}
-a.cohort-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 40px -18px rgba(11, 11, 11, 0.55);
-}
-a.cohort-card:hover .cohort-card__media { transform: scale(1.06); }
 
-.cohort-card__body {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(8px, 1.2vh, 12px);
+.about-feature__photo img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 24px 60px -14px rgba(0, 0, 0, 0.8);
 }
-.cohort-card__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.cohort-card__index {
-  font-family: var(--mono);
-  font-weight: 500;
-  font-size: clamp(22px, 2.6vh, 30px);
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.92);
-}
-.cohort-card__status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(4px);
-  white-space: nowrap;
-}
-.cohort-card__dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.cohort-card__city {
+
+.about-feature__caption {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: clamp(24px, 3.2vh, 34px);
-  line-height: 1.04;
-  letter-spacing: -0.01em;
 }
-.cohort-card__city small {
+
+.about-feature__name {
   font-family: var(--mono);
-  font-style: normal;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
-}
-.cohort-card__stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-}
-.cohort-card__stat {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 5px;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.66);
-}
-.cohort-card__stat b {
+  font-size: 11px;
   font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0;
-  color: #fff;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
 }
-.cohort-card__blurb {
-  font-family: var(--sans);
-  font-size: 13px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.74);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+
+.about-feature__role {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+/* ---- story column ---- */
+.about-feature__story {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-family: var(--serif);
+  font-size: clamp(14px, 1.65vh, 17px);
+  line-height: 1.78;
+  color: rgba(255, 255, 255, 0.52);
+  columns: 2;
+  column-gap: clamp(22px, 3vw, 38px);
+}
+
+.about-feature__story p {
+  margin: 0 0 0.7em;
+  break-inside: avoid;
+}
+
+.about-feature__story p:last-child { margin-bottom: 0; }
+
+.about-feature__story em {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* =========================================================
+   PANEL · COHORTS — cracked departures
+   A dark departures board (each cohort = a flight; application status →
+   flight state) that issues a per-city portrait boarding pass (left) +
+   a "gate" details panel (right). Built by `departures` in script.js.
+   ========================================================= */
+.panel--cohorts .panel__inner--cohorts {
+  justify-content: flex-start;
+  gap: clamp(22px, 3.4vh, 38px);
+  overflow-y: auto;
+}
+.panel__head--cohorts { max-width: 820px; }
+
+.departures { display: flex; flex-direction: column; gap: clamp(20px, 3vh, 34px); width: 100%; min-height: 0; }
+
+/* ---- departures board (dark airport slab) ---- */
+.departures__board {
+  --dep-cols: 92px 1fr 110px 150px;
+  background: #0e100d;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: clamp(10px, 1.4vh, 16px) clamp(12px, 1.4vw, 20px);
+  box-shadow: 0 24px 60px -34px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
   overflow: hidden;
 }
-.cohort-card__cta {
+.dep-row {
+  display: grid; grid-template-columns: var(--dep-cols); align-items: center; gap: 16px;
+  width: 100%; text-align: left;
+  appearance: none; border: 0; background: none; cursor: pointer;
+  padding: clamp(10px, 1.5vh, 15px) 6px;
+  font-family: var(--mono); color: #cfd2cb;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  transition: background 200ms ease, color 200ms ease;
+}
+.dep-row:last-child { border-bottom: 0; }
+.dep-row--head {
+  cursor: default; font-size: 9.5px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: rgba(207,210,203,0.42); padding-top: 4px; padding-bottom: 10px;
+}
+button.dep-row:hover { background: rgba(255,255,255,0.04); color: #fff; }
+.dep-row.is-active { background: rgba(255,255,255,0.06); }
+.dep-row.is-active .dep-flight { color: #fff; }
+
+.dep-flight { font-size: 13px; letter-spacing: 0.1em; color: #fff; }
+.dep-dest {
+  font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: #f1f3ee;
+  display: inline-flex; align-items: baseline; gap: 10px; min-width: 0;
+}
+.dep-dest i { font-style: normal; font-size: 11px; letter-spacing: 0.14em; color: rgba(255,255,255,0.4); }
+.dep-date { font-size: 12px; letter-spacing: 0.12em; color: rgba(255,255,255,0.6); }
+.dep-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; justify-self: start;
+}
+.dep-status__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+.dep-row--departed .dep-status { color: rgba(255,255,255,0.4); }
+.dep-row--boarding .dep-status { color: #ffc66d; }
+.dep-row--open .dep-status { color: #8effa5; }
+.dep-row--open .dep-status__dot { animation: dep-blink 1.6s steps(1,end) infinite; }
+.dep-row--future { cursor: default; }
+.dep-row--future .dep-flight,
+.dep-row--future .dep-dest,
+.dep-row--future .dep-date,
+.dep-row--future .dep-status { color: rgba(207,210,203,0.4); }
+.dep-row--future .dep-dest i { color: rgba(207,210,203,0.3); }
+@keyframes dep-blink { 0%,55% { opacity: 1; } 56%,100% { opacity: 0.25; } }
+
+.departures__board.is-in .dep-row {
+  animation: dep-flap 460ms cubic-bezier(0.16,1,0.3,1) backwards;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+@keyframes dep-flap { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+/* ---- pass (left) + gate (right) ---- */
+.boarding-pass-wrap {
+  display: grid;
+  grid-template-columns: minmax(290px, 332px) 1fr;
+  gap: clamp(24px, 3.4vw, 48px);
+  align-items: start;
+  width: 100%;
+}
+
+/* portrait boarding pass with a side-notch tear (per-city --livery) */
+.pass {
+  position: relative; width: 100%;
+  border-radius: 16px; overflow: hidden; background: #fffdf8;
   font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  transition: color 220ms ease;
+  box-shadow: 0 34px 70px -38px rgba(11,11,11,0.45), 0 1px 0 rgba(11,11,11,0.04);
+  opacity: 0;
 }
-a.cohort-card:hover .cohort-card__cta { color: #fff; }
+.pass.is-issued { animation: pass-issue 600ms cubic-bezier(0.16,1,0.3,1) forwards; }
+@keyframes pass-issue { from { opacity: 0; transform: translateY(16px) scale(0.99); } to { opacity: 1; transform: none; } }
 
-/* status accents — dot + pill tint per state */
-.cohort-card--open .cohort-card__status { background: rgba(142, 255, 165, 0.22); }
-.cohort-card--open .cohort-card__dot {
-  background: #8effa5;
-  box-shadow: 0 0 8px 1px rgba(142, 255, 165, 0.7);
+.pass__top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--livery); color: #fff; padding: 12px clamp(16px,2.4vw,20px);
 }
-.cohort-card--boarding .cohort-card__status { background: rgba(255, 198, 109, 0.22); }
-.cohort-card--boarding .cohort-card__dot {
-  background: #ffc66d;
-  box-shadow: 0 0 8px 1px rgba(255, 198, 109, 0.7);
+.pass__label { font-size: 10.5px; letter-spacing: 0.26em; text-transform: uppercase; font-weight: 600; }
+.pass__status-chip {
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; color: #fff;
+  border: 1px solid rgba(255,255,255,0.55); border-radius: 999px; padding: 4px 10px; white-space: nowrap;
 }
-.cohort-card--shipped .cohort-card__status { background: rgba(255, 255, 255, 0.12); }
-.cohort-card--shipped .cohort-card__dot { background: rgba(255, 255, 255, 0.7); }
 
-/* the open-ended "?? your call" tile — no photo, dashed, inert */
-.cohort-card--next {
-  background: rgba(11, 11, 11, 0.02);
-  border: 1px dashed rgba(11, 11, 11, 0.22);
-  color: var(--ink);
-  box-shadow: none;
+.pass__body { position: relative; padding: clamp(18px,2.8vw,24px); display: flex; flex-direction: column; gap: clamp(16px,2.4vh,22px); }
+.pass__map {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.07;
+  background-image: radial-gradient(circle at center, var(--livery) 1px, transparent 1.5px);
+  background-size: 13px 13px;
 }
-.cohort-card--next::after { content: none; }
-.cohort-card--next .cohort-card__index,
-.cohort-card--next .cohort-card__city { color: var(--ink); }
-.cohort-card--next .cohort-card__city small { color: var(--ink-3); }
-.cohort-card--next .cohort-card__status {
-  background: rgba(11, 11, 11, 0.05);
-  color: var(--ink-3);
-}
-.cohort-card--next .cohort-card__blurb { color: var(--ink-2); }
+.pass__airline-row { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pass__airline { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--livery); }
+.pass__airline b { font-weight: 700; }
+.pass__plane { font-size: 13px; }
+.pass__flightno { font-size: 12px; letter-spacing: 0.14em; color: var(--ink-3); }
 
-/* responsive */
-@media (max-width: 640px) {
-  .cohorts-grid { grid-template-columns: 1fr; }
-  .cohort-card { min-height: clamp(220px, 32vh, 300px); }
+.pass__route { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.pass__leg { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.pass__leg b { font-family: var(--mono); font-weight: 600; font-size: clamp(30px,7vw,40px); line-height: 1; letter-spacing: 0.02em; color: var(--ink); }
+.pass__leg small { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
+.pass__leg--to { text-align: right; align-items: flex-end; }
+.pass__plane2 { color: var(--livery); font-size: 18px; align-self: center; flex: none; }
+
+.pass__grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 13px 14px; }
+.pass__f { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pass__f small { font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-4); }
+.pass__f b { font-weight: 600; font-size: 13px; letter-spacing: 0.02em; color: var(--ink); }
+
+/* tear line with notches biting in from each edge (pass clips them) */
+.pass__tear { position: relative; height: 0; border-top: 2px dashed rgba(11,11,11,0.18); }
+.pass__tear::before, .pass__tear::after {
+  content: ""; position: absolute; top: 0; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--bg, #ffffff); transform: translateY(-50%);
+}
+.pass__tear::before { left: -11px; }
+.pass__tear::after  { right: -11px; }
+
+.pass__stub {
+  position: relative; display: flex; flex-direction: column; gap: 14px;
+  padding: clamp(16px,2.4vw,20px) clamp(18px,2.8vw,24px) clamp(18px,2.8vw,22px);
+  background: rgba(11,11,11,0.018);
+}
+.pass__stub-info { display: flex; gap: clamp(18px,4vw,32px); }
+.pass__barcode {
+  width: 100%; height: 44px;
+  background-image: repeating-linear-gradient(90deg,
+    var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 9px,
+    var(--ink) 9px 12px, transparent 12px 14px);
+  opacity: 0.8;
+}
+.pass--departed { filter: saturate(0.85); }
+
+/* ---- gate · flight details (right column) ---- */
+.gate { display: flex; flex-direction: column; gap: clamp(14px,2vh,18px); min-width: 0; }
+.gate__photos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.gate__photo { aspect-ratio: 4 / 3; border-radius: 10px; background-size: cover; background-position: center; background-color: #e9e7e0; }
+.gate__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.gate__chip {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2);
+  background: rgba(11,11,11,0.04); border: 1px solid rgba(11,11,11,0.08); padding: 6px 11px; border-radius: 999px;
+}
+.gate__chip b { font-weight: 600; font-size: 13px; letter-spacing: 0; color: var(--ink); }
+.gate__chip--win { background: rgba(61,107,78,0.10); border-color: rgba(61,107,78,0.25); color: var(--accent); }
+.gate__chip--win b { color: var(--accent); }
+.gate__blurb {
+  margin: 0; font-family: var(--serif); font-style: italic; font-size: clamp(15px,1.9vh,19px);
+  line-height: 1.5; color: var(--ink-2); max-width: 60ch;
+}
+.gate__foot { display: flex; align-items: center; gap: 16px; }
+.gate__cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--sans); font-size: 14px; font-weight: 500;
+  background: var(--ink); color: #fff; text-decoration: none; padding: 11px 22px; border-radius: 999px;
+  transition: transform 200ms ease, background 200ms ease;
+}
+.gate__cta:hover { transform: translateY(-1px); background: #1f1f1f; }
+.gate__closed { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-4); }
+
+/* responsive — stack pass over gate */
+@media (max-width: 860px) {
+  .departures__board { --dep-cols: 64px 1fr 92px; }
+  .dep-date { display: none; }
+  .boarding-pass-wrap { grid-template-columns: 1fr; gap: 22px; }
+  .pass { max-width: 380px; }
+  .gate__photos { grid-template-columns: repeat(4, 1fr); }
 }
 
 /* ---------- PANEL · FELLOWS ---------- */
@@ -4618,6 +4717,37 @@ body.page--single[data-active-panel="main"] .dock__icon:hover {
   color: #ffffff;
   background: rgba(255, 255, 255, 0.10);
 }
+
+/* about panel — same dark chrome as main */
+body.page--single[data-active-panel="about"] { background: #080c12; }
+body.page--single[data-active-panel="about"] .brand { color: #f4f3ee; }
+body.page--single[data-active-panel="about"] .rail__pill {
+  color: #f4f3ee;
+  opacity: 0.5;
+}
+body.page--single[data-active-panel="about"] .rail__pill:hover {
+  color: #ffffff;
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.10);
+}
+body.page--single[data-active-panel="about"] .rail__pill.is-active {
+  color: #ffffff;
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+body.page--single[data-active-panel="about"] .rail__pill[data-disabled="true"] {
+  opacity: 1;
+  color: rgba(244, 243, 238, 0.3);
+}
+body.page--single[data-active-panel="about"] .rail__pill[data-disabled="true"]:hover {
+  color: rgba(244, 243, 238, 0.5);
+  background: transparent;
+  opacity: 1;
+}
+body.page--single[data-active-panel="about"] .dock { color: rgba(244, 243, 238, 0.82); }
+body.page--single[data-active-panel="about"] .dock__icon { color: rgba(244, 243, 238, 0.75); }
+body.page--single[data-active-panel="about"] .dock__icon:hover { color: #ffffff; background: rgba(255, 255, 255, 0.10); }
+
 /* mobile: collapse the dock cleanly, stack the rail */
 @media (max-width: 720px) {
   .dock {
@@ -4767,3 +4897,202 @@ body.page--single[data-active-panel="main"] .dock__icon:hover {
   background: rgba(11, 11, 11, 0.06);
 }
 
+
+/* =========================================================
+   PANEL · FELLOWS v2 — open passport ID cards (3×2), flip to stamps
+   (supersedes the old draggable passport deck/book styles above)
+   ========================================================= */
+.panel--fellows .panel__inner--fellows { overflow-y: auto; }
+
+.fellows-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 2.2vw, 32px);
+  align-content: start;
+}
+
+/* flip card shell */
+.fellow-card { perspective: 1600px; cursor: pointer; }
+.fellow-card__flip {
+  position: relative; width: 100%; aspect-ratio: 1.44 / 1;
+  transform-style: preserve-3d;
+  transition: transform 700ms cubic-bezier(0.16,1,0.3,1);
+}
+.fellow-card.is-flipped .fellow-card__flip { transform: rotateY(180deg); }
+.fellow-card__face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: 10px; overflow: hidden; background: transparent;
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.55) inset,
+    0 28px 58px -32px rgba(0,0,0,0.55),
+    0 0 0 0.5px rgba(0,0,0,0.14);
+}
+.fellow-card__face--back { transform: rotateY(180deg); }
+
+/* ==========================================================
+   FRONT — realistic passport data page
+   ========================================================== */
+.pid {
+  position: relative; height: 100%; display: flex; flex-direction: column;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background:
+    repeating-linear-gradient(63deg,  transparent 0 9px, rgba(0,68,60,0.042) 9px 10px),
+    repeating-linear-gradient(-63deg, transparent 0 9px, rgba(0,68,60,0.042) 9px 10px),
+    repeating-linear-gradient(0deg,   transparent 0 20px, rgba(0,68,60,0.02) 20px 21px),
+    #cfe5e1;
+  overflow: hidden;
+}
+
+/* header strip — country names (left) + type/code/no + holo (right) */
+.pid__hdr {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 6px;
+  padding: clamp(5px,0.8vw,8px) clamp(8px,1.1vw,12px) clamp(4px,0.7vw,7px);
+  background: rgba(0,68,60,0.05);
+  border-bottom: 1px solid rgba(0,68,60,0.13);
+}
+.pid__country { display: flex; align-items: flex-start; gap: 5px; min-width: 0; }
+.pid__emblem {
+  flex: none;
+  width: clamp(13px,1.5vw,17px); height: clamp(13px,1.5vw,17px);
+  border-radius: 50%; background: #c1272d;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(6px,0.65vw,8px); color: #fff; font-weight: 800;
+  margin-top: 1px; flex-shrink: 0;
+}
+.pid__cnames {
+  display: flex; flex-direction: column; gap: 0.5px;
+  font-size: clamp(4px,0.42vw,5.5px); letter-spacing: 0.16em;
+  text-transform: uppercase; color: #1a3632; line-height: 1.65; white-space: nowrap;
+}
+.pid__metarow {
+  display: flex; align-items: flex-start; gap: clamp(6px,0.8vw,11px); flex: none;
+}
+.pid__metacol { display: flex; flex-direction: column; gap: 1px; }
+.pid__mlab {
+  font-size: clamp(4px,0.42vw,5.5px); letter-spacing: 0.16em;
+  text-transform: uppercase; color: #3a5e54; white-space: nowrap;
+}
+.pid__mval {
+  font-size: clamp(8px,0.82vw,10.5px); font-weight: 700;
+  letter-spacing: 0.06em; color: #0c2220; white-space: nowrap;
+}
+.pid__holo {
+  flex: none; align-self: center;
+  width: clamp(22px,2.6vw,34px); height: clamp(22px,2.6vw,34px); border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    rgba(140,210,204,0.95), rgba(210,196,136,0.95),
+    rgba(196,136,186,0.95), rgba(136,178,210,0.95),
+    rgba(210,136,152,0.95), rgba(140,210,204,0.95));
+  opacity: 0.52; box-shadow: 0 0 0 1px rgba(255,255,255,0.38);
+}
+
+/* body — photo (left) + fields (right) */
+.pid__body { flex: 1 1 auto; display: flex; min-height: 0; overflow: hidden; }
+.pid__photo {
+  flex: none; width: clamp(68px,24%,94px);
+  background-size: cover; background-position: center top;
+  background-color: #a6c6c2; position: relative;
+  border-right: clamp(2px,0.28vw,4px) solid #fff;
+}
+.pid__pbadge {
+  position: absolute; bottom: 4px; left: 4px;
+  font-size: clamp(4.5px,0.46vw,6px); letter-spacing: 0.1em; color: rgba(255,255,255,0.88);
+  background: rgba(0,0,0,0.42); padding: 1.5px 5px; border-radius: 2px;
+  font-family: 'Courier New', monospace;
+}
+.pid__fields {
+  flex: 1 1 auto; min-width: 0; overflow: hidden;
+  display: flex; flex-direction: column;
+  padding: clamp(4px,0.6vw,7px) clamp(6px,0.9vw,10px) clamp(3px,0.5vw,6px);
+  gap: 0;
+}
+.pid__f {
+  display: flex; flex-direction: column; gap: 0.5px;
+  padding: clamp(2px,0.35vw,3.5px) 0;
+  border-bottom: 1px solid rgba(0,68,60,0.09);
+  min-height: 0; overflow: hidden; flex-shrink: 0;
+}
+.pid__f:last-child { border-bottom: 0; }
+.pid__f--row { flex-direction: row; gap: clamp(7px,0.9vw,12px); align-items: flex-end; }
+.pid__f--row .pid__sf { flex: 1; min-width: 0; overflow: hidden; }
+.pid__sf { display: flex; flex-direction: column; gap: 0.5px; min-width: 0; overflow: hidden; }
+.pid__lbl {
+  font-size: clamp(4px,0.42vw,5.5px); letter-spacing: 0.14em;
+  text-transform: uppercase; color: #3a5e54; white-space: nowrap; overflow: hidden;
+}
+.pid__val {
+  font-size: clamp(8px,0.84vw,11px); letter-spacing: 0.02em;
+  color: #0c2220; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.25;
+}
+.pid__val--big  { font-size: clamp(10px,1.15vw,14px); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.pid__val--med  { font-weight: 600; }
+.pid__val--flip { color: #2e7060; cursor: pointer; font-size: clamp(7.5px,0.78vw,10px); }
+
+/* MRZ strip — pink band at bottom, OCR-B style */
+.pid__mrz {
+  flex: none; background: #f0c6c4;
+  border-top: 1.5px solid #0c2220;
+  padding: clamp(3px,0.45vw,5px) clamp(7px,1vw,11px) clamp(3px,0.5vw,5px);
+}
+.pid__mrzlines {
+  display: flex; flex-direction: column; gap: 0;
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: clamp(5.5px,0.57vw,7.5px); letter-spacing: 0.05em;
+  color: #0c2220; white-space: nowrap; overflow: hidden; line-height: 1.55;
+}
+
+/* ==========================================================
+   BACK — visa stamps page
+   ========================================================== */
+.pstamps {
+  height: 100%; display: flex; flex-direction: column; gap: 5px;
+  padding: clamp(12px,1.4vw,16px);
+  font-family: var(--mono);
+  background:
+    repeating-linear-gradient(63deg,  transparent 0 9px, rgba(0,68,60,0.025) 9px 10px),
+    repeating-linear-gradient(-63deg, transparent 0 9px, rgba(0,68,60,0.025) 9px 10px),
+    #f3ede0;
+}
+.pstamps__top {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: #5a5040;
+}
+.pstamps__back {
+  font-size: 8px; letter-spacing: 0.12em; color: #2e7060; cursor: pointer;
+  background: rgba(0,68,60,0.08); padding: 3px 9px; border-radius: 999px;
+  transition: background 160ms;
+}
+.pstamps__back:hover { background: rgba(0,68,60,0.16); }
+.pstamps__grid {
+  flex: 1 1 auto; display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: center; gap: clamp(10px,1.4vw,18px); padding: 4px 0;
+}
+.pstamps__name {
+  font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: #5a5040; text-align: center;
+}
+
+/* visa stamp */
+.vstamp {
+  --tint: #b2472f; --rot: -6deg;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  width: clamp(86px,10vw,114px); aspect-ratio: 1.5/1; padding: 6px;
+  border: 2px solid var(--tint); border-radius: 8px; color: var(--tint);
+  box-shadow: inset 0 0 0 1px var(--tint);
+  transform: rotate(var(--rot)); opacity: 0.85;
+  background: repeating-linear-gradient(45deg, transparent 0 5px, rgba(255,255,255,0.28) 5px 6px);
+}
+.vstamp__arc  { font-size: 6.5px; letter-spacing: 0.14em; text-transform: uppercase; }
+.vstamp__city { font-family: var(--serif); font-style: italic; font-size: clamp(14px,1.5vw,18px); line-height: 1; }
+.vstamp__code { font-size: 8px; letter-spacing: 0.22em; }
+.vstamp__date { font-size: 6.5px; letter-spacing: 0.08em; }
+
+/* responsive */
+@media (max-width: 900px) { .fellows-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 560px) {
+  .fellows-grid { grid-template-columns: 1fr; }
+  .fellow-card__flip { aspect-ratio: 1.5/1; }
+}
