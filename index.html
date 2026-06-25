@@ -11,8 +11,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="CrackedHQ" />
   <link rel="apple-touch-icon" href="/favicon.png" />
+  <link rel="icon" href="/favicon.png" />
   <script src="/analytics.js"></script>
-  <title>Cracked Hackerhouse — for cracked people, wherever we go next</title>
+  <title>Cracked Hackerhouse: for cracked people, wherever we go next</title>
   <meta name="description" content="Cracked Hackerhouse — a community of cracked people living, traveling, and building together. Cohort zero in Bangalore. Next stop, Vietnam." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -127,19 +128,29 @@
         </button>
       </li>
       <li>
+        <button type="button" class="rail__pill rail__pill--soon" data-panel-link="fellows" data-disabled="true" aria-disabled="true">
+          <span class="rail__pill-dot" aria-hidden="true"></span>
+          <span class="rail__pill-label">fellows</span>
+          <span class="rail__pill-soon" aria-label="coming soon">soon</span>
+        </button>
+      </li>
+      <li>
         <button type="button" class="rail__pill" data-panel-link="cohorts" data-disabled="true" aria-disabled="true">
           <span class="rail__pill-dot" aria-hidden="true"></span>
           <span class="rail__pill-label">cohorts</span>
         </button>
       </li>
-      <li>
-        <button type="button" class="rail__pill" data-panel-link="fellows" data-disabled="true" aria-disabled="true">
-          <span class="rail__pill-dot" aria-hidden="true"></span>
-          <span class="rail__pill-label">fellows</span>
-        </button>
-      </li>
     </ul>
   </nav>
+
+  <!-- Login button — top-right corner, persistent across all panels. -->
+  <button type="button" class="site-login-btn" id="site-login-btn" aria-label="Log in">
+    <svg class="site-login-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.5"/>
+      <path d="M5 20c0-3.314 3.134-6 7-6s7 2.686 7 6"/>
+    </svg>
+    log in
+  </button>
 
   <!-- Screen-level corner vignette — present across every panel. -->
   <div class="page-vignette" aria-hidden="true"></div>
@@ -371,11 +382,188 @@
           <span class="panel__eyebrow">the fellows</span>
           <h2 id="panel-fellows-title" class="panel__title">the people who <em>showed up</em></h2>
           <p class="panel__lede">
-            every fellow gets a passport. <span class="panel__lede-key">tap</span> one to flip to their house stamps.
+            the most cracked builders from every cohort.
           </p>
         </header>
 
-        <div class="fellows-grid" data-fellows-grid aria-label="Fellows"></div>
+        <!-- Six featured fellows — spy briefing wall -->
+        <div class="spy-wall" aria-label="Featured fellows">
+
+          <!-- wall atmosphere layer — all decorative, screen-reader invisible -->
+          <div class="spy-wall__bg" aria-hidden="true">
+
+            <!-- red string connections between subjects -->
+            <svg class="spy-strings" viewBox="0 0 600 700" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- top row horizontal -->
+              <path d="M 90 130 Q 195 150 300 125" stroke="#c0392b" stroke-width="1.8" fill="none" opacity="0.68"/>
+              <path d="M 300 125 Q 405 145 510 133" stroke="#c0392b" stroke-width="1.8" fill="none" opacity="0.6"/>
+              <!-- bottom row horizontal -->
+              <path d="M 90 462 Q 195 476 300 462" stroke="#c0392b" stroke-width="1.8" fill="none" opacity="0.62"/>
+              <path d="M 300 462 Q 405 476 510 455" stroke="#c0392b" stroke-width="1.8" fill="none" opacity="0.55"/>
+              <!-- verticals -->
+              <path d="M 90 130 Q 74 296 90 462" stroke="#c0392b" stroke-width="1.5" fill="none" opacity="0.45"/>
+              <path d="M 300 125 Q 283 294 300 462" stroke="#c0392b" stroke-width="1.5" fill="none" opacity="0.42"/>
+              <path d="M 510 133 Q 526 295 510 455" stroke="#c0392b" stroke-width="1.5" fill="none" opacity="0.45"/>
+              <!-- diagonal cross connections -->
+              <path d="M 90 130 Q 300 308 510 455" stroke="#d4700a" stroke-width="1.2" fill="none" stroke-dasharray="5,3" opacity="0.38"/>
+              <path d="M 510 133 Q 300 308 90 462" stroke="#d4700a" stroke-width="1.2" fill="none" stroke-dasharray="5,3" opacity="0.33"/>
+              <path d="M 300 125 Q 186 294 90 462" stroke="#c0392b" stroke-width="1.2" fill="none" opacity="0.28"/>
+            </svg>
+
+            <!-- post-it notes -->
+            <div class="spy-note" style="--x:2%;--y:2%;--rot:-4deg">BLR CELL<br>ACTIVE</div>
+            <div class="spy-note spy-note--pink" style="--x:31%;--y:3%;--rot:5deg">payment<br>rails → ?</div>
+            <div class="spy-note" style="--x:74%;--y:1%;--rot:-3deg">DUBAI<br>expand?</div>
+            <div class="spy-note spy-note--blue" style="--x:22%;--y:45%;--rot:6deg">all roads<br>lead here</div>
+            <div class="spy-note" style="--x:2%;--y:76%;--rot:-5deg">WATCH<br>this one</div>
+            <div class="spy-note spy-note--pink" style="--x:70%;--y:77%;--rot:4deg">why<br>compilers??</div>
+
+            <!-- typed CIA-style documents -->
+            <div class="spy-doc" style="--x:65%;--y:0%;--rot:4deg">
+              <div class="spy-doc__label">FIELD REPORT · REF-0042</div>
+              <div class="spy-doc__line"></div>
+              <div class="spy-doc__line spy-doc__line--s"></div>
+              <div class="spy-doc__redact"></div>
+              <div class="spy-doc__line spy-doc__line--m"></div>
+              <div class="spy-doc__stamp">VERIFIED</div>
+            </div>
+            <div class="spy-doc" style="--x:-2%;--y:34%;--rot:-5deg">
+              <div class="spy-doc__label">SUBJECT MANIFEST</div>
+              <div class="spy-doc__line"></div>
+              <div class="spy-doc__redact"></div>
+              <div class="spy-doc__line spy-doc__line--s"></div>
+              <div class="spy-doc__line"></div>
+              <div class="spy-doc__stamp spy-doc__stamp--grn">CLEARED</div>
+            </div>
+            <div class="spy-doc" style="--x:69%;--y:57%;--rot:2deg">
+              <div class="spy-doc__label">INTER-AGENCY MEMO</div>
+              <div class="spy-doc__line"></div>
+              <div class="spy-doc__redact"></div>
+              <div class="spy-doc__line spy-doc__line--m"></div>
+              <div class="spy-doc__stamp">CONFIDENTIAL</div>
+            </div>
+
+            <!-- operation mission card -->
+            <div class="spy-mission" style="--x:40%;--y:43%;--rot:-1deg">
+              <span class="spy-mission__eyebrow">OPERATION</span>
+              <span class="spy-mission__name">CRACKED</span>
+              <span class="spy-mission__sub">6 ASSETS · 2 CELLS · ONGOING</span>
+            </div>
+
+            <!-- city location markers -->
+            <div class="spy-location" style="--x:3%;--y:92%">
+              <span class="spy-location__dot"></span>
+              <span class="spy-location__name">BANGALORE</span>
+              <span class="spy-location__code">BLR · 12.97°N 77.59°E</span>
+            </div>
+            <div class="spy-location" style="--x:44%;--y:92%">
+              <span class="spy-location__dot"></span>
+              <span class="spy-location__name">DUBAI</span>
+              <span class="spy-location__code">DAD · 25.20°N 55.27°E</span>
+            </div>
+
+          </div><!-- /.spy-wall__bg -->
+
+          <figure class="spy-photo" style="--rot:-1.8deg; --cohort-clr:#b2472f">
+            <div class="spy-photo__pin" aria-hidden="true"></div>
+            <div class="spy-photo__frame">
+              <div class="spy-photo__img" style="background-image:url('fellows/BHEWwnjs_400x400.jpg')"></div>
+              <figcaption class="spy-photo__caption">
+                <span class="spy-photo__name">Vagdev Korrapati</span>
+                <span class="spy-photo__role">payment rails for emerging markets</span>
+                <span class="spy-photo__meta">CRK·00·0001 &nbsp;·&nbsp; COHORT 00 · BLR</span>
+              </figcaption>
+            </div>
+            <span class="spy-photo__stamp" aria-hidden="true">CLEARED</span>
+          </figure>
+
+          <figure class="spy-photo" style="--rot:2.1deg; --cohort-clr:#0f7d7a">
+            <div class="spy-photo__pin" aria-hidden="true"></div>
+            <div class="spy-photo__frame">
+              <div class="spy-photo__img" style="background-image:url('fellows/UfGyY5_j_400x400.jpg')"></div>
+              <figcaption class="spy-photo__caption">
+                <span class="spy-photo__name">Riza Aydin</span>
+                <span class="spy-photo__role">small models that actually think</span>
+                <span class="spy-photo__meta">CRK·00·0002 &nbsp;·&nbsp; COHORT 00–01</span>
+              </figcaption>
+            </div>
+            <span class="spy-photo__stamp" aria-hidden="true">CLEARED</span>
+          </figure>
+
+          <figure class="spy-photo" style="--rot:-1.2deg; --cohort-clr:#b2472f">
+            <div class="spy-photo__pin" aria-hidden="true"></div>
+            <div class="spy-photo__frame">
+              <div class="spy-photo__img" style="background-image:url('fellows/yDrxSxQu_400x400.jpg')"></div>
+              <figcaption class="spy-photo__caption">
+                <span class="spy-photo__name">Ashrith Reddy</span>
+                <span class="spy-photo__role">cold-chain sensors for vaccines</span>
+                <span class="spy-photo__meta">CRK·00·0003 &nbsp;·&nbsp; COHORT 00 · BLR</span>
+              </figcaption>
+            </div>
+            <span class="spy-photo__stamp" aria-hidden="true">CLEARED</span>
+          </figure>
+
+          <figure class="spy-photo" style="--rot:1.6deg; --cohort-clr:#0f7d7a">
+            <div class="spy-photo__pin" aria-hidden="true"></div>
+            <div class="spy-photo__frame">
+              <div class="spy-photo__img" style="background-image:url('fellows/90960705.jpeg')"></div>
+              <figcaption class="spy-photo__caption">
+                <span class="spy-photo__name">Kalash Mehta</span>
+                <span class="spy-photo__role">compilers &middot; WASM &amp; Rust</span>
+                <span class="spy-photo__meta">CRK·01·0004 &nbsp;·&nbsp; COHORT 01 · DAD</span>
+              </figcaption>
+            </div>
+            <span class="spy-photo__stamp" aria-hidden="true">CLEARED</span>
+          </figure>
+
+          <figure class="spy-photo" style="--rot:-2.3deg; --cohort-clr:#0f7d7a">
+            <div class="spy-photo__pin" aria-hidden="true"></div>
+            <div class="spy-photo__frame">
+              <div class="spy-photo__img" style="background-image:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85')"></div>
+              <figcaption class="spy-photo__caption">
+                <span class="spy-photo__name">Karthik Nair</span>
+                <span class="spy-photo__role">dev tools for AI agents</span>
+                <span class="spy-photo__meta">CRK·00·0005 &nbsp;·&nbsp; COHORT 00–01</span>
+              </figcaption>
+            </div>
+            <span class="spy-photo__stamp" aria-hidden="true">CLEARED</span>
+          </figure>
+
+          <figure class="spy-photo" style="--rot:1.9deg; --cohort-clr:#0f7d7a">
+            <div class="spy-photo__pin" aria-hidden="true"></div>
+            <div class="spy-photo__frame">
+              <div class="spy-photo__img" style="background-image:url('https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=facearea&facepad=2.4&w=520&h=640&q=85')"></div>
+              <figcaption class="spy-photo__caption">
+                <span class="spy-photo__name">Tanish Jain</span>
+                <span class="spy-photo__role">weird consumer social apps</span>
+                <span class="spy-photo__meta">CRK·01·0006 &nbsp;·&nbsp; COHORT 01 · DAD</span>
+              </figcaption>
+            </div>
+            <span class="spy-photo__stamp" aria-hidden="true">CLEARED</span>
+          </figure>
+
+        </div>
+
+        <!-- Locked directory — full roster, fellows only -->
+        <div class="fellows-lock" aria-label="Fellows directory — members only">
+          <div class="fellows-lock__ghosts" aria-hidden="true">
+            <div class="fellows-lock__ghost"></div>
+            <div class="fellows-lock__ghost"></div>
+            <div class="fellows-lock__ghost"></div>
+          </div>
+          <div class="fellows-lock__overlay">
+            <svg class="fellows-lock__lockicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="10" rx="2"/>
+              <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+            </svg>
+            <p class="fellows-lock__headline">30+ cracked builders<br>in the network.</p>
+            <p class="fellows-lock__desc">Search, discover, and connect with every fellow across all cohorts. Fellows only.</p>
+            <div class="fellows-lock__actions">
+              <button type="button" class="fellows-lock__btn" id="fellows-request-btn">Request access</button>
+              <p class="fellows-lock__signin">Already approved? <a href="#" id="fellows-login-link">Log in →</a></p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>

@@ -79,6 +79,7 @@ window.__siteLoaded = (() => {
         { tagline: "Our unlimited diet coke sponsor", logo: "sponsors/cohort-00/diet-coke.svg", alt: "team.shiksha", size: "lg", url: "https://team.shiksha/" },
       ],
       photos: [
+        "villas/cohort-00/fa1983ea-a554-4e9e-a35b-f606330f3490.JPG",
         "villas/cohort-00/IMG_1115.jpg",
         "villas/cohort-00/IMG_1118.jpg",
         "villas/cohort-00/IMG_1120.jpg",
@@ -86,7 +87,6 @@ window.__siteLoaded = (() => {
         "villas/cohort-00/IMG_0723_Original.jpg",
         "villas/cohort-00/image.png",
         "villas/cohort-00/image copy.png",
-        "villas/cohort-00/image copy 2.png",
       ],
       stats: [
         { value: "10", label: "cracked" },
@@ -268,11 +268,50 @@ window.__siteLoaded = (() => {
     });
   }
 
+  // flyTo() zooms out to ~z4–6 while panning between cities.  The existing
+  // prefetchAllCohorts only warms each destination's local tiles, leaving the
+  // transit path uncached — hence the black during the arc.  This covers the
+  // entire bounding box of all cohorts at every zoom level the camera passes
+  // through (z3–z6, ~210 tiny low-res tiles, <3 MB).
+  let transitPrefetchDone = false;
+  function prefetchTransitRegion() {
+    if (transitPrefetchDone) return;
+    transitPrefetchDone = true;
+    const conn = navigator.connection;
+    if (conn && (conn.saveData || /(^|-)2g/.test(conn.effectiveType || ""))) return;
+
+    const lons = COHORTS.map(c => c.cam.lon);
+    const lats = COHORTS.map(c => c.cam.lat);
+    const minLon = Math.min(...lons) - 8;
+    const maxLon = Math.max(...lons) + 8;
+    const minLat = Math.min(...lats) - 8;
+    const maxLat = Math.max(...lats) + 8;
+
+    const seen = new Set();
+    [3, 4, 5, 6].forEach(z => {
+      const t0 = lonLatToTile(minLon, maxLat, z);  // top-left  (NW corner)
+      const t1 = lonLatToTile(maxLon, minLat, z);  // bottom-right (SE corner)
+      const n  = Math.pow(2, z);
+      for (let ix = t0.x; ix <= t1.x; ix++) {
+        const tx = ((ix % n) + n) % n;
+        for (let iy = t0.y; iy <= t1.y; iy++) {
+          const url = ESRI_TILE
+            .replace("{z}", z).replace("{x}", tx).replace("{y}", iy);
+          if (seen.has(url)) continue;
+          seen.add(url);
+          const img = new Image();
+          img.decoding = "async";
+          img.src = url;
+        }
+      }
+    });
+  }
+
   function idlePrefetch() {
     if ("requestIdleCallback" in window) {
-      requestIdleCallback(() => prefetchAllCohorts(), { timeout: 3000 });
+      requestIdleCallback(() => { prefetchAllCohorts(); prefetchTransitRegion(); }, { timeout: 3000 });
     } else {
-      setTimeout(prefetchAllCohorts, 1200);
+      setTimeout(() => { prefetchAllCohorts(); prefetchTransitRegion(); }, 1200);
     }
   }
 
@@ -319,7 +358,10 @@ window.__siteLoaded = (() => {
             attribution: "© Esri, Maxar, Earthstar Geographics"
           }
         },
-        layers: [{ id: "satellite", type: "raster", source: "satellite" }]
+        layers: [
+          { id: "map-bg", type: "background", paint: { "background-color": "#0d0d0d" } },
+          { id: "satellite", type: "raster", source: "satellite" }
+        ]
       },
       center:  [START.lon, START.lat],
       zoom:    START.zoom,
