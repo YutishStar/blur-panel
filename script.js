@@ -212,8 +212,37 @@ window.__siteLoaded = (() => {
      browser HTTP cache with a small tile pyramid for every cohort's
      destination view: switches then land on cached imagery, and there's
      always a blurry low-zoom ancestor to show instead of black. */
-  const ESRI_TILE =
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+  // Satellite imagery. Prefer Mapbox Satellite (clean, seamless, licensed) when
+  // a token is present in config.js; otherwise fall back to Esri World Imagery.
+  // Tiles are substituted by name, so each URL's {x}/{y} order matches its own
+  // provider scheme (Mapbox = z/x/y, Esri = z/y/x).
+  const MAPBOX_TOKEN = (window.CONFIG && window.CONFIG.MAPBOX_TOKEN) || "";
+  // Try a look by setting MAP_STYLE in config.js and refreshing. All render to
+  // raster so they drop straight into the existing hero.
+  const styleTiles = (id) =>
+    "https://api.mapbox.com/styles/v1/mapbox/" + id +
+    "/tiles/256/{z}/{x}/{y}@2x?access_token=" + MAPBOX_TOKEN;
+  const MAP_STYLES = {
+    satellite:           "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.jpg90?access_token=" + MAPBOX_TOKEN,
+    "satellite-streets": styleTiles("satellite-streets-v12"), // imagery + subtle roads/labels
+    dark:                styleTiles("dark-v11"),              // minimal dark vector (Linear/Arc vibe)
+    light:               styleTiles("light-v11"),             // minimal light vector
+    streets:             styleTiles("streets-v12"),           // full street map
+    "navigation-night":  styleTiles("navigation-night-v1"),   // deep navy night map
+  };
+  const MAP_STYLE = (window.CONFIG && window.CONFIG.MAP_STYLE) || "satellite";
+  const SATELLITE = MAPBOX_TOKEN
+    ? {
+        tiles: MAP_STYLES[MAP_STYLE] || MAP_STYLES.satellite,
+        maxzoom: 22,
+        attribution: "© Mapbox © Maxar",
+      }
+    : {
+        tiles: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        maxzoom: 19,
+        attribution: "© Esri, Maxar, Earthstar Geographics",
+      };
+  const ESRI_TILE = SATELLITE.tiles;
 
   function lonLatToTile(lon, lat, z) {
     const n = Math.pow(2, z);
@@ -353,9 +382,10 @@ window.__siteLoaded = (() => {
         sources: {
           satellite: {
             type: "raster",
-            tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
+            tiles: [SATELLITE.tiles],
             tileSize: 256,
-            attribution: "© Esri, Maxar, Earthstar Geographics"
+            maxzoom: SATELLITE.maxzoom,
+            attribution: SATELLITE.attribution
           }
         },
         layers: [
@@ -1714,5 +1744,93 @@ window.__siteLoaded = (() => {
     // dispatch a window resize one frame later so the panel transition
     // has committed before MapLibre measures.
     requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+  });
+})();
+
+/* ---------------------------------------------------------------------------
+   Passport app links. The Cracked Passport is a separate app (its own deploy).
+   Any element with [data-passport-link] points there; the attribute's value is
+   the path (default /passport). Locally we target the dev server so the flow is
+   testable end-to-end; in production it's the passport subdomain.
+   --------------------------------------------------------------------------- */
+(function () {
+  var h = location.hostname;
+  var isLocal =
+    h === "localhost" || h === "127.0.0.1" || h === "0.0.0.0" ||
+    h === "[::1]" || h === "" || h.slice(-6) === ".local";
+  var base = isLocal ? "http://localhost:3000" : "https://passport.thecrackedhq.com";
+
+  var links = document.querySelectorAll("[data-passport-link]");
+  if (!links.length) return;
+
+  // Real href (so it still works without JS / on middle-click / SEO).
+  links.forEach(function (el) {
+    el.setAttribute("href", base + (el.getAttribute("data-passport-link") || "/passport"));
+  });
+
+  /* Rather than navigating straight off the site, a click opens a gate modal
+     over the page — the site blurs behind it, and the modal hands you off to
+     the passport app. Built here so every page gets it without extra markup. */
+  var modal = document.createElement("div");
+  modal.className = "pgate";
+  modal.setAttribute("hidden", "");
+  modal.innerHTML =
+    '<div class="pgate__scrim" data-pgate-close></div>' +
+    '<div class="pgate__card" role="dialog" aria-modal="true" aria-labelledby="pgate-title">' +
+      '<span class="pgate__brand">crackedHQ<span class="pgate__brand-dot">.</span></span>' +
+      '<h2 class="pgate__title" id="pgate-title">This area is reserved for <em>verified Cracked Fellows.</em></h2>' +
+      '<p class="pgate__body">Your Passport lives here. Sign in to open it.</p>' +
+      '<a class="pgate__btn" href="#">Enter' +
+        '<svg class="pgate__btn-door" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M6 2.5h7v11H6"/>' +
+          '<path d="M6 2.5 2.5 4v9.5L6 13.5z"/>' +
+          '<circle cx="5" cy="8.2" r="0.5" fill="currentColor" stroke="none"/>' +
+        '</svg>' +
+      '</a>' +
+      '<span class="pgate__foot">Not a fellow yet? You can request verification inside.</span>' +
+    '</div>';
+  document.body.appendChild(modal);
+
+  var card = modal.querySelector(".pgate__card");
+  var enter = modal.querySelector(".pgate__btn");
+  var lastFocus = null;
+
+  function open(href) {
+    lastFocus = document.activeElement;
+    enter.setAttribute("href", href);
+    modal.removeAttribute("hidden");
+    document.body.classList.add("pgate-open");
+    requestAnimationFrame(function () { modal.classList.add("is-open"); });
+    enter.focus();
+  }
+  function close() {
+    modal.classList.remove("is-open");
+    document.body.classList.remove("pgate-open");
+    setTimeout(function () { modal.setAttribute("hidden", ""); }, 260);
+    if (lastFocus) lastFocus.focus();
+  }
+
+  links.forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let new-tab through
+      e.preventDefault();
+      open(el.getAttribute("href"));
+    });
+  });
+
+  modal.addEventListener("click", function (e) {
+    if (e.target.hasAttribute("data-pgate-close")) close();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !modal.hasAttribute("hidden")) close();
+  });
+  // keep focus inside the card while open
+  card.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab") return;
+    var f = card.querySelectorAll("button, a[href]");
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
 })();

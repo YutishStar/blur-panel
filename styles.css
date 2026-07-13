@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'PPMondwest';
+  src: url('/fonts/ppmondwest-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* =========================================================
    Cracked Hacker House — premium white, black ink
    ========================================================= */
@@ -739,7 +747,7 @@ img, svg { display: block; max-width: 100%; }
 }
 
 .hero__title {
-  font-family: var(--serif);
+  font-family: 'PPMondwest', var(--serif);
   font-weight: 400;
   font-size: clamp(44px, 4.6vw, 68px);
   line-height: 0.98;
@@ -753,8 +761,8 @@ img, svg { display: block; max-width: 100%; }
   position: relative;
   z-index: 1;
 }
-/* Inline emphasis — italic serif for the brand word ("Cracked"). */
-.hero__title em { font-style: italic; }
+/* Inline emphasis — same weight, no italic. */
+.hero__title em { font-style: normal; }
 .hero__title span { display: block; }
 
 .hero__sub {
@@ -827,24 +835,7 @@ img, svg { display: block; max-width: 100%; }
 
 /* ── cohort badge above the headline ──────────────────────────────────── */
 .hero__cohort {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 12px 5px 8px;
-  margin-bottom: 20px;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.78);
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  text-shadow: 0 1px 10px rgba(11, 11, 11, 0.3);
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  position: relative;
-  z-index: 1;
+  display: none;
 }
 .hero__cohort-dot {
   width: 6px;
@@ -4029,7 +4020,7 @@ body.page--single[data-active-panel="main"] { background: #000; }
 }
 
 .about-title {
-  font-family: var(--serif);
+  font-family: 'PPMondwest', var(--serif);
   font-size: clamp(52px, 6.5vw, 92px);
   line-height: 0.96;
   letter-spacing: -0.025em;
@@ -4344,8 +4335,8 @@ button.dep-row:hover { background: rgba(255,255,255,0.04); color: #fff; }
   left: 50%;
   transform: translateX(-50%);
   z-index: 80;
-  font-family: var(--serif);
-  font-style: italic;
+  font-family: 'PPMondwest', var(--serif);
+  font-style: normal;
   font-size: clamp(20px, 3vh, 28px);
   line-height: 1;
   letter-spacing: -0.015em;
@@ -4357,6 +4348,66 @@ button.dep-row:hover { background: rgba(255,255,255,0.04); color: #fff; }
 }
 .brand:hover { transform: translateX(-50%) translateY(-1px); }
 .brand__dot { color: var(--accent); opacity: 0.95; }
+
+/* Passport entry — top-right link into the Cracked Passport app. Styled
+   to match the rail "menu bar": frosted-glass pill, mono uppercase label
+   with wide tracking. href set by script.js. */
+.passport-link {
+  position: fixed;
+  top: clamp(14px, 2.5vh, 22px);
+  right: clamp(14px, 2.4vw, 26px);
+  z-index: 82;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--ink-2);
+  border: 0.5px solid rgba(11, 11, 11, 0.05);
+  border-radius: 999px;
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow:
+    0 18px 40px -22px rgba(11, 11, 11, 0.18),
+    0 4px 14px -10px rgba(11, 11, 11, 0.10);
+  transition: transform 200ms ease, box-shadow 220ms ease, background 280ms ease, color 220ms ease, border-color 280ms ease;
+}
+.passport-link:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow:
+    0 22px 46px -22px rgba(11, 11, 11, 0.24),
+    0 6px 18px -10px rgba(11, 11, 11, 0.14);
+}
+.passport-link__arrow {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1;
+  color: currentColor;
+  opacity: 0.75;
+  transition: transform 220ms ease;
+}
+.passport-link:hover .passport-link__arrow { transform: translate(3px, 0); }
+
+/* on the dark hero, flip to cream ink like the rail pills */
+body.page--single[data-active-panel="main"] .passport-link {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f4f3ee;
+}
+body.page--single[data-active-panel="main"] .passport-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
 
 /* on the dark hero, flip to cream ink */
 body.page--single[data-active-panel="main"] .brand {
@@ -5425,46 +5476,6 @@ body.page--single[data-active-panel="about"] .dock__icon:hover { color: #ffffff;
 }
 
 /* =========================================================
-   LOGIN BUTTON — top-right persistent chrome
-   ========================================================= */
-.site-login-btn {
-  position: fixed;
-  top: clamp(14px, 2.5vh, 22px);
-  right: clamp(14px, 2.4vw, 26px);
-  z-index: 82;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 16px 0 13px;
-  height: 34px;
-  border-radius: 999px;
-  border: none;
-  background: #f4f3ee;
-  color: #0b0b0b;
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.7) inset,
-    0 8px 22px -8px rgba(11, 11, 11, 0.22);
-  transition: background 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease;
-}
-.site-login-btn:hover {
-  background: #ffffff;
-  transform: translateY(-1px);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 12px 28px -8px rgba(11, 11, 11, 0.28);
-}
-.site-login-btn:active { transform: scale(0.97); }
-.site-login-btn__icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-/* =========================================================
    FELLOWS LOCK — locked directory teaser
    ========================================================= */
 .fellows-lock {
@@ -5564,20 +5575,174 @@ body.page--single[data-active-panel="about"] .dock__icon:hover { color: #ffffff;
 }
 .fellows-lock__btn:active { transform: scale(0.97); }
 
-.fellows-lock__signin {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.38);
-  margin: 0;
-}
-.fellows-lock__signin a {
-  color: rgba(255, 255, 255, 0.65);
-  text-decoration: none;
-}
-.fellows-lock__signin a:hover { color: #fff; }
-
 @media (max-width: 560px) {
   .fellows-lock__ghosts { grid-template-columns: 1fr; }
   .fellows-lock__headline { font-size: 20px; }
+}
+
+/* =========================================================
+   PASSPORT GATE — modal over the site. Clicking "Passport"
+   softens the page behind a glass card cut from the same
+   cloth as the rail/menu (light blur, translucent, light text).
+   ========================================================= */
+.pgate {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.pgate[hidden] { display: none; }
+
+/* the blur: gentle — the map stays readable behind it */
+.pgate__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 10, 9, 0.32);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+.pgate.is-open .pgate__scrim { opacity: 1; }
+
+/* the card — liquid glass: a luminous rim that catches the light,
+   brightest along the top edge, fading down the sides */
+.pgate__card {
+  position: relative;
+  z-index: 1;
+  width: min(430px, 92vw);
+  padding: 44px 36px 32px;
+  text-align: center;
+  border-radius: 36px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.17) 0%,
+    rgba(255, 255, 255, 0.09) 60%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  backdrop-filter: blur(26px) saturate(150%);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  border: none;
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.22),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 34px 80px -32px rgba(11, 11, 11, 0.6);
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  transition:
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* side catch-lights — the "liquid" part of the glass */
+.pgate__card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    rgba(255, 255, 255, 0.02) 70%,
+    rgba(255, 255, 255, 0.14) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 1px;
+}
+.pgate.is-open .pgate__card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* wordmark — same face + dot as the site logo */
+.pgate__brand {
+  display: block;
+  font-family: 'PPMondwest', var(--serif);
+  font-size: 21px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.62);
+  margin-bottom: 22px;
+}
+.pgate__brand-dot { color: #9fd4ac; }
+
+.pgate__title {
+  font-family: 'PPMondwest', var(--serif);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #f4f3ee;
+  text-shadow: 0 2px 18px rgba(11, 11, 11, 0.35);
+  margin: 0;
+}
+.pgate__title em {
+  font-style: normal;
+  color: #9fd4ac;
+}
+.pgate__body {
+  margin: 14px auto 0;
+  max-width: 26ch;
+  font-family: var(--sans);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* white pill — identical to the site's apply buttons */
+.pgate__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  box-shadow: 0 8px 24px -10px rgba(11, 11, 11, 0.40);
+  transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+.pgate__btn:hover {
+  background: #f5f4ef;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px -10px rgba(11, 11, 11, 0.50);
+}
+/* little door — nudges open on hover */
+.pgate__btn-door {
+  display: block;
+  flex-shrink: 0;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pgate__btn:hover .pgate__btn-door { transform: translateX(2px) rotate(-6deg); }
+
+.pgate__foot {
+  display: block;
+  margin-top: 14px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+body.pgate-open { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pgate__scrim, .pgate__card { transition: none; }
 }

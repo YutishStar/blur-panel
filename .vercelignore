@@ -1,0 +1,14 @@
+# Vercel uses this INSTEAD of .gitignore when deciding what to upload.
+#
+# Why it exists: config.js holds the Mapbox + MapKit tokens and is gitignored
+# (kept out of the repo), but production needs it or the map silently falls back
+# to Esri imagery. Listing our own excludes here — and NOT config.js — means
+# `vercel --prod` uploads it while git still ignores it.
+
+.git
+.DS_Store
+Thumbs.db
+*.log
+node_modules
+.env
+.env.*
