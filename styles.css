@@ -4531,9 +4531,6 @@ body.page--single[data-active-panel="main"] .rail__list {
   white-space: nowrap;
   flex: none;
 }
-/* suppress duplicate tooltip since inline badge already shows */
-.rail__pill--soon[data-disabled="true"]::after { display: none; }
-
 /* individual pill hover — just a tone shift, no size change */
 .rail__pill:hover {
   color: var(--ink);
@@ -4787,6 +4784,15 @@ body.page--single[data-active-panel="main"] .dock__icon:hover {
 /* about panel — same dark chrome as main */
 body.page--single[data-active-panel="about"] { background: #080c12; }
 body.page--single[data-active-panel="about"] .brand { color: #f4f3ee; }
+body.page--single[data-active-panel="about"] .passport-link {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f4f3ee;
+}
+body.page--single[data-active-panel="about"] .passport-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
 body.page--single[data-active-panel="about"] .rail__pill {
   color: #f4f3ee;
   opacity: 0.5;

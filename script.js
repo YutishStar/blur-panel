@@ -108,7 +108,7 @@ window.__siteLoaded = (() => {
       heroTitle: { a: "Are you",   b: "<em>Cracked</em> enough?" },
       heroDesc:  "A house full of builders, creators, hackers, and ambitious misfits living together for thirty days.",
       actions: [
-        { label: "Filled!", variant: "ghost" },
+        { label: "Ongoing!", variant: "ghost" },
         { label: "Apply to next cohort", variant: "primary", arrow: true, cohortJump: 2 },
       ],
       sponsors: [
