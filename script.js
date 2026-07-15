@@ -132,24 +132,54 @@ window.__siteLoaded = (() => {
       blurb: "Sleep is optional in this house, but shipping and having fun is undeniable.",
     },
     {
-      // ---- C2 · DUBAI (NEW) — placeholder content; real copy + Dubai-specific
-      // Tally link land later. Photos reuse the Bali set as placeholders until
-      // real Dubai shots are dropped into villas/cohort-02/. -------------------
+      // ---- C2 · BALI (moved up — next cohort, Sep 2026) --------------------
       id: "02",
-      badge: 'Cohort 2, Dubai, UAE <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status hero__cohort-status--open">Applications open!</span>',
+      badge: 'Cohort 2, Canggu, Bali <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status hero__cohort-status--open">Applications open!</span>',
       title: "CRACKED HACKER HOUSE",
-      sub:   "Cohort 02 · Starts 8th Aug!",
+      sub:   "1st September · 10 Fellows · 30 Days",
+      loc:   "Canggu, Bali",
+      cam:       { lon: 115.16274, lat: -8.65019, zoom: 12.8, pitch: 45, bearing: 136.2 },
+      camMobile: { lon: 115.1310,  lat: -8.6575,  zoom: 12.8, pitch: 45, bearing: 135.9 },
+      anchor:    { lon: 115.1285,  lat: -8.6573 },
+      apps:  { label: "applications open", range: "Rolling · house starts 1st Sep", status: "open" },
+      ctaLabel: "Apply C2",
+      tally: "https://tally.so/r/A7yDE0",
+      heroTitle: { a: "10 Fellows.", b: "30 days.", c: "<em>Bali 🇮🇩.</em>" },
+      heroDesc:  "Starts 1st September. One huge Canggu villa, ten cracked fellows, thirty days of shipping: good wifi, bad sleep schedules, and demo days that end in the ocean instead of a pitch deck. Compute credits, sponsor intros, scooters at the gate, and thousands in OpenAI + Anthropic grants for the builders in this house, announcing soon.",
+      actions: [
+        { label: "Apply C2", variant: "primary", arrow: true, href: "https://tally.so/r/A7yDE0" },
+      ],
+      sponsors: [
+        { tagline: "Thousands of OpenAI credits", logo: "sponsors/openai.png", alt: "OpenAI", size: "md", url: "https://openai.com/" },
+      ],
+      photos: [
+        "villas/cohort-03/01.png", "villas/cohort-03/02.png", "villas/cohort-03/03.png", "villas/cohort-03/04.png",
+        "villas/cohort-03/05.png", "villas/cohort-03/06.png", "villas/cohort-03/07.png", "villas/cohort-03/08.png",
+      ],
+      stats: [
+        { value: "10", label: "fellows" },
+        { value: "30", label: "days" },
+        { value: "1",  label: "huge villa" },
+      ],
+      blurb: "Ten cracked fellows, one huge Canggu villa, this September. Thousands in OpenAI + Anthropic grants for the builders in this house, announcing soon.",
+    },
+    {
+      // ---- C3 · DUBAI (moved back — dates to be announced) -----------------
+      id: "03",
+      badge: 'Cohort 3, Dubai, UAE <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status hero__cohort-status--open">Applications open!</span>',
+      title: "CRACKED HACKER HOUSE",
+      sub:   "Cohort 03 · Dates soon",
       loc:   "Dubai, UAE",
       cam:       { lon: 55.17257, lat: 25.11601, zoom: 12.8, pitch: 45, bearing: 124.2 },
       camMobile: { lon: 55.13957, lat: 25.10801, zoom: 12.8, pitch: 45, bearing: 123.2 },
       anchor:    { lon: 55.15536, lat: 25.09564 },
-      apps:  { label: "applications open", range: "Starts 8th August", status: "open" },
-      ctaLabel: "Apply C2",
+      apps:  { label: "applications open", range: "Dates announced soon", status: "open" },
+      ctaLabel: "Apply C3",
       tally: "https://tally.so/r/VLNzGJ",
       heroTitle: { a: "30 days.", b: "16 cracked founders.", c: "<em>Dubai.</em>" },
-      heroDesc:  "Starts 8th August. $500 buys a bed, a seat at the workstation, and 30 days next to sixteen cracked builders in a Dubai villa 10 minutes from the Burj Khalifa. Compute credits, founder dinners, sponsor intros, and demo days that end in the ocean.",
+      heroDesc:  "Next up after Bali. $500 buys a bed, a seat at the workstation, and 30 days next to sixteen cracked builders in a Dubai villa 10 minutes from the Burj Khalifa. Compute credits, founder dinners, sponsor intros, and demo days that end in the ocean. Exact dates dropping soon.",
       actions: [
-        { label: "Apply C2", variant: "primary", arrow: true, href: "https://tally.so/r/VLNzGJ" },
+        { label: "Apply C3", variant: "primary", arrow: true, href: "https://tally.so/r/VLNzGJ" },
       ],
       sponsors: [],
       photos: [
@@ -162,38 +192,8 @@ window.__siteLoaded = (() => {
       ],
       blurb: "Sixteen cracked founders living ten meters apart in Dubai, 10 minutes from the Burj Khalifa. Compute credits to ship faster, founder dinners, sponsor intros, and demo days that end in the ocean.",
     },
-    {
-      id: "03",
-      badge: 'Cohort 3, Canggu, Bali <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status hero__cohort-status--open">Applications open!</span>',
-      title: "CRACKED HACKER HOUSE",
-      sub:   "Cohort 03 · Starts 1st Sep!",
-      loc:   "Canggu, Bali",
-      cam:       { lon: 115.16274, lat: -8.65019, zoom: 12.8, pitch: 45, bearing: 136.2 },
-      camMobile: { lon: 115.1310,  lat: -8.6575,  zoom: 12.8, pitch: 45, bearing: 135.9 },
-      anchor:    { lon: 115.1285,  lat: -8.6573 },
-      apps:  { label: "applications open", range: "1st June – 20th June", status: "open" },
-      ctaLabel: "Apply C3",
-      // TODO: swap in the Bali-specific Tally link when provided.
-      tally: "https://tally.so/r/A7yDE0",
-      heroTitle: { a: "The Cracked Internet", b: "is moving to", c: "<em>Bali.</em>" },
-      heroDesc:  "Starts 1st September. $500 puts you in a Canggu villa with nine other cracked builders for thirty days — rice-paddy mornings, rooftop founder dinners, and demo days that end in the ocean. Compute credits, sponsor intros, scooters at the gate, and a cohort that ships before it surfs.",
-      actions: [
-        { label: "Apply C3", variant: "primary", arrow: true, href: "https://tally.so/r/A7yDE0" },
-      ],
-      sponsors: [],
-      photos: [
-        "villas/cohort-03/01.png", "villas/cohort-03/02.png", "villas/cohort-03/03.png", "villas/cohort-03/04.png",
-        "villas/cohort-03/05.png", "villas/cohort-03/06.png", "villas/cohort-03/07.png", "villas/cohort-03/08.png",
-      ],
-      stats: [
-        { value: "10", label: "builders" },
-        { value: "30", label: "days" },
-        { value: "5",  label: "rooms" },
-      ],
-      blurb: "Ten cracked builders living ten meters apart. Compute credits to ship faster, founder dinners on the rooftop, sponsor intros, and demo days that end in the ocean.",
-    },
   ];
-  let cohortIdx = 1; // default landing cohort: Da Nang, Vietnam (01)
+  let cohortIdx = 2; // default landing cohort: Canggu, Bali (02) — the next house
 
   // Desktop and mobile want different camera framings for the SAME anchor:
   // on desktop the glass pane covers the left, so `cam` composes the city to
@@ -364,7 +364,7 @@ window.__siteLoaded = (() => {
   }
 
   /* =========================================================
-     MAPLIBRE GL — Esri satellite tiles, focused on Da Nang
+     MAPLIBRE GL — satellite tiles, focused on the landing cohort
      ========================================================= */
   function initMap(el, place) {
     const heroMapEl = el.parentElement;
@@ -495,7 +495,7 @@ window.__siteLoaded = (() => {
 
   /* =========================================================
      COHORT NAV — left/right arrows on the marker box fly the
-     camera between Bangalore (00) → Da Nang (01) → Dubai (02) → Canggu, Bali (03)
+     camera between Bangalore (00) → Da Nang (01) → Canggu, Bali (02) → Dubai (03)
      ========================================================= */
   /* Sync all per-cohort DOM (marker box, hero title/desc/actions, badge,
      apps label/range, dock dot status, expand panel) to a cohort. Runs on
@@ -765,8 +765,8 @@ window.__siteLoaded = (() => {
     const FLIGHT = {
       "00": { iata: "BLR", depart: "JUL '25", date: "JUN 2025",    livery: "#c2563a" }, // bangalore · terracotta
       "01": { iata: "DAD", depart: "JUL '26", date: "01 JUL 2026", livery: "#0f8a86" }, // da nang · teal
-      "02": { iata: "DXB", depart: "AUG '26", date: "08 AUG 2026", livery: "#b8902f" }, // dubai · gold
-      "03": { iata: "DPS", depart: "SEP '26", date: "01 SEP 2026", livery: "#9b4d8f" }, // bali · orchid
+      "02": { iata: "DPS", depart: "SEP '26", date: "01 SEP 2026", livery: "#9b4d8f" }, // bali · orchid
+      "03": { iata: "DXB", depart: "TBA",     date: "DATES SOON",  livery: "#b8902f" }, // dubai · gold
     };
     const FUTURE = { flight: "CR04", city: "wherever", iata: "????", depart: "2027", board: "scheduled" };
     const PLANE = "✈";
@@ -1485,8 +1485,8 @@ window.__siteLoaded = (() => {
   const HOUSES = {
     bangalore: { city: "Bangalore", code: "BLR", cohort: "00", dates: "06·25 → 09·25", tint: "#b2472f" },
     vietnam:   { city: "Da Nang",   code: "DAD", cohort: "01", dates: "07·26 → 08·26", tint: "#0f7d7a" },
-    dubai:     { city: "Dubai",     code: "DXB", cohort: "02", dates: "08·26 → 09·26", tint: "#b8902f" },
-    bali:      { city: "Canggu",    code: "DPS", cohort: "03", dates: "09·26 → 10·26", tint: "#9b4d8f" },
+    bali:      { city: "Canggu",    code: "DPS", cohort: "02", dates: "09·26 → 10·26", tint: "#9b4d8f" },
+    dubai:     { city: "Dubai",     code: "DXB", cohort: "03", dates: "TBA",           tint: "#b8902f" },
   };
 
   // ⚠ PLACEHOLDER fellows — swap in the 6 real "most cracked" here.

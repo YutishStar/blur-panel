@@ -14,14 +14,14 @@
   <link rel="icon" href="/favicon.png?v=2" />
   <script src="/analytics.js"></script>
   <title>Cracked Hackerhouse: for cracked people, wherever we go next</title>
-  <meta name="description" content="Cracked Hackerhouse — a community of cracked people living, traveling, and building together. Cohort zero in Bangalore. Next stop, Vietnam." />
+  <meta name="description" content="Cracked Hackerhouse — a community of cracked people living, traveling, and building together. Cohort zero in Bangalore. Next stop, Bali." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css?v=50" />
+  <link rel="stylesheet" href="styles.css?v=51" />
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
   <!-- phone-test harness — only active at /phone-test (private staging route).
        Drops the mobile gate and loads the in-progress mobile styles. Completely
@@ -57,7 +57,7 @@
     })();
   </script>
 </head>
-<body class="page--single" data-apps-status="filled">
+<body class="page--single" data-apps-status="open">
   <!-- Mobile gate — overlays everything on narrow viewports until the
        responsive layout ships. Hidden via CSS above the breakpoint. -->
   <div class="mobile-gate" role="dialog" aria-modal="true" aria-label="Open on desktop">
@@ -175,23 +175,21 @@
         <!-- LAYER 2: glass pane on the LEFT — copy, CTAs, fellows -->
         <div class="hero__left">
           <article class="hero__pane glass">
-            <div class="hero__cohort"><span class="hero__cohort-dot" aria-hidden="true"></span><span data-cohort-label>Cohort 1, Da Nang, Vietnam <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status">Spots Filled!</span></span></div>
+            <div class="hero__cohort"><span class="hero__cohort-dot" aria-hidden="true"></span><span data-cohort-label>Cohort 2, Canggu, Bali <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status hero__cohort-status--open">Applications open!</span></span></div>
 
             <h1 id="panel-main-title" class="hero__title" data-hero-title>
-              <span>Are you</span>
-              <span><em>Cracked</em> enough?</span>
+              <span>10 Fellows.</span>
+              <span>30 days.</span>
+              <span><em>Bali 🇮🇩.</em></span>
             </h1>
 
             <p class="hero__sub" data-hero-desc>
-              A house full of builders, creators, hackers, and ambitious misfits living together for thirty days.
+              Starts 1st September. One huge Canggu villa, ten cracked fellows, thirty days of shipping: good wifi, bad sleep schedules, and demo days that end in the ocean instead of a pitch deck. Compute credits, sponsor intros, scooters at the gate, and thousands in OpenAI + Anthropic grants for the builders in this house, announcing soon.
             </p>
 
             <div class="hero__actions" data-hero-actions>
-              <a href="#apply" class="hero__apply hero__apply--ghost">
-                <span>Ongoing!</span>
-              </a>
-              <a href="#apply" class="hero__apply">
-                <span>Apply to next cohort</span>
+              <a href="https://tally.so/r/A7yDE0" class="hero__apply" target="_blank" rel="noopener noreferrer">
+                <span>Apply C2</span>
                 <span class="hero__apply-arrow" aria-hidden="true">→</span>
               </a>
             </div>
@@ -220,12 +218,8 @@
             <div class="hero__sponsors" data-hero-sponsors>
               <span class="hero__sponsors-label" data-hero-sponsors-label>The Sponsors</span>
               <span class="hero__sponsors-row">
-                <span class="hero__sponsors-tagline">Our content sponsors &mdash;</span>
-                <img class="hero__sponsor-logo hero__sponsor-logo--sm" src="sponsors/sponsor-1.png" alt="Content sponsor" />
-              </span>
-              <span class="hero__sponsors-row">
-                <span class="hero__sponsors-tagline">Our credits sponsor &mdash;</span>
-                <img class="hero__sponsor-logo" src="sponsors/razorpay.png" alt="Razorpay" />
+                <span class="hero__sponsors-tagline">Thousands of OpenAI credits &mdash;</span>
+                <img class="hero__sponsor-logo" src="sponsors/openai.png" alt="OpenAI" />
               </span>
             </div>
           </article>
@@ -239,18 +233,18 @@
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M10 3 L4 8 L10 13"/>
                 </svg>
-                <span class="house-marker__nav-label" data-prev-label>C0</span>
+                <span class="house-marker__nav-label" data-prev-label>C1</span>
               </button>
               <div class="house-marker__text">
                 <span class="house-marker__title" data-marker-title>CRACKED HACKER HOUSE</span>
-                <span class="house-marker__sub" data-marker-sub>Cohort 01 &middot; next stop</span>
+                <span class="house-marker__sub" data-marker-sub>1st September &middot; 10 Fellows &middot; 30 Days</span>
                 <span class="house-marker__loc">
                   <span class="house-marker__loc-dot" aria-hidden="true"></span>
-                  <span data-marker-loc>Da Nang, Vietnam</span>
+                  <span data-marker-loc>Canggu, Bali</span>
                 </span>
               </div>
               <button type="button" class="house-marker__nav house-marker__nav--next" data-cohort-next aria-label="Next cohort">
-                <span class="house-marker__nav-label" data-next-label>C2</span>
+                <span class="house-marker__nav-label" data-next-label>C3</span>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M6 3 L12 8 L6 13"/>
                 </svg>
@@ -410,7 +404,7 @@
             <!-- post-it notes -->
             <div class="spy-note" style="--x:2%;--y:2%;--rot:-4deg">BLR CELL<br>ACTIVE</div>
             <div class="spy-note spy-note--pink" style="--x:31%;--y:3%;--rot:5deg">payment<br>rails → ?</div>
-            <div class="spy-note" style="--x:74%;--y:1%;--rot:-3deg">DUBAI<br>expand?</div>
+            <div class="spy-note" style="--x:74%;--y:1%;--rot:-3deg">BALI<br>expand?</div>
             <div class="spy-note spy-note--blue" style="--x:22%;--y:45%;--rot:6deg">all roads<br>lead here</div>
             <div class="spy-note" style="--x:2%;--y:76%;--rot:-5deg">WATCH<br>this one</div>
             <div class="spy-note spy-note--pink" style="--x:70%;--y:77%;--rot:4deg">why<br>compilers??</div>
@@ -455,8 +449,8 @@
             </div>
             <div class="spy-location" style="--x:44%;--y:92%">
               <span class="spy-location__dot"></span>
-              <span class="spy-location__name">DUBAI</span>
-              <span class="spy-location__code">DAD · 25.20°N 55.27°E</span>
+              <span class="spy-location__name">BALI</span>
+              <span class="spy-location__code">DPS · 8.65°S 115.16°E</span>
             </div>
 
           </div><!-- /.spy-wall__bg -->
@@ -569,12 +563,12 @@
   <footer class="dock" aria-label="Site footer">
     <div class="dock__left">
       <span class="dock__apps-dot" aria-hidden="true"></span>
-      <span class="dock__apps-label" data-apps-label>applications filled!</span>
-      <span class="dock__apps-range" data-apps-range>The house starts 1st July</span>
+      <span class="dock__apps-label" data-apps-label>applications open</span>
+      <span class="dock__apps-range" data-apps-range>Rolling · house starts 1st Sep</span>
     </div>
 
     <div class="dock__center">
-      <a class="dock__cta" href="#apply" data-dock-cta>
+      <a class="dock__cta" href="https://tally.so/r/A7yDE0" target="_blank" rel="noopener noreferrer" data-dock-cta>
         <span data-dock-cta-label>Apply C2</span>
         <span class="dock__cta-arrow" aria-hidden="true">→</span>
       </a>
@@ -605,6 +599,6 @@
 
   <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
   <script src="config.js?v=1"></script>
-  <script src="script.js?v=19"></script>
+  <script src="script.js?v=26"></script>
 </body>
 </html>
