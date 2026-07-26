@@ -97,19 +97,18 @@ window.__siteLoaded = (() => {
     },
     {
       id: "01",
-      badge: 'Cohort 1, Da Nang, Vietnam <span class="hero__cohort-sep">|</span> <span class="hero__cohort-status">Spots Filled!</span>',
+      badge: 'Cohort 1, Da Nang, Vietnam',
       title: "CRACKED HACKER HOUSE",
-      sub:   "Cohort 01 · next stop",
+      sub:   'Cohort C1 · <span class="house-marker__sub-status">Shipped!</span>',
       loc:   "Da Nang, Vietnam",
       cam:       { lon: 108.26627, lat: 16.07186, zoom: 12.8, pitch: 45, bearing: 119.7 },
       camMobile: { lon: 108.2348,  lat: 16.0548,  zoom: 12.8, pitch: 45, bearing: 118 },
       anchor:    { lon: 108.2405,  lat: 16.0560 },
-      apps:  { label: "applications filled!", range: "The house starts 1st July", status: "filled" },
+      apps:  { label: "applications closed", range: "Cohort 1 · shipped", status: "closed" },
       heroTitle: { a: "Are you",   b: "<em>Cracked</em> enough?" },
       heroDesc:  "A house full of builders, creators, hackers, and ambitious misfits living together for thirty days.",
       actions: [
-        { label: "Ongoing!", variant: "ghost" },
-        { label: "Apply to next cohort", variant: "primary", arrow: true, cohortJump: 2 },
+        { label: "Shipped!", variant: "ghost" },
       ],
       sponsors: [
         { tagline: "Our content sponsors", logos: [
@@ -119,10 +118,14 @@ window.__siteLoaded = (() => {
         { tagline: "Our credits sponsors", logo: "sponsors/razorpay.png", alt: "Razorpay", size: "md", url: "https://razorpay.com/" },
       ],
       photos: [
-        "villas/cohort-01/HIx-N74aIAAgNFg.jpeg",
-        "villas/cohort-01/HIx-N8ebcAA0Hr_.jpeg",
-        "villas/cohort-01/HIx-N8iawAAzFm1.jpeg",
-        "villas/cohort-01/HIx-N8paMAAHUK_.jpeg",
+        "villas/cohort-01/01.jpg",
+        "villas/cohort-01/02.avif",
+        "villas/cohort-01/03.jpg",
+        "villas/cohort-01/04.jpg",
+        "villas/cohort-01/05.jpg",
+        "villas/cohort-01/06.png",
+        "villas/cohort-01/07.png",
+        "villas/cohort-01/08.png",
       ],
       stats: [
         { value: "14",   label: "cracked" },
