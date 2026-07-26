@@ -105,8 +105,8 @@ window.__siteLoaded = (() => {
       camMobile: { lon: 108.2348,  lat: 16.0548,  zoom: 12.8, pitch: 45, bearing: 118 },
       anchor:    { lon: 108.2405,  lat: 16.0560 },
       apps:  { label: "applications closed", range: "Cohort 1 · shipped", status: "closed" },
-      heroTitle: { a: "Are you",   b: "<em>Cracked</em> enough?" },
-      heroDesc:  "A house full of builders, creators, hackers, and ambitious misfits living together for thirty days.",
+      heroTitle: { a: "Da Nang,",   b: "<em>cracked certified.</em>" },
+      heroDesc:  "Fourteen cracked builders, one house, thirty days in Da Nang. Team1 sponsored fellows with grants to build, and the director of Da Nang's startup program came through for demo day to see what the house had shipped.",
       actions: [
         { label: "Shipped!", variant: "ghost" },
       ],
