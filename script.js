@@ -130,7 +130,7 @@ window.__siteLoaded = (() => {
       stats: [
         { value: "14",   label: "cracked" },
         { value: "30",   label: "days" },
-        { value: "$5M+", label: "made by builders" },
+        { value: "∞",    label: "Fun & lines of code!" },
       ],
       blurb: "Sleep is optional in this house, but shipping and having fun is undeniable.",
     },
