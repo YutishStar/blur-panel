@@ -1758,7 +1758,7 @@ window.__siteLoaded = (() => {
   var isLocal =
     h === "localhost" || h === "127.0.0.1" || h === "0.0.0.0" ||
     h === "[::1]" || h === "" || h.slice(-6) === ".local";
-  var base = isLocal ? "http://localhost:3000" : "https://passport.thecrackedhq.com";
+  var base = isLocal ? "http://localhost:3000" : "https://cracked-passport.vercel.app";
 
   var links = document.querySelectorAll("[data-passport-link]");
   if (!links.length) return;
