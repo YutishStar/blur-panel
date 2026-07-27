@@ -141,7 +141,7 @@ window.__siteLoaded = (() => {
       title: "CRACKED HACKER HOUSE",
       sub:   "1st September · 10 Fellows · 30 Days",
       loc:   "Canggu, Bali",
-      cam:       { lon: 115.16274, lat: -8.65019, zoom: 12.8, pitch: 45, bearing: 136.2 },
+      cam:       { lon: 115.15711, lat: -8.65566, zoom: 12.8, pitch: 45, bearing: 136.2 },
       camMobile: { lon: 115.1310,  lat: -8.6575,  zoom: 12.8, pitch: 45, bearing: 135.9 },
       anchor:    { lon: 115.1285,  lat: -8.6573 },
       apps:  { label: "applications open", range: "Rolling · house starts 1st Sep", status: "open" },
